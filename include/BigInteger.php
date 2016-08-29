@@ -1,5 +1,4 @@
 <?php
-namespace app\music\event;
 /**
  * Pure-PHP arbitrary precision integer arithmetic library.
  *

@@ -1,14 +1,14 @@
 <?php
 /*
-Plugin Name: Hermit
-Plugin URI: http://mufeng.me/hermit-for-wordpress.html
-Description: 音乐播放器 Hermit music player build for wordpress
-Version: 2.4.1
-Author: mufeng
-Author URI: http://mufeng.me
+Plugin Name: Hermit with Aplayer
+Plugin URI: https://blog.lwl12.com
+Description: 音乐播放器 Hermit music player build for wordpress with APlayer
+Version: 2.4.6
+Author: mufeng && liwanglin12 && DIYgod
+Author URI: https://blog.lwl12.com
 */
 
-define('HERMIT_VERSION', '2.4.5');
+define('HERMIT_VERSION', '2.4.6');
 define('HERMIT_URL', plugins_url('', __FILE__));
 define('HERMIT_PATH', dirname(__FILE__));
 define('HERMIT_ADMIN_URL', admin_url());

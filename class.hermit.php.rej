@@ -1,0 +1,9 @@
+diff a/class.hermit.php b/class.hermit.php	(rejected hunks)
+@@ -91,7 +91,6 @@
+ 		$color   = $this->settings( 'color' );
+ 		$exClass = sprintf( 'hermit hermit-%s hermit-unexpand-%s hermit-fullheight-%s', $color, $unexpand, $fullheight );
+ 
+-		return '<!--Hermit v' . HERMIT_VERSION . ' start--><div class="' . $exClass . '" auto="' . $auto . '" loop="' . $loop . '" songs="' . $content . '"><div class="hermit-box hermit-clear"><div class="hermit-cover"><img class="hermit-cover-image" src="' . $cover . '" width="80" height="80" /><div class="hermit-button"></div></div><div class="hermit-info"><div class="hermit-title"><div class="hermit-detail"></div></div><div class="hermit-controller"><div class="hermit-author"></div><div class="hermit-additive"><div class="hermit-duration">00:00/00:00</div><div class="hermit-volume"></div><div class="hermit-listbutton"></div></div></div><div class="hermit-prosess"><div class="hermit-loaded"></div><div class="hermit-prosess-bar"><div class="hermit-prosess-after"></div></div></div></div></div><div class="hermit-list"></div></div><!--Hermit  v' . HERMIT_VERSION . ' end-->';
+ 		$APlayerInit = "{
+     element: document.getElementById('player1'),
+     narrow: false,

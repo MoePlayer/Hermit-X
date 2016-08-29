@@ -22,7 +22,7 @@ class hermit {
 		add_action( 'wp_ajax_hermit', array( $this, 'hermit_callback' ) );
 		add_action( 'in_admin_footer', array( $this, 'music_footer' ) );
 		add_action( 'wp_ajax_hermit_source', array( $this, 'hermit_source_callback' ) );
-		add_action('wp_footer', 'aplayer_init');
+		add_action('wp_footer', array( $this, 'aplayer_init'));
 
 		/**
 		 ** 封面来源
@@ -56,7 +56,7 @@ class hermit {
 	 * 加载资源
 	 */
 	private function _load_scripts() {
-		$this->_js( 'APlayer', $this->settings( 'jsplace' ) );
+		$this->_js( 'APlayer.min', $this->settings( 'jsplace' ) );
 
 		wp_localize_script( 'hermit', 'hermit', array(
 			"url"          => HERMIT_URL . '/assets/swf/',
@@ -82,19 +82,15 @@ class hermit {
 	 * 添加文章短代码
 	 */
 	public function shortcode( $atts, $content = null ) {
-		extract( shortcode_atts( array(
-			'auto'       => 0,
-			'loop'       => 0,
-			'unexpand'   => 0,
-			'fullheight' => 0
-		), $atts ) );
 
-		$color   = $this->settings( 'color' );
-		$exClass = sprintf( 'hermit hermit-%s hermit-unexpand-%s hermit-fullheight-%s', $color, $unexpand, $fullheight );
-
-		var_dump($atts);
-		exit();
-		return '<!--Hermit v' . HERMIT_VERSION . ' start--><div id="aplayer' . self::getUniqueId() . '" class="aplayer" "auto="' . $auto . '" loop="' . $loop . '" songs="' . $content . '"></div><!--Hermit  v' . HERMIT_VERSION . ' end-->';
+		$atts["color"] = $this->settings( 'color' );
+		$atts["songs"] = $content;
+		$keys = array_keys($atts);
+		$apatts = "";
+		foreach ($keys as $value) {
+			$apatts = $apatts . 'data-' . $value . '="' . $atts[$value] . '" ';
+		}
+		return '<!-APWHermit v' . HERMIT_VERSION . ' start--><div id="aplayer' . self::getUniqueId() . '" class="aplayer" ' . $apatts . '></div><!--APWHermit  v' . HERMIT_VERSION . ' end-->';
 	}
 
 	/**
@@ -143,6 +139,19 @@ class hermit {
 				$result = array(
 					'status' => 200,
 					'msg'    => $HMTJSON->netease_songs( $id )
+				);
+				break;
+			case 'netease_song_url' :
+				$result = array(
+					'status' => 200,
+					'msg'    => $HMTJSON->netease_song_url( $id )
+				);
+				break;
+			
+			case 'netease_pic_url' :
+				$result = array(
+					'status' => 200,
+					'msg'    => $HMTJSON->netease_pic_url( $id )
 				);
 				break;
 
@@ -657,7 +666,7 @@ class hermit {
 		exit;
 	}
 
-	private function aplayer_init() {
+	public function aplayer_init() {
 		echo "
 			<script>
 				var aps = document.getElementsByClassName('aplayer');
@@ -665,7 +674,6 @@ class hermit {
 				for (var i = 0; i < aps.length; i++) {
 				    var option = Object.assign({}, aps[i].dataset);
 				    option.element = aps[i];
-
 				    // get info from api
 				    var xhr = new XMLHttpRequest();
 				    xhr.onreadystatechange = function () {
@@ -673,7 +681,6 @@ class hermit {
 				            if (xhr.status >= 200 && xhr.status < 300 || xhr.status === 304) {
 				                var response = JSON.parse(xhr.responseText);
 				                option.music = response.msg.songs;
-
 				                if (option.music[0].lrc) {
 				                    option.showlrc = 3;
 				                }
@@ -683,7 +690,6 @@ class hermit {
 				                if (option.music.length === 1) {
 				                    option.music = option.music[0];
 				                }
-
 				                ap[i] = new APlayer(option);
 				            }
 				            else {
@@ -698,5 +704,6 @@ class hermit {
 				}
 			</script>";
 	}
+
 
 }

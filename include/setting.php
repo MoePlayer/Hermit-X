@@ -95,7 +95,7 @@
 					<?php $color_array = array(
 						'default' => '默认',
 						'red'     => '新年红',
-						'blue'    => '青葱绿',
+						'green'   => '青葱绿',
 						'yellow'  => '淡淡黄',
 						'pink'    => '少女粉',
 						'purple'  => '基情紫',
