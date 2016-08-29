@@ -22,6 +22,7 @@ class hermit {
 		add_action( 'wp_ajax_hermit', array( $this, 'hermit_callback' ) );
 		add_action( 'in_admin_footer', array( $this, 'music_footer' ) );
 		add_action( 'wp_ajax_hermit_source', array( $this, 'hermit_source_callback' ) );
+		add_action('wp_footer', 'aplayer_init');
 
 		/**
 		 ** 封面来源
@@ -91,23 +92,8 @@ class hermit {
 		$color   = $this->settings( 'color' );
 		$exClass = sprintf( 'hermit hermit-%s hermit-unexpand-%s hermit-fullheight-%s', $color, $unexpand, $fullheight );
 
-		$APlayerInit = "{
-    element: document.getElementById('player1'),
-    narrow: false,
-    autoplay: true,
-    showlrc: 0,
-    mutex: true,
-    theme: '#e6d0b2',
-    loop: true,
-    preload: 'metadata',
-    music: {
-        title: 'Preparation',
-        author: 'Hans Zimmer/Richard Harvey',
-        url: 'http://7xifn9.com1.z0.glb.clouddn.com/Preparation.mp3',
-        pic: 'http://7xifn9.com1.z0.glb.clouddn.com/Preparation.jpg',
-        lrc: '[00:00.00]lrc here\n[00:01.00]aplayer'
-    }f
-}";
+		var_dump($atts);
+		exit();
 		return '<!--Hermit v' . HERMIT_VERSION . ' start--><div id="aplayer' . self::getUniqueId() . '" class="aplayer" "auto="' . $auto . '" loop="' . $loop . '" songs="' . $content . '"></div><!--Hermit  v' . HERMIT_VERSION . ' end-->';
 	}
 
@@ -670,4 +656,9 @@ class hermit {
 		echo json_encode( $result );
 		exit;
 	}
+
+	private function aplayer_init() {
+		
+	}
+
 }
