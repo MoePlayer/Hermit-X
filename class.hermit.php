@@ -658,7 +658,45 @@ class hermit {
 	}
 
 	private function aplayer_init() {
-		
+		echo "
+			<script>
+				var aps = document.getElementsByClassName('aplayer');
+				var ap = [];
+				for (var i = 0; i < aps.length; i++) {
+				    var option = aps[i].dataset;
+				    option.element = aps[i];
+
+				    // get info from api
+				    var xhr = new XMLHttpRequest();
+				    xhr.onreadystatechange = function () {
+				        if (xhr.readyState === 4) {
+				            if (xhr.status >= 200 && xhr.status < 300 || xhr.status === 304) {
+				                var response = JSON.parse(xhr.responseText);
+				                option.music = response.msg.songs;
+
+				                if (option.music[0].lrc) {
+				                    option.showlrc = 3;
+				                }
+				                else {
+				                    option.showlrc = 0;
+				                }
+				                if (option.music.length === 1) {
+				                    option.music = option.music[0];
+				                }
+
+				                ap[i] = new APlayer(option);
+				            }
+				            else {
+				                console.log('Request was unsuccessful: ' + xhr.status);
+				            }
+				        }
+				    };
+				    var scope = option.songs.split('#:');
+				    apiurl = '/wp-admin/admin-ajax.php?action=hermit&scope=' + option.songs.split('#:')[0] + '&id=' + option.songs.split('#:')[1];
+				    xhr.open('get', apiurl, true);
+				    xhr.send(null);
+				}
+			</script>";
 	}
 
 }
