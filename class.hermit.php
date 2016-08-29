@@ -663,7 +663,7 @@ class hermit {
 				var aps = document.getElementsByClassName('aplayer');
 				var ap = [];
 				for (var i = 0; i < aps.length; i++) {
-				    var option = aps[i].dataset;
+				    var option = Object.assign({}, aps[i].dataset);
 				    option.element = aps[i];
 
 				    // get info from api
