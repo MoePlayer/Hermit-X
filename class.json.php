@@ -326,7 +326,7 @@ class HermitJson
                     "url" => $mp3_url,
                     "author" => $artists,
                     "pic" => admin_url() . "admin-ajax.php" . '?action=hermit&scope=netease_pic_url&id=' . $value['al']['pic_str'],
-					 "lrc" => 'https://api.lwl12.com/music/netease/lyric?raw=true&id=' . $value["id"]
+					"lrc" => 'https://api.lwl12.com/music/netease/lyric?raw=true&id=' . $value["id"]
                 );
             }
             
