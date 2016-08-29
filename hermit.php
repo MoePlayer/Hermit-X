@@ -8,7 +8,7 @@ Author: mufeng
 Author URI: http://mufeng.me
 */
 
-define('HERMIT_VERSION', '2.4.1');
+define('HERMIT_VERSION', '2.4.5');
 define('HERMIT_URL', plugins_url('', __FILE__));
 define('HERMIT_PATH', dirname(__FILE__));
 define('HERMIT_ADMIN_URL', admin_url());

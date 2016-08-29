@@ -2,6 +2,7 @@
 
 class hermit {
 	private $_settings;
+	protected static $playerID = 0;
 
 	public function __construct() {
 		/**
@@ -54,8 +55,7 @@ class hermit {
 	 * 加载资源
 	 */
 	private function _load_scripts() {
-		$this->_css( 'hermit' );
-		$this->_js( 'hermit', $this->settings( 'jsplace' ) );
+		$this->_js( 'APlayer', $this->settings( 'jsplace' ) );
 
 		wp_localize_script( 'hermit', 'hermit', array(
 			"url"          => HERMIT_URL . '/assets/swf/',
@@ -67,6 +67,15 @@ class hermit {
 			"album_source" => $this->settings( 'albumSource' )
 		) );
 	}
+
+	/**
+     * 获取一个唯一的id以区分各个播放器实例
+     * @return number
+     */
+    public static function getUniqueId()
+    {
+        return ++self::$playerID;
+    }
 
 	/**
 	 * 添加文章短代码
@@ -81,9 +90,25 @@ class hermit {
 
 		$color   = $this->settings( 'color' );
 		$exClass = sprintf( 'hermit hermit-%s hermit-unexpand-%s hermit-fullheight-%s', $color, $unexpand, $fullheight );
-		$cover   = HERMIT_URL . "/assets/images/cover@3x.png";
 
-		return '<!--Hermit v' . HERMIT_VERSION . ' start--><div class="' . $exClass . '" auto="' . $auto . '" loop="' . $loop . '" songs="' . $content . '"><div class="hermit-box hermit-clear"><div class="hermit-cover"><img class="hermit-cover-image" src="' . $cover . '" width="80" height="80" /><div class="hermit-button"></div></div><div class="hermit-info"><div class="hermit-title"><div class="hermit-detail"></div></div><div class="hermit-controller"><div class="hermit-author"></div><div class="hermit-additive"><div class="hermit-duration">00:00/00:00</div><div class="hermit-volume"></div><div class="hermit-listbutton"></div></div></div><div class="hermit-prosess"><div class="hermit-loaded"></div><div class="hermit-prosess-bar"><div class="hermit-prosess-after"></div></div></div></div></div><div class="hermit-list"></div></div><!--Hermit  v' . HERMIT_VERSION . ' end-->';
+		$APlayerInit = "{
+    element: document.getElementById('player1'),
+    narrow: false,
+    autoplay: true,
+    showlrc: 0,
+    mutex: true,
+    theme: '#e6d0b2',
+    loop: true,
+    preload: 'metadata',
+    music: {
+        title: 'Preparation',
+        author: 'Hans Zimmer/Richard Harvey',
+        url: 'http://7xifn9.com1.z0.glb.clouddn.com/Preparation.mp3',
+        pic: 'http://7xifn9.com1.z0.glb.clouddn.com/Preparation.jpg',
+        lrc: '[00:00.00]lrc here\n[00:01.00]aplayer'
+    }f
+}";
+		return '<!--Hermit v' . HERMIT_VERSION . ' start--><div id="aplayer' . self::getUniqueId() . '" class="aplayer" "auto="' . $auto . '" loop="' . $loop . '" songs="' . $content . '"></div><!--Hermit  v' . HERMIT_VERSION . ' end-->';
 	}
 
 	/**
