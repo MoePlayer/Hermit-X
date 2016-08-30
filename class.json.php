@@ -259,7 +259,7 @@ class HermitJson
             
             $album_name   = $response["album"]["name"];
             $album_author = $response["album"]["artist"]["name"];
-            $cover        = admin_url() . "admin-ajax.php" . '?action=hermit&scope=netease_pic_url&picid=' . (string)$value["album"]['pic'];
+            $cover        = admin_url() . "admin-ajax.php" . '?action=hermit&scope=netease_pic_url&picid=' . $response["album"]['picId'];
             
             $album = array(
                 "album_id" => $album_id,
