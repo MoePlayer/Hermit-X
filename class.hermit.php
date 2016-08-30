@@ -57,16 +57,6 @@ class hermit {
 	 */
 	private function _load_scripts() {
 		$this->_js( 'APlayer.min', $this->settings( 'jsplace' ) );
-
-		wp_localize_script( 'hermit', 'hermit', array(
-			"url"          => HERMIT_URL . '/assets/swf/',
-			"ajax_url"     => admin_url() . "admin-ajax.php",
-			"text_tips"    => $this->settings( 'tips' ),
-			"remain_time"  => $this->settings( 'remainTime' ),
-			"debug"        => $this->settings( 'debug' ),
-			"version"      => HERMIT_VERSION,
-			"album_source" => $this->settings( 'albumSource' )
-		) );
 	}
 
 	/**
@@ -678,6 +668,7 @@ class hermit {
 			<script>
 				var aps = document.getElementsByClassName('aplayer');
 				var ap = [];
+				remain_time = " . $this->settings( 'remainTime' ) . " 
 				for (var i = 0; i < aps.length; i++) {
 				    var option = Object.assign({}, aps[i].dataset);
 				    option.element = aps[i];
@@ -705,7 +696,7 @@ class hermit {
 				        }
 				    };
 				    var scope = option.songs.split('#:');
-				    apiurl = '/wp-admin/admin-ajax.php?action=hermit&scope=' + option.songs.split('#:')[0] + '&id=' + option.songs.split('#:')[1];
+				    apiurl = '" . admin_url() . "admin-ajax.php?action=hermit&scope=' + option.songs.split('#:')[0] + '&id=' + option.songs.split('#:')[1];
 				    xhr.open('get', apiurl, true);
 				    xhr.send(null);
 				}
