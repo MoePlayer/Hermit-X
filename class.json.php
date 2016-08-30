@@ -275,7 +275,8 @@ class HermitJson
                     "title" => $value["name"],
                     "url" => $mp3_url,
                     "author" => $album_author,
-                    "pic" => $cover  . '&id=' . $value["id"]
+                    "pic" => $cover  . '&id=' . $value["id"],
+		    "lrc" => 'https://api.lwl12.com/music/netease/lyric?raw=true&id=' . $value["id"]
                 );
             }
             
