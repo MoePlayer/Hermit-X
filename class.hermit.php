@@ -104,9 +104,10 @@ class hermit {
 		$apatts = "";
 		foreach ($keys as $value) {
 			if ($value == "auto") {
-				$apatts = $apatts . 'data-autoplay' . '="' . ($atts[$value] == 1) ? "true" : "false" . '" ';
+				$apatts = $apatts . 'data-autoplay="' . (($atts[$value] == 1) ? "true" : "false") . '" ';
 				continue;
 			}
+			
 			$apatts = $apatts . 'data-' . $value . '="' . $atts[$value] . '" ';
 		}
 		return '<!-APWHermit v' . HERMIT_VERSION . ' start--><div id="aplayer' . self::getUniqueId() . '" class="aplayer" ' . $apatts . '></div><!--APWHermit  v' . HERMIT_VERSION . ' end-->';
