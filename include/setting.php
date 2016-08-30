@@ -12,15 +12,6 @@
 		<table class="form-table">
 			<tbody>
 			<tr valign="top">
-				<th scope="row"><label>播放器提示</label></th>
-				<td>
-					<p><input type="text" class="regular-text" name="hermit_setting[tips]"
-					          value="<?php echo $this->settings( 'tips' ); ?>"/></p>
-
-					<p class="description">默认显示：<strong>点击播放或暂停</strong> 为空则不显示任何文字。</p>
-				</td>
-			</tr>
-			<tr valign="top">
 				<th scope="row"><label>资源加载策略</label></th>
 				<td>
 					<p>
@@ -74,28 +65,12 @@
 				</td>
 			</tr>
 			<tr valign="top">
-				<th scope="row"><label>音乐封面来源</label></th>
-				<td>
-					<p>
-						<label title="从本站加载">
-							<input type="checkbox" name="hermit_setting[albumSource]"
-							       value="1" <?php if ( $this->settings( 'albumSource' ) == 1 ) {
-								echo 'checked="checked"';
-							} ?>/>
-							<span>从本站加载</span>
-						</label>
-					</p>
-
-					<p class="description">从主站加载抓取的封面内容会消耗部分流量</p>
-				</td>
-			</tr>
-			<tr valign="top">
 				<th scope="row"><label>颜色选择</label></th>
 				<td>
 					<?php $color_array = array(
 						'default' => '默认',
 						'red'     => '新年红',
-						'green'   => '青葱绿',
+						'blue'    => '青葱绿',
 						'yellow'  => '淡淡黄',
 						'pink'    => '少女粉',
 						'purple'  => '基情紫',
@@ -120,6 +95,27 @@
 					          value="<?php echo $this->settings( 'prePage' ); ?>"/></p>
 
 					<p class="description">默认数量：20。</p>
+				</td>
+			</tr>
+			<tr valign="top">
+				<th scope="row"><label>网易云镜像地址</label></th>
+				<td>
+					<p><input type="text" class="regular-text" name="hermit_setting[NeteaseMirror]"
+					          value="<?php echo $this->settings( 'NeteaseMirror' ); ?>"/></p>
+
+					<p class="description">
+					您可以通过镜像 Hermit 网易云歌曲信息解析接口以提供 HTTPS 的网易云封面和歌曲<br>
+					要启用此功能，请依照以下步骤操作：<br>
+					1.添加 rewrite 规则到您的 HTTP 服务器配置文件，以下是 NGINX 可用的 rewrite 规则<br>		
+					<pre><code>rewrite ^/wp-admin/hermit/netease_song_url/id/(\d+)$ /wp-admin/admin-ajax.php?action=hermit&scope=netease_song_url&id=$1 last;</code></pre><pre><code>rewrite ^/wp-admin/hermit/netease_pic_url/id/(\d+)/picid/(\d+)$ /wp-admin/admin-ajax.php?action=hermit&scope=netease_pic_url&id=$1&picid=$2 last;</code></pre><br>
+					2.通过七牛、又拍云或其他服务商提供的 “镜像储存” 或类似功能镜像以下 URL：<br>
+					https://your_domain/wp-admin/hermit/<br>
+					3.将镜像 URL 填入上方输入框<br>
+					Hermit 将会修改歌曲和封面调用地址为您的镜像地址<br>
+					*如您修改了后台路径，请修改规则中两个 /wp-admin/admin-ajax.php 部分的 /wp-admin 为您正确的后台路径<br>
+					*镜像歌曲可能带来高昂的流量费用以及法律风险，如您决定使用此功能，一切后果与 Hermit 开发成员无关<br>
+					*此镜像功能仅对网易云音乐单曲/播放列表/专辑有效
+					</p>
 				</td>
 			</tr>
 			<tr valign="top">
@@ -170,23 +166,6 @@
 				</td>
 			</tr>
 			<tr valign="top">
-				<th scope="row"><label>开发调试</label></th>
-				<td>
-					<p>
-						<label title="开启调试信息">
-							<input type="checkbox" name="hermit_setting[debug]"
-							       value="1" <?php if ( $this->settings( 'debug' ) == 1 ) {
-								echo 'checked="checked"';
-							} ?>/>
-							<span>开启调试信息</span>
-						</label>
-					</p>
-
-					<p class="description">开发调试信息，默认关闭，如需要定位错误信息，可开启此项。<br/>开启后所有错误信息，会在开发者工具面板打印。（例如
-						Chrome：Ctrl+Shift+I）</p>
-				</td>
-			</tr>
-			<tr valign="top">
 				<th scope="row"></th>
 				<td>
 					<input type="submit" class="button-primary" name="save" value="保存"/>
@@ -195,7 +174,7 @@
 			</tbody>
 		</table>
 	</form>
-	<h2>清空所有数据库、浏览器缓存</h2>
+	<h2>清空所有数据库缓存</h2>
 
 	<form method="post">
 		<input type="submit" class="button-primary" value="清空缓存"/>
