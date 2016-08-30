@@ -72,12 +72,41 @@ class hermit {
 	 * 添加文章短代码
 	 */
 	public function shortcode( $atts, $content = null ) {
-
-		$atts["color"] = $this->settings( 'color' );
+		$color = $this->settings( 'color' );
+		switch ($color) {
+			case 'default':
+				$color = "#5895be";
+				break;
+			case 'red':
+				$color = "#dd4b39";
+				break;
+			case 'blue':
+				$color = "#5cb85c";
+				break;
+			case 'yellow':
+				$color = "#f0ad4e";
+				break;
+			case 'pink':
+				$color = "#f489ad";
+				break;
+			case 'purple':
+				$color = "#da70d6";
+				break;
+			case 'black':
+				$color = "#aaaaaa";
+				break;
+			default:
+				break;
+		}
+		$atts["theme"] = $color;
 		$atts["songs"] = $content;
 		$keys = array_keys($atts);
 		$apatts = "";
 		foreach ($keys as $value) {
+			if ($value == "auto") {
+				$apatts = $apatts . 'data-autoplay' . '="' . ($atts[$value] == 1) ? "true" : "false" . '" ';
+				continue;
+			}
 			$apatts = $apatts . 'data-' . $value . '="' . $atts[$value] . '" ';
 		}
 		return '<!-APWHermit v' . HERMIT_VERSION . ' start--><div id="aplayer' . self::getUniqueId() . '" class="aplayer" ' . $apatts . '></div><!--APWHermit  v' . HERMIT_VERSION . ' end-->';
