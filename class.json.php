@@ -1,7 +1,4 @@
 <?php
- ini_set('display_errors',1);            //错误信息
- ini_set('display_startup_errors',1);    //php启动错误信息
- error_reporting(-1);                    //打印出所有的 错误信息
 class HermitJson
 {
     private $token;
@@ -354,9 +351,6 @@ class HermitJson
             return $cache;
         
         $response = json_decode($Netease->DJ($radio_id), true);
-        echo "<pre>";
-        var_dump($response);
-        exit;
         if ($response["code"] == 200 && $response["programs"]) {
             //处理音乐信息
             $result = $response["programs"];
@@ -377,7 +371,7 @@ class HermitJson
                 $collect["songs"][] = array(
                     "title" => $val['mainSong']['name'],
                     "url" => $val['mainSong']['mp3Url'],
-                    "author" => $val['artist']['name'],
+                    "author" => $val['mainSong']["album"]['artist']['name'],
                     "pic" => $val['mainSong']['album']['picUrl'],
                     "lyc" => ""
                 );

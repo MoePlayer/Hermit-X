@@ -110,7 +110,7 @@ class hermit {
 			
 			$apatts = $apatts . 'data-' . $value . '="' . $atts[$value] . '" ';
 		}
-		return '<!-APWHermit v' . HERMIT_VERSION . ' start--><div id="aplayer' . self::getUniqueId() . '" class="aplayer" ' . $apatts . '></div><!--APWHermit  v' . HERMIT_VERSION . ' end-->';
+		return '<!-Hermit X v' . HERMIT_VERSION . ' start--><div id="aplayer' . self::getUniqueId() . '" class="aplayer" ' . $apatts . '></div><!--Hermit X v' . HERMIT_VERSION . ' end-->';
 	}
 
 	/**

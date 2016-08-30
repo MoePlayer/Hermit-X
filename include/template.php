@@ -52,8 +52,6 @@
 						<div>
 							<label for="hermit-auto"><input type="checkbox" id="hermit-auto">自动播放</label>
 							<label for="hermit-loop"><input type="checkbox" id="hermit-loop">循环播放</label>
-							<label for="hermit-fullheight"><input type="checkbox" id="hermit-fullheight">显示全部音乐</label>
-							<label for="hermit-unexpand"><input type="checkbox" id="hermit-unexpand">折叠播放列表</label>
 						</div>
 						<div id="hermit-preview">
 						</div>
