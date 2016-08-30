@@ -119,6 +119,12 @@ class hermit {
 					'msg'    => $HMTJSON->song_list( $id )
 				);
 				break;
+			case 'songlist' :
+				$result = array(
+					'status' => 200,
+					'msg'    => $HMTJSON->song_list( $id )
+				);
+				break;
 
 			case 'album':
 				$result = array(
@@ -151,7 +157,7 @@ class hermit {
 			case 'netease_pic_url' :
 				$result = array(
 					'status' => 200,
-					'msg'    => $HMTJSON->netease_pic_url( $id )
+					'msg'    => $HMTJSON->netease_pic_url( $id, $_GET['picid'] )
 				);
 				break;
 
@@ -412,10 +418,11 @@ class hermit {
 
 		foreach ( $data as $key => $value ) {
 			$result['songs'][] = array(
-				"song_id"     => $value->id,
-				"song_title"  => $value->song_name,
-				"song_author" => $value->song_author,
-				"song_src"    => $value->song_url
+				"title"  => $value->song_name,
+				"author" => $value->song_author,
+				"url"    => $value->song_url,
+				"pic"    => "",
+				"lrc"    => ""
 			);
 		}
 

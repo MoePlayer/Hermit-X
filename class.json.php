@@ -28,16 +28,17 @@ class HermitJson
             return $cache;
         
         $response = $this->xiami_http(0, $song_id);
-        
+        var_dump($response);
+        exit;
         if ($response && $response["state"] == 0 && $response['data']) {
             $result = $response["data"]["song"];
             
             $song = array(
-                "song_id" => $result["song_id"],
-                "song_title" => $result["song_name"],
-                "song_author" => $result["singers"],
-                "song_src" => $result["listen_file"],
-                "song_cover" => $result['logo']
+                "title" => $result["song_name"],
+                "author" => $result["singers"],
+                "url" => $result["listen_file"],
+                "pic" => $result['logo'],
+                "lrc" => ""
             );
             
             $this->set_cache($cache_key, $song);
@@ -139,12 +140,11 @@ class HermitJson
             
             foreach ($result['songs'] as $key => $value) {
                 $collect["songs"][] = array(
-                    "song_id" => $value["song_id"],
-                    "song_title" => $value["song_name"],
-                    "song_length" => $value["length"],
-                    "song_src" => $value["listen_file"],
-                    "song_author" => $value["singers"],
-                    "song_cover" => $value['album_logo']
+                    "title" => $value["song_name"],
+                    "url" => $value["listen_file"],
+                    "author" => $value["singers"],
+                    "pic" => $value['album_logo'],
+                    "lrc" => ""
                 );
             }
             
@@ -171,7 +171,7 @@ class HermitJson
             //处理音乐信息
             $mp3_url    = admin_url() . "admin-ajax.php" . '?action=hermit&scope=netease_song_url&id=' . $music_id;
             $music_name = $response["songs"][0]["name"];
-            $cover      = admin_url() . "admin-ajax.php" . '?action=hermit&scope=netease_pic_url&id=' . $response['songs'][0]['al']['pic_str'];
+            $cover      = admin_url() . "admin-ajax.php" . '?action=hermit&scope=netease_pic_url&picid=' . $response['songs'][0]['al']['pic_str'] . '&id=' . $music_id;
             $artists    = array();
             
             foreach ($response["songs"][0]["ar"] as $artist) {
@@ -207,7 +207,7 @@ class HermitJson
         Header("Location: " . $url);
         exit;
     }
-    public function netease_pic_url($pic_str)
+    public function netease_pic_url($id, $pic_str)
     {
 		global $Netease;
         Header("Location: " . $Netease->id2url($pic_str));
@@ -253,7 +253,7 @@ class HermitJson
             
             $album_name   = $response["album"]["name"];
             $album_author = $response["album"]["artist"]["name"];
-            $cover        = admin_url() . "admin-ajax.php" . '?action=hermit&scope=netease_pic_url&id=' . (string)$value["album"]['pic'];
+            $cover        = admin_url() . "admin-ajax.php" . '?action=hermit&scope=netease_pic_url&picid=' . (string)$value["album"]['pic'];
             
             $album = array(
                 "album_id" => $album_id,
@@ -266,12 +266,10 @@ class HermitJson
             foreach ($result as $k => $value) {
                 $mp3_url          = admin_url() . "admin-ajax.php" . '?action=hermit&scope=netease_song_url&id=' . $value["id"];
                 $album["songs"][] = array(
-                    "song_id" => $value["id"],
-                    "song_title" => $value["name"],
-                    "song_length" => ceil($value['duration'] / 1000),
-                    "song_src" => $mp3_url,
-                    "song_author" => $album_author,
-                    "song_cover" => $cover
+                    "title" => $value["name"],
+                    "url" => $mp3_url,
+                    "author" => $album_author,
+                    "pic" => $cover  . '&id=' . $value["id"]
                 );
             }
             
@@ -325,7 +323,7 @@ class HermitJson
                     "title" => $value["name"],
                     "url" => $mp3_url,
                     "author" => $artists,
-                    "pic" => admin_url() . "admin-ajax.php" . '?action=hermit&scope=netease_pic_url&id=' . $value['al']['pic_str'],
+                    "pic" => admin_url() . "admin-ajax.php" . '?action=hermit&scope=netease_pic_url&picid=' . $value['al']['pic_str']  . '&id=' . $value["id"],
 					"lrc" => 'https://api.lwl12.com/music/netease/lyric?raw=true&id=' . $value["id"]
                 );
             }
@@ -366,12 +364,10 @@ class HermitJson
             
             foreach ($result as $k => $val) {
                 $collect["songs"][] = array(
-                    "song_id" => $val['mainSong']['id'],
-                    "song_title" => $val['mainSong']['name'],
-                    "song_length" => (int) $val['mainSong']['duration'] / 1000,
-                    "song_src" => $val['mainSong']['mp3Url'],
-                    "song_author" => $val['radio']['name'],
-                    "song_cover" => $val['mainSong']['album']['picUrl']
+                    "title" => $val['mainSong']['name'],
+                    "url" => $val['mainSong']['mp3Url'],
+                    "author" => $val['radio']['name'],
+                    "pic" => $val['mainSong']['album']['picUrl']
                 );
             }
             
