@@ -668,11 +668,10 @@ class hermit {
 			<script>
 				var aps = document.getElementsByClassName('aplayer');
 				var ap = [];
-				remain_time = " . $this->settings( 'remainTime' ) . " 
+				remain_time = " . $this->settings( 'remainTime' ) . ";
 				for (var i = 0; i < aps.length; i++) {
 				    var option = Object.assign({}, aps[i].dataset);
 				    option.element = aps[i];
-				    // get info from api
 				    var xhr = new XMLHttpRequest();
 				    xhr.onreadystatechange = function () {
 				        if (xhr.readyState === 4) {
