@@ -198,6 +198,11 @@ class HermitJson
     public function netease_song_url($music_id)
     {
 		global $Netease;
+        if ($this->settings( 'NeteaseMirror_status' ) == 1 && strpos($_SERVER['REQUEST_URI'], "admin-ajax.php") !== FALSE) {
+            Header("Location: " . $this->settings('NeteaseMirror') . "/netease_song_url/id/" . $music_id);
+            exit;
+        }
+        
         $url = json_decode($Netease->url($music_id), true);
         $url = $url["data"][0]["url"];
         if (empty($url)) {
@@ -210,6 +215,10 @@ class HermitJson
     public function netease_pic_url($id, $pic_str)
     {
 		global $Netease;
+        if ($this->settings( 'NeteaseMirror_status' ) == 1 && strpos($_SERVER['REQUEST_URI'], "admin-ajax.php") !== FALSE) {
+            Header("Location: " . $this->settings('NeteaseMirror') . "/netease_pic_url/id/" . $id . "/picid/" . $pic_str);
+            exit;
+        }
         Header("Location: " . $Netease->id2url($pic_str));
         exit;
     }
@@ -378,67 +387,6 @@ class HermitJson
         }
         
         return false;
-    }
-    
-    private function netease_http($type, $id)
-    {
-        $header = array(
-            "Accept:*/*",
-            "Accept-Language:zh-CN,zh;q=0.8",
-            "Cache-Control:no-cache",
-            "Connection:keep-alive",
-            "Content-Type:application/x-www-form-urlencoded;charset=UTF-8",
-            "Cookie:visited=true;",
-            "DNT:1",
-            "Host:music.163.com",
-            "Pragma:no-cache",
-            "Referer:http://music.163.com/outchain/player?type={$type}&id={$id}&auto=1&height=430&bg=e8e8e8",
-            "User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.155 Safari/537.36"
-        );
-        
-        $prefix = 'http://music.163.com/api/';
-        
-        switch ($type) {
-            //歌单
-            case 0:
-                $url = "playlist/detail?id={$id}&ids=%5B%22{$id}%22%5D&limit=10000&offset=0";
-                break;
-            
-            //专辑
-            case 1:
-                $url = "album/{$id}?id={$id}&id={$id}&ids=%5B%22{$id}%22%5D&limit=10000&offset=0";
-                break;
-            
-            //单曲
-            case 2:
-                $url = "song/detail?id={$id}&id={$id}&ids=%5B%22{$id}%22%5D&limit=10000&offset=0";
-                break;
-            
-            //单播客
-            case 3:
-                $url = "dj/program/detail?id={$id}&id={$id}&ids=%5B%22{$id}%22%5D&limit=10000&offset=0";
-                break;
-            
-            //播客全集
-            case 4:
-                $url = "dj/program/byradio?radioId={$id}&id={$id}&ids=%5B%22{$id}%22%5D&limit=10000&offset=0";
-                break;
-        }
-        
-        $url = $prefix . $url;
-        
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-        $cexecute = curl_exec($ch);
-        @curl_close($ch);
-        
-        if ($cexecute) {
-            $result = json_decode($cexecute, TRUE);
-            return $result;
-        } else {
-            return false;
-        }
     }
     
     private function xiami_http($type, $id)

@@ -169,10 +169,19 @@ class MusicAPI{
         );
         return $this->curl($url,$this->prepare($data));
     }
-    public function dj($dj_id){
+    public function DJdetail($dj_id){
         $url='http://music.163.com/weapi/dj/program/detail?csrf_token=';
         $data=array(
             'id'=>$dj_id,
+            'csrf_token'=>'',
+        );
+        return $this->curl($url,$this->prepare($data));
+    }
+    
+    public function DJ($dj_id){
+        $url='http://music.163.com/weapi/dj/program/byradio?csrf_token=';
+        $data=array(
+            'radioId'=>$dj_id,
             'csrf_token'=>'',
         );
         return $this->curl($url,$this->prepare($data));

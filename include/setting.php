@@ -100,7 +100,12 @@
 			<tr valign="top">
 				<th scope="row"><label>网易云镜像地址</label></th>
 				<td>
-					<p><input type="text" class="regular-text" name="hermit_setting[NeteaseMirror]"
+					<p><label><input type="checkbox" name="hermit_setting[NeteaseMirror_status]"
+					          value="1" <?php if ( $this->settings( 'NeteaseMirror_status' ) == 1 ) {
+							echo 'checked="checked"';
+						} ?>/>
+					<span>使用镜像地址</span></label></p>
+					<p><input type="text" placeholder="网址末尾请不要包括斜线/" class="regular-text" name="hermit_setting[NeteaseMirror]"
 					          value="<?php echo $this->settings( 'NeteaseMirror' ); ?>"/></p>
 
 					<p class="description">
