@@ -107,7 +107,7 @@ class hermit {
 				$apatts = $apatts . 'data-autoplay="' . (($atts[$value] == 1) ? "true" : "false") . '" ';
 				continue;
 			}
-			
+
 			$apatts = $apatts . 'data-' . $value . '="' . $atts[$value] . '" ';
 		}
 		return '<!-Hermit X v' . HERMIT_VERSION . ' start--><div id="aplayer' . self::getUniqueId() . '" class="aplayer" ' . $apatts . '></div><!--Hermit X v' . HERMIT_VERSION . ' end-->';
@@ -173,7 +173,7 @@ class hermit {
 					'msg'    => $HMTJSON->netease_song_url( $id )
 				);
 				break;
-			
+
 			case 'netease_pic_url' :
 				$result = array(
 					'status' => 200,
@@ -696,39 +696,52 @@ class hermit {
 	public function aplayer_init() {
 		echo "
 			<script>
-				var aps = document.getElementsByClassName('aplayer');
-				var ap = [];
-				remain_time = " . $this->settings( 'remainTime' ) . ";
-				for (var i = 0; i < aps.length; i++) {
-				    var option = Object.assign({}, aps[i].dataset);
-				    option.element = aps[i];
-				    var xhr = new XMLHttpRequest();
-				    xhr.onreadystatechange = function () {
-				        if (xhr.readyState === 4) {
-				            if (xhr.status >= 200 && xhr.status < 300 || xhr.status === 304) {
-				                var response = JSON.parse(xhr.responseText);
-				                option.music = response.msg.songs;
-				                if (option.music[0].lrc) {
-				                    option.showlrc = 3;
-				                }
-				                else {
-				                    option.showlrc = 0;
-				                }
-				                if (option.music.length === 1) {
-				                    option.music = option.music[0];
-				                }
-				                ap[i] = new APlayer(option);
-				            }
-				            else {
-				                console.log('Request was unsuccessful: ' + xhr.status);
-				            }
-				        }
-				    };
-				    var scope = option.songs.split('#:');
-				    apiurl = '" . admin_url() . "admin-ajax.php?action=hermit&scope=' + option.songs.split('#:')[0] + '&id=' + option.songs.split('#:')[1];
-				    xhr.open('get', apiurl, true);
-				    xhr.send(null);
+				function hermitInit(){
+					var aps = document.getElementsByClassName('aplayer');
+					ap = [];
+					remain_time = 10;
+					for (var i = 0; i < aps.length; i++) {
+					    var option = Object.assign({}, aps[i].dataset);
+					    option.element = aps[i];
+					    var xhr = new XMLHttpRequest();
+					    xhr.onreadystatechange = function () {
+					        if (xhr.readyState === 4) {
+					            if (xhr.status >= 200 && xhr.status < 300 || xhr.status === 304) {
+					                var response = JSON.parse(xhr.responseText);
+					                option.music = response.msg.songs;
+					                if (option.music[0].lrc) {
+					                    option.showlrc = 3;
+					                }
+					                else {
+					                    option.showlrc = 0;
+					                }
+					                if (option.music.length === 1) {
+					                    option.music = option.music[0];
+					                }
+					                ap[i] = new APlayer(option);
+					            }
+					            else {
+					                console.log('Request was unsuccessful: ' + xhr.status);
+					            }
+					        }
+					    };
+					    var scope = option.songs.split('#:');
+					    apiurl = 'https://www.wingsdream.cn/wp-admin/admin-ajax.php?action=hermit&scope=' + option.songs.split('#:')[0] + '&id=' + option.songs.split('#:')[1];
+					    xhr.open('get', apiurl, false);
+					    xhr.send(null);
+					}
 				}
+
+				function realoadHermit(){
+					for (var i = 0; i < ap.length; i++) {
+						try{
+					    	ap[i].pause();
+					    } catch (e) {}
+					};
+					hermitInit();
+				}
+
+				hermitInit();
 			</script>";
 	}
 
