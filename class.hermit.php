@@ -708,7 +708,6 @@ class hermit {
 					    xhr[i] = new XMLHttpRequest();
 					    xhr[i].onreadystatechange = function () {
 					        var index = xhr.indexOf(this);
-					        console.log(index);
 					        var op = option[index];
 					        if (this.readyState === 4) {
 					            if (this.status >= 200 && this.status < 300 || this.status === 304) {
