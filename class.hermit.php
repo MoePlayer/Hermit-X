@@ -72,7 +72,7 @@ class hermit {
 	 * 添加文章短代码
 	 */
 	public function shortcode( $atts, $content = null ) {
-		$color = $this->settings( 'color' );
+		$color = $atts["theme"] ?: $this->settings( 'color' );
 		switch ($color) {
 			case 'default':
 				$color = "#5895be";
