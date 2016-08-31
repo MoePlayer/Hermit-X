@@ -698,37 +698,42 @@ class hermit {
 			<script>
 				function hermitInit(){
 					var aps = document.getElementsByClassName('aplayer');
-					ap = [];
-					remain_time = 10;
+					var ap = [];
+					var xhr = [];
+					var option = [];
+					remain_time = " . $this->settings( 'remainTime' ) . ";
 					for (var i = 0; i < aps.length; i++) {
-					    var option = Object.assign({}, aps[i].dataset);
-					    option.element = aps[i];
-					    var xhr = new XMLHttpRequest();
-					    xhr.onreadystatechange = function () {
-					        if (xhr.readyState === 4) {
-					            if (xhr.status >= 200 && xhr.status < 300 || xhr.status === 304) {
-					                var response = JSON.parse(xhr.responseText);
-					                option.music = response.msg.songs;
-					                if (option.music[0].lrc) {
-					                    option.showlrc = 3;
+					    option[i] = Object.assign({}, aps[i].dataset);
+					    option[i].element = aps[i];
+					    xhr[i] = new XMLHttpRequest();
+					    xhr[i].onreadystatechange = function () {
+					        var index = xhr.indexOf(this);
+					        console.log(index);
+					        var op = option[index];
+					        if (this.readyState === 4) {
+					            if (this.status >= 200 && this.status < 300 || this.status === 304) {
+					                var response = JSON.parse(this.responseText);
+					                op.music = response.msg.songs;
+					                if (op.music[0].lrc) {
+					                    op.showlrc = 3;
 					                }
 					                else {
-					                    option.showlrc = 0;
+					                    op.showlrc = 0;
 					                }
-					                if (option.music.length === 1) {
-					                    option.music = option.music[0];
+					                if (op.music.length === 1) {
+					                    op.music = op.music[0];
 					                }
-					                ap[i] = new APlayer(option);
+					                ap[i] = new APlayer(op);
 					            }
 					            else {
-					                console.log('Request was unsuccessful: ' + xhr.status);
+					                console.log('Request was unsuccessful: ' + this.status);
 					            }
 					        }
 					    };
-					    var scope = option.songs.split('#:');
-					    apiurl = 'https://www.wingsdream.cn/wp-admin/admin-ajax.php?action=hermit&scope=' + option.songs.split('#:')[0] + '&id=' + option.songs.split('#:')[1];
-					    xhr.open('get', apiurl, false);
-					    xhr.send(null);
+					    var scope = option[i].songs.split('#:');
+						apiurl = '" . admin_url() . "admin-ajax.php?action=hermit&scope=' + option.songs.split('#:')[0] + '&id=' + option.songs.split('#:')[1];	    xhr[i].open('get', apiurl, true);
+					    xhr[i].open('get', apiurl, true);
+					    xhr[i].send(null);
 					}
 				}
 
