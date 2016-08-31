@@ -345,7 +345,7 @@ class hermit {
 	 * 显示后台菜单
 	 */
 	public function menu() {
-		add_menu_page( 'Hermit 播放器', 'Hermit 播放器', 'manage_options', 'hermit', array( $this, 'library' ), HERMIT_URL . '/assets/images/logo.png' );
+		add_menu_page( 'Hermit X 播放器', 'Hermit X 播放器', 'manage_options', 'hermit', array( $this, 'library' ), HERMIT_URL . '/assets/images/logo.png' );
 		add_submenu_page( 'hermit', '音乐库', '音乐库', 'manage_options', 'hermit', array( $this, 'library' ) );
 		add_submenu_page( 'hermit', '设置', '设置', 'manage_options', 'hermit-setting', array( $this, 'setting' ) );
 		add_submenu_page( 'hermit', '帮助', '帮助', 'manage_options', 'hermit-help', array( $this, 'help' ) );

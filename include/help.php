@@ -1,5 +1,5 @@
 <div class="wrap">
-	<h2>Hermit 帮助</h2>
+	<h2>Hermit X 帮助</h2>
 	<table class="form-table">
 		<tbody>
 		<tr>

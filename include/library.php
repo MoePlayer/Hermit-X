@@ -6,7 +6,7 @@ $maxPage = ceil($count / $prePage);
 $catid = isset($_GET['catid']) && $_GET['catid'] ? $_GET['catid'] : null;
 ?>
 <div class="wrap">
-	<h2>Hermit 音乐库 <a href="javascript:;" class="add-new-h2">新建音乐</a></h2>
+	<h2>Hermit X 音乐库 <a href="javascript:;" class="add-new-h2">新建音乐</a></h2>
 
 	<div class="hermit-list-table">
 		<ul class="subsubsub"></ul>
