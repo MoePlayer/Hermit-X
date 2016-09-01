@@ -703,36 +703,38 @@ class hermit {
 					var option = [];
 					remain_time = " . $this->settings( 'remainTime' ) . ";
 					for (var i = 0; i < aps.length; i++) {
-					    option[i] = Object.assign({}, aps[i].dataset);
-					    option[i].element = aps[i];
-					    xhr[i] = new XMLHttpRequest();
-					    xhr[i].onreadystatechange = function () {
-					        var index = xhr.indexOf(this);
-					        var op = option[index];
-					        if (this.readyState === 4) {
-					            if (this.status >= 200 && this.status < 300 || this.status === 304) {
-					                var response = JSON.parse(this.responseText);
-					                op.music = response.msg.songs;
-					                if (op.music[0].lrc) {
-					                    op.showlrc = 3;
-					                }
-					                else {
-					                    op.showlrc = 0;
-					                }
-					                if (op.music.length === 1) {
-					                    op.music = op.music[0];
-					                }
-					                ap[i] = new APlayer(op);
-					            }
-					            else {
-					                console.log('Request was unsuccessful: ' + this.status);
-					            }
-					        }
-					    };
-					    var scope = option[i].songs.split('#:');
-						apiurl = '" . admin_url() . "admin-ajax.php?action=hermit&scope=' + option[i].songs.split('#:')[0] + '&id=' + option[i].songs.split('#:')[1];
-					    xhr[i].open('get', apiurl, true);
-					    xhr[i].send(null);
+						if (aps[i].dataset.songs) {
+						    option[i] = Object.assign({}, aps[i].dataset);
+						    option[i].element = aps[i];
+						    xhr[i] = new XMLHttpRequest();
+						    xhr[i].onreadystatechange = function () {
+						        var index = xhr.indexOf(this);
+						        var op = option[index];
+						        if (this.readyState === 4) {
+						            if (this.status >= 200 && this.status < 300 || this.status === 304) {
+						                var response = JSON.parse(this.responseText);
+						                op.music = response.msg.songs;
+						                if (op.music[0].lrc) {
+						                    op.showlrc = 3;
+						                }
+						                else {
+						                    op.showlrc = 0;
+						                }
+						                if (op.music.length === 1) {
+						                    op.music = op.music[0];
+						                }
+						                ap[i] = new APlayer(op);
+						            }
+						            else {
+						                console.log('Request was unsuccessful: ' + this.status);
+						            }
+						        }
+						    };
+						    var scope = option[i].songs.split('#:');
+							apiurl = '" . admin_url() . "admin-ajax.php?action=hermit&scope=' + option[i].songs.split('#:')[0] + '&id=' + option[i].songs.split('#:')[1];
+						    xhr[i].open('get', apiurl, true);
+						    xhr[i].send(null);
+						}
 					}
 				}
 
