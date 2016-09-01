@@ -714,15 +714,34 @@ class hermit {
 						            if (this.status >= 200 && this.status < 300 || this.status === 304) {
 						                var response = JSON.parse(this.responseText);
 						                op.music = response.msg.songs;
+
 						                if (op.music[0].lrc) {
 						                    op.showlrc = 3;
 						                }
 						                else {
 						                    op.showlrc = 0;
 						                }
+
 						                if (op.music.length === 1) {
 						                    op.music = op.music[0];
 						                }
+
+						                if (op.autoplay) {
+						                	op.autoplay = (op.autoplay === 'true');
+						                }
+
+						                if (op.loop) {
+						                	op.loop = (op.loop === 'true');
+						                }
+
+						                if (op.mutex) {
+						                	op.mutex = (op.mutex === 'true');
+						                }
+
+						                if (op.narrow) {
+						                	op.narrow = (op.narrow === 'true');
+						                }
+
 						                ap[i] = new APlayer(op);
 						            }
 						            else {
