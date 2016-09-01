@@ -698,7 +698,7 @@ class hermit {
 			<script>
 				function hermitInit(){
 					var aps = document.getElementsByClassName('aplayer');
-					var ap = [];
+					ap = [];
 					var xhr = [];
 					var option = [];
 					remain_time = " . $this->settings( 'remainTime' ) . ";
@@ -730,7 +730,7 @@ class hermit {
 					        }
 					    };
 					    var scope = option[i].songs.split('#:');
-						apiurl = '" . admin_url() . "admin-ajax.php?action=hermit&scope=' + option.songs.split('#:')[0] + '&id=' + option.songs.split('#:')[1];	    xhr[i].open('get', apiurl, true);
+						apiurl = '" . admin_url() . "admin-ajax.php?action=hermit&scope=' + option[i].songs.split('#:')[0] + '&id=' + option[i].songs.split('#:')[1];
 					    xhr[i].open('get', apiurl, true);
 					    xhr[i].send(null);
 					}
