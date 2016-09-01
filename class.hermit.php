@@ -727,19 +727,19 @@ class hermit {
 						                }
 
 						                if (op.autoplay) {
-						                	op.autoplay = (op.autoplay === 'true');
+						                	op.autoplay = (op.autoplay === 'true' || op.autoplay === '1');
 						                }
 
 						                if (op.loop) {
-						                	op.loop = (op.loop === 'true');
+						                	op.loop = (op.loop === 'true' || op.loop === '1');
 						                }
 
 						                if (op.mutex) {
-						                	op.mutex = (op.mutex === 'true');
+						                	op.mutex = (op.mutex === 'true' || op.mutex === '1');
 						                }
 
 						                if (op.narrow) {
-						                	op.narrow = (op.narrow === 'true');
+						                	op.narrow = (op.narrow === 'true' || op.narrow === '1');
 						                }
 
 						                ap[i] = new APlayer(op);
