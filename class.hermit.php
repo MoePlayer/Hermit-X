@@ -696,6 +696,34 @@ class hermit {
 	public function aplayer_init() {
 		echo "
 			<script>
+				function cloneObject(src) {
+				    if (src == null || typeof src != 'object') {
+				        return src;
+				    }
+
+				    if (src instanceof Date) {
+				        var clone = new Date(src.getDate());
+				        return clone;
+				    }
+
+				    if (src instanceof Array) {
+				        var clone = [];
+				        for (var i = 0, len = src.length; i < len; i++) {
+				            clone[i] = src[i];
+				        }
+				        return clone;
+				    }
+
+				    if (src instanceof Object) {
+				        var clone = {};
+				        for (var key in src) {
+				            if (src.hasOwnProperty(key)) {
+				                clone[key] = cloneObject(src[key]);
+				            }
+				        }
+				        return clone;
+				    }
+				}
 				function hermitInit(){
 					var aps = document.getElementsByClassName('aplayer');
 					ap = [];
@@ -704,7 +732,7 @@ class hermit {
 					remain_time = " . $this->settings( 'remainTime' ) . ";
 					for (var i = 0; i < aps.length; i++) {
 						if (aps[i].dataset.songs) {
-						    option[i] = Object.assign({}, aps[i].dataset);
+						    option[i] = cloneObject(aps[i].dataset);
 						    option[i].element = aps[i];
 						    xhr[i] = new XMLHttpRequest();
 						    xhr[i].onreadystatechange = function () {
