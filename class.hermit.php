@@ -785,7 +785,7 @@ class hermit {
 					}
 				}
 
-				function realoadHermit(){
+				function reloadHermit(){
 					for (var i = 0; i < ap.length; i++) {
 						try{
 					    	ap[i].pause();
