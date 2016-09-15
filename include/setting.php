@@ -144,6 +144,15 @@
 					<p class="description">默认数量：10小时，最大不宜超过48小时。</p>
 				</td>
 			</tr>
+			<tr valign="top">
+				<th scope="row"><label>播放列表最大高度</label></th>
+				<td>
+					<p><input type="text" class="small-text" name="hermit_setting[playlist_max_height]"
+					          value="<?php echo $this->settings( 'playlist_max_height' ); ?>"/>px</p>
+
+					<p class="description">限制播放列表的最大高度，0为不限制。</p>
+				</td>
+			</tr>
 			<tr>
 				<th scope="row"><label>新建权限</label></th>
 				<td>

@@ -110,7 +110,10 @@ class hermit {
 
 			$apatts = $apatts . 'data-' . $value . '="' . $atts[$value] . '" ';
 		}
-		return '<!-Hermit X v' . HERMIT_VERSION . ' start--><div id="aplayer' . self::getUniqueId() . '" class="aplayer" ' . $apatts . '></div><!--Hermit X v' . HERMIT_VERSION . ' end-->';
+
+		$playlist_max_height = $this->settings( 'playlist_max_height' );
+		$playlist_max_height = $playlist_max_height != 0 ? ("<style> .aplayer-list { max-height: " . $playlist_max_height . "px; } </style>") : "";
+		return '<!-Hermit X v' . HERMIT_VERSION . ' start--><div id="aplayer' . self::getUniqueId() . '" class="aplayer" ' . $apatts . '></div>' . $playlist_max_height . '<!--Hermit X v' . HERMIT_VERSION . ' end-->';
 	}
 
 	/**
