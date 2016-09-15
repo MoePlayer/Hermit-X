@@ -112,7 +112,7 @@ class hermit {
 		}
 
 		$playlist_max_height = $this->settings( 'playlist_max_height' );
-		$playlist_max_height = $playlist_max_height != 0 ? ("<style> .aplayer-list { max-height: " . $playlist_max_height . "px; } </style>") : "";
+		$playlist_max_height = ($playlist_max_height != 0 && $atts["limitheight"] !== "0") ? ("<style> .aplayer-list { max-height: " . $playlist_max_height . "px; } </style>") : "";
 		return '<!-Hermit X v' . HERMIT_VERSION . ' start--><div id="aplayer' . self::getUniqueId() . '" class="aplayer" ' . $apatts . '></div>' . $playlist_max_height . '<!--Hermit X v' . HERMIT_VERSION . ' end-->';
 	}
 
