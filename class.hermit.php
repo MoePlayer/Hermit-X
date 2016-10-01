@@ -418,6 +418,8 @@ class hermit {
 			'tips'           => '点击播放或暂停',
 			'strategy'       => 1,
 			'color'          => 'default',
+			'playlist_max_height' => '349',
+			'Netease_Quality' => '999000',
 			'jsplace'        => 0,
 			'prePage'        => 20,
 			'remainTime'     => 10,

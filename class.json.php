@@ -200,7 +200,7 @@ class HermitJson
             exit;
         }
         
-        $url = json_decode($Netease->url($music_id), true);
+        $url = json_decode($Netease->url($music_id, $this->settings( 'Netease_Quality' )), true);
         $url = $url["data"][0]["url"];
         if (empty($url)) {
             Header("Location: " . 'http://tts.baidu.com/text2audio?lan=zh&pid=101&ie=UTF-8&spd=6&text=%E9%9D%9E%E5%B8%B8%E6%8A%B1%E6%AD%89%EF%BC%8C%E6%AD%A4%E6%AD%8C%E6%9B%B2%E5%9B%A0%E7%89%88%E6%9D%83%E5%8E%9F%E5%9B%A0%E6%88%96%E5%9B%A0%E7%BD%91%E6%98%93%E4%BA%91%E6%8A%BD%E9%A3%8E%E6%97%A0%E6%B3%95%E6%92%AD%E6%94%BE');
@@ -496,6 +496,8 @@ class HermitJson
             'tips' => '点击播放或暂停',
             'strategy' => 1,
             'color' => 'default',
+            'playlist_max_height' => '349',
+            'Netease_Quality' => '999000',
             'jsplace' => 0,
             'prePage' => 20,
             'remainTime' => 10,
