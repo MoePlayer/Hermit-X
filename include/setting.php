@@ -101,7 +101,6 @@
 				<th scope="row"><label>网易云音质</label></th>
 				<td>
 					<?php $quality_array = array(
-						'999000' =>  '无损',
 						'320000' =>  '极高 (320kbit/s)',
 						'192000' =>  '较高 (192kbit/s)',
 						'128000' =>  '普通 (128kbit/s)',
@@ -116,7 +115,7 @@
 						</label>
 					<?php }
 					?>
-					<p class="description">实际音质<b>小于等于</b>所选音质，如选择无损一般会取到 320kbit/s 歌曲。默认无损<br>*由于法律风险无法取到无损音质</p>
+					<p class="description">实际音质<b>小于等于</b>所选音质。默认极高</p>
 				</td>
 			</tr>
 			<tr valign="top">

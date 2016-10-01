@@ -419,7 +419,7 @@ class hermit {
 			'strategy'       => 1,
 			'color'          => 'default',
 			'playlist_max_height' => '349',
-			'Netease_Quality' => '999000',
+			'Netease_Quality' => '320000',
 			'jsplace'        => 0,
 			'prePage'        => 20,
 			'remainTime'     => 10,
