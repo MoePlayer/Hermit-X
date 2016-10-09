@@ -216,7 +216,7 @@ class HermitJson
             Header("Location: " . $this->settings('NeteaseMirror') . "/netease_pic_url/id/" . $id . "/picid/" . $pic_str);
             exit;
         }
-        Header("Location: " . $Netease->id2url($pic_str));
+        Header("Location: " . $Netease->id2url($pic_str) . "?param=120y120");
         exit;
     }
     public function netease_songs($song_list)
