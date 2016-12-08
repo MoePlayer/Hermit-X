@@ -168,7 +168,7 @@ class HermitJson
             //处理音乐信息
             $mp3_url    = admin_url() . "admin-ajax.php" . '?action=hermit&scope=netease_song_url&id=' . $music_id;
             $music_name = $response["songs"][0]["name"];
-            $cover      = admin_url() . "admin-ajax.php" . '?action=hermit&scope=netease_pic_url&picid=' . $response['songs'][0]['al']['pic_str'] . '&id=' . $music_id;
+            $cover      = admin_url() . "admin-ajax.php" . '?action=hermit&scope=netease_pic_url&picid=' . $response['songs'][0]['al']['pic'] . '&id=' . $music_id;
             $artists    = array();
             
             foreach ($response["songs"][0]["ar"] as $artist) {
@@ -209,14 +209,14 @@ class HermitJson
         Header("Location: " . $url);
         exit;
     }
-    public function netease_pic_url($id, $pic_str)
+    public function netease_pic_url($id, $pic)
     {
 		global $Netease;
         if ($this->settings( 'NeteaseMirror_status' ) == 1 && strpos($_SERVER['REQUEST_URI'], "admin-ajax.php") !== FALSE) {
-            Header("Location: " . $this->settings('NeteaseMirror') . "/netease_pic_url/id/" . $id . "/picid/" . $pic_str);
+            Header("Location: " . $this->settings('NeteaseMirror') . "/netease_pic_url/id/" . $id . "/picid/" . $pic);
             exit;
         }
-        Header("Location: " . $Netease->id2url($pic_str) . "?param=120y120");
+        Header("Location: " . $Netease->id2url($pic) . "?param=120y120");
         exit;
     }
     public function netease_songs($song_list)
@@ -330,7 +330,7 @@ class HermitJson
                     "title" => $value["name"],
                     "url" => $mp3_url,
                     "author" => $artists,
-                    "pic" => admin_url() . "admin-ajax.php" . '?action=hermit&scope=netease_pic_url&picid=' . $value['al']['pic_str']  . '&id=' . $value["id"],
+                    "pic" => admin_url() . "admin-ajax.php" . '?action=hermit&scope=netease_pic_url&picid=' . $value['al']['pic']  . '&id=' . $value["id"],
 					"lrc" => 'https://api.lwl12.com/music/netease/lyric?raw=true&id=' . $value["id"]
                 );
             }
