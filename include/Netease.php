@@ -166,7 +166,7 @@ class MusicAPI{
         $result=base64_encode(md5($this->Arr2Str($song_id),1));
         $result=str_replace('/','_',$result);
         $result=str_replace('+','-',$result);
-        return 'http://p3.music.126.net/' . $result . '/' . $id . '.jpg';
+        return 'https://p4.music.126.net/' . $result . '/' . $id . '.jpg';
     }
     protected function Str2Arr($string){
         $bytes=array();
