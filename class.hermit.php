@@ -102,7 +102,7 @@ class hermit {
 		$atts["songs"] = $content;
 		$playlist_max_height = $this->settings( 'playlist_max_height' );
 		if ($playlist_max_height != 0 && empty($atts["listmaxheight"])) {
-			$atts["listmaxheight"] = $playlist_max_height;
+			$atts["listmaxheight"] = $playlist_max_height . "px";
 		}
 		$keys = array_keys($atts);
 		$apatts = "";
