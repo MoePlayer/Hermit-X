@@ -100,6 +100,10 @@ class hermit {
 		}
 		$atts["theme"] = $color;
 		$atts["songs"] = $content;
+		$playlist_max_height = $this->settings( 'playlist_max_height' );
+		if ($playlist_max_height != 0 && empty($atts["listmaxheight"])) {
+			$atts["listmaxheight"] = $playlist_max_height;
+		}
 		$keys = array_keys($atts);
 		$apatts = "";
 		foreach ($keys as $value) {
@@ -111,9 +115,7 @@ class hermit {
 			$apatts = $apatts . 'data-' . $value . '="' . $atts[$value] . '" ';
 		}
 
-		$playlist_max_height = $this->settings( 'playlist_max_height' );
-		$playlist_max_height = ($playlist_max_height != 0 && $atts["limitheight"] !== "0") ? ("<style> .aplayer-list { max-height: " . $playlist_max_height . "px; } </style>") : "";
-		return '<!-Hermit X v' . HERMIT_VERSION . ' start--><div id="aplayer' . self::getUniqueId() . '" class="aplayer" ' . $apatts . '></div>' . $playlist_max_height . '<!--Hermit X v' . HERMIT_VERSION . ' end-->';
+		return '<!-Hermit X v' . HERMIT_VERSION . ' start--><div id="aplayer' . self::getUniqueId() . '" class="aplayer" ' . $apatts . '></div><!--Hermit X v' . HERMIT_VERSION . ' end-->';
 	}
 
 	/**
