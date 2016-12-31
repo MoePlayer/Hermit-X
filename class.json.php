@@ -201,7 +201,7 @@ class HermitJson
 
         $response = json_decode($Netease->format()->song($music_id), true);
 
-        if (!empty($response["id"])) {
+        if (!empty($response[0]["id"])) {
             //处理音乐信息
             $mp3_url    = admin_url() . "admin-ajax.php" . '?action=hermit&scope=netease_song_url&id=' . $music_id;
             $music_name = $response["name"];
