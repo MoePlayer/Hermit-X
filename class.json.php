@@ -220,7 +220,7 @@ class HermitJson
 
             $this->set_cache($cache_key, $result, 24);
 
-            return $response;
+            return $result;
         }
 
         return false;
