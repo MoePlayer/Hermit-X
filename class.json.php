@@ -196,7 +196,7 @@ class HermitJson
         $cache_key = "/netease/song/$music_id";
 
         $cache = $this->get_cache($cache_key);
-        if ($cache)
+        if ($cache);
         //    return $cache;
 
         $response = json_decode($Netease->format()->song($music_id), true);
@@ -204,9 +204,9 @@ class HermitJson
         if (!empty($response[0]["id"])) {
             //处理音乐信息
             $mp3_url    = admin_url() . "admin-ajax.php" . '?action=hermit&scope=netease_song_url&id=' . $music_id;
-            $music_name = $response[0]["name"];
+            $music_name = $response[0]['name'];
             $cover      = admin_url() . "admin-ajax.php" . '?action=hermit&scope=netease_pic_url&picid=' . $response['pic_id'] . '&id=' . $music_id;
-            $artists    = $response[0]["artist"];
+            $artists    = $response[0]['artist'];
 
             $artists = implode(",", $artists);
 
