@@ -304,8 +304,8 @@ class HermitJson
                     "title" => $value["name"],
                     "url" => $mp3_url,
                     "author" => $album_author,
-                    "pic" => $cover  . '&id=' . $value["id"],
-		    "lrc" => 'https://api.lwl12.com/music/netease/lyric?raw=true&id=' . $value["id"]
+                    "pic" => admin_url() . "admin-ajax.php" . '?action=hermit&scope=netease_pic_url&picid=' . $value['pic_id'] . '&id=' . $value['id'],
+		            "lrc" => 'https://api.lwl12.com/music/netease/lyric?raw=true&id=' . $value["id"]
                 );
             }
 
@@ -352,7 +352,7 @@ class HermitJson
                     "title" => $value["name"],
                     "url" => $mp3_url,
                     "author" => $artists,
-                    "pic" => admin_url() . "admin-ajax.php" . '?action=hermit&scope=netease_pic_url&picid=' . $value['al']['pic']  . '&id=' . $value["id"],
+                    "pic" => admin_url() . "admin-ajax.php" . '?action=hermit&scope=netease_pic_url&picid=' . $value['pic_id'] . '&id=' . $value['id'],
 					"lrc" => 'https://api.lwl12.com/music/netease/lyric?raw=true&id=' . $value["id"]
                 );
             }
