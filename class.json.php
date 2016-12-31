@@ -77,7 +77,7 @@ class HermitJson
                 Header("Location: " . $this->settings('XiamiMirror') . "/xiami_pic_url/id/" . $id . "/picid/" . $pic);
                 exit;
             }
-            Header("Location: " . $Xiami->pic($pic)["url"]);
+            Header("Location: " . json_decode($Xiami->pic($pic))["url"]);
             exit;
         }
         public function songs($song_list)
@@ -196,8 +196,8 @@ class HermitJson
         $cache_key = "/netease/song/$music_id";
 
         $cache = $this->get_cache($cache_key);
-        if ($cache);
-        //    return $cache;
+        if ($cache)
+            return $cache;
 
         $response = json_decode($Netease->format()->song($music_id), true);
 
@@ -249,7 +249,7 @@ class HermitJson
             Header("Location: " . $this->settings('NeteaseMirror') . "/netease_pic_url/id/" . $id . "/picid/" . $pic);
             exit;
         }
-        Header("Location: " . $Netease->pic($pic)["url"] . "?param=120y120");
+        Header("Location: " . json_decode($Netease->pic($pic))["url"] . "?param=120y120");
         exit;
     }
     public function netease_songs($song_list)
