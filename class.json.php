@@ -33,7 +33,7 @@ class HermitJson
                 //处理音乐信息
                 $mp3_url    = admin_url() . "admin-ajax.php" . '?action=hermit&scope=xiami_song_url&id=' . $music_id;
                 $music_name = $response["name"];
-                $cover      = admin_url() . "admin-ajax.php" . '?action=hermit&scope=xiami_pic_url&picid=' . $response['pic_id'] . '&id=' . $music_id;
+                $cover      = admin_url() . "admin-ajax.php" . '?action=hermit&scope=xiami_pic_url&picid=' . $response[0]['pic_id'] . '&id=' . $music_id;
                 $artists    = $response["artist"];
 
                 $artists = implode(",", $artists);
@@ -206,7 +206,7 @@ class HermitJson
             //处理音乐信息
             $mp3_url    = admin_url() . "admin-ajax.php" . '?action=hermit&scope=netease_song_url&id=' . $music_id;
             $music_name = $response[0]['name'];
-            $cover      = admin_url() . "admin-ajax.php" . '?action=hermit&scope=netease_pic_url&picid=' . $response['pic_id'] . '&id=' . $music_id;
+            $cover      = admin_url() . "admin-ajax.php" . '?action=hermit&scope=netease_pic_url&picid=' . $response[0]['pic_id'] . '&id=' . $music_id;
             $artists    = $response[0]['artist'];
 
             $artists = implode(",", $artists);
@@ -251,7 +251,7 @@ class HermitJson
             exit;
         }
         $pic = json_decode($Netease->pic($pic), true);
-        Header("Location: " . $pic["url"] . "?param=120y120");
+        Header("Location: " . $pic["url"]);
         exit;
     }
     public function netease_songs($song_list)
