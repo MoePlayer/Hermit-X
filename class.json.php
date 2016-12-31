@@ -204,9 +204,9 @@ class HermitJson
         if (!empty($response[0]["id"])) {
             //处理音乐信息
             $mp3_url    = admin_url() . "admin-ajax.php" . '?action=hermit&scope=netease_song_url&id=' . $music_id;
-            $music_name = $response["name"];
+            $music_name = $response[0]["name"];
             $cover      = admin_url() . "admin-ajax.php" . '?action=hermit&scope=netease_pic_url&picid=' . $response['pic_id'] . '&id=' . $music_id;
-            $artists    = $response["artist"];
+            $artists    = $response[0]["artist"];
 
             $artists = implode(",", $artists);
 
