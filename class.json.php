@@ -77,7 +77,7 @@ class HermitJson
                 Header("Location: " . $this->settings('XiamiMirror') . "/xiami_pic_url/id/" . $id . "/picid/" . $pic);
                 exit;
             }
-            $pic = json_decode($Xiami->pic($pic));
+            $pic = json_decode($Xiami->pic($pic), true);
             Header("Location: " . $pic["url"]);
             exit;
         }
@@ -250,7 +250,7 @@ class HermitJson
             Header("Location: " . $this->settings('NeteaseMirror') . "/netease_pic_url/id/" . $id . "/picid/" . $pic);
             exit;
         }
-        $pic = json_decode($Netease->pic($pic));
+        $pic = json_decode($Netease->pic($pic), true);
         Header("Location: " . $pic["url"] . "?param=120y120");
         exit;
     }
