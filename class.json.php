@@ -77,7 +77,8 @@ class HermitJson
                 Header("Location: " . $this->settings('XiamiMirror') . "/xiami_pic_url/id/" . $id . "/picid/" . $pic);
                 exit;
             }
-            Header("Location: " . json_decode($Xiami->pic($pic))["url"]);
+            $pic = json_decode($Xiami->pic($pic));
+            Header("Location: " . $pic["url"]);
             exit;
         }
         public function songs($song_list)
@@ -249,7 +250,8 @@ class HermitJson
             Header("Location: " . $this->settings('NeteaseMirror') . "/netease_pic_url/id/" . $id . "/picid/" . $pic);
             exit;
         }
-        Header("Location: " . json_decode($Netease->pic($pic))["url"] . "?param=120y120");
+        $pic = json_decode($Netease->pic($pic));
+        Header("Location: " . $pic["url"] . "?param=120y120");
         exit;
     }
     public function netease_songs($song_list)
