@@ -197,7 +197,7 @@ class HermitJson
 
         $cache = $this->get_cache($cache_key);
         if ($cache)
-            return $cache;
+        //    return $cache;
 
         $response = json_decode($Netease->format()->song($music_id), true);
 
