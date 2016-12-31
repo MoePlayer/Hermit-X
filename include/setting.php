@@ -101,9 +101,9 @@
 				<th scope="row"><label>网易云音质</label></th>
 				<td>
 					<?php $quality_array = array(
-						'320000' =>  '极高 (320kbit/s)',
-						'192000' =>  '较高 (192kbit/s)',
-						'128000' =>  '普通 (128kbit/s)',
+						'320' =>  '极高 (320kbit/s)',
+						'192' =>  '较高 (192kbit/s)',
+						'128' =>  '普通 (128kbit/s)',
 					);
 					foreach ( $quality_array as $key => $title ) { ?>
 						<label title="<?php echo $title; ?>">
@@ -130,10 +130,10 @@
 					          value="<?php echo $this->settings( 'NeteaseMirror' ); ?>"/></p>
 
 					<p class="description">
-					您可以通过镜像 Hermit X 网易云歌曲信息解析接口以提供 HTTPS 的网易云封面和歌曲<br>
+					您可以通过镜像 Hermit X 歌曲信息解析接口以提供 HTTPS 的封面和歌曲<br>
 					要启用此功能，请依照以下步骤操作：<br>
 					1.添加 rewrite 规则到您的 HTTP 服务器配置文件，以下是 NGINX 可用的 rewrite 规则<br>
-					<pre><code>rewrite ^/wp-admin/hermit/netease_song_url/id/(\d+)$ /wp-admin/admin-ajax.php?action=hermit&scope=netease_song_url&id=$1 last;</code></pre><pre><code>rewrite ^/wp-admin/hermit/netease_pic_url/id/(\d+)/picid/(\d+)$ /wp-admin/admin-ajax.php?action=hermit&scope=netease_pic_url&id=$1&picid=$2 last;</code></pre>
+					<pre><code>rewrite ^/wp-admin/hermit/netease_song_url/id/(\d+)$ /wp-admin/admin-ajax.php?action=hermit&amp;scope=netease_song_url&amp;id=$1 last;</code></pre><pre><code>rewrite ^/wp-admin/hermit/netease_pic_url/id/(\d+)/picid/(\d+)$ /wp-admin/admin-ajax.php?action=hermit&scope=netease_pic_url&amp;id=$1&amp;picid=$2 last;</code></pre>
 					2.通过七牛、又拍云或其他服务商提供的 “镜像储存” 或类似功能镜像以下 URL：<br>
 					https://your_domain/wp-admin/hermit/<br>
 					3.将镜像 URL 填入上方输入框<br>
