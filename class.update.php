@@ -35,10 +35,32 @@ final class Hermit_Update {
 	 * @since Hermit X 2.5.9
 	 */
 	public function __construct() {
+		register_activation_hook(
+			HERMIT_FILE,
+			array( $this, 'force_check' )
+		);
+
 		add_filter(
 			'pre_set_site_transient_update_plugins',
 			array( $this, 'insert_update_data' )
 		);
+	}
+
+	/**
+	 * 强制检测插件更新
+	 *
+	 * @since Hermit X 2.5.9
+	 * @see wp_update_themes()
+	 */
+	public function force_check() {
+		$update = get_site_transient( 'update_plugins' );
+
+		if ( isset( $update->last_checked ) ) {
+			unset( $update->last_checked );
+			set_site_transient( 'update_plugins', $update );
+		}
+
+		wp_update_plugins();
 	}
 
 	/**
@@ -67,9 +89,6 @@ final class Hermit_Update {
 		$wp_version  = get_bloginfo( 'version' );
 		$home_url    = home_url();
 
-		$plugin  = get_plugin_data( HERMIT_FILE );
-		$version = $plugin['Version'];
-
 		$response = wp_remote_post( $this->api, array(
 			'timeout'    => 10,
 			'user-agent' => "WordPress/{$wp_version}; {$home_url}",
@@ -77,7 +96,7 @@ final class Hermit_Update {
 			'body' => array(
 				'url'         => $home_url,
 				'file'        => $this->get_plugin_file(),
-				'version'     => $version,
+				'version'     => $this->get_plugin_version(),
 				'wp_version'  => $wp_version,
 				'php_version' => phpversion(),
 				'wp_locale'   => get_locale()
@@ -102,6 +121,19 @@ final class Hermit_Update {
 	 */
 	private function get_plugin_file() {
 		return plugin_basename( HERMIT_FILE );
+	}
+
+	/**
+	 * 获取插件版本
+	 *
+	 * @since Hermit X 2.5.9
+	 */
+	private function get_plugin_version() {
+		if ( !function_exists( 'get_plugin_data' ) )
+			require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+
+		$plugin = get_plugin_data( HERMIT_FILE );
+		return $plugin['Version'];
 	}
 
 }
