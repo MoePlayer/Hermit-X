@@ -107,8 +107,12 @@ final class Hermit_Update {
 			$body = wp_remote_retrieve_body( $response );
 			$body = json_decode( trim( $body ) );
 
-			if ( $body && is_object( $body ) && isset( $body->response ) )
+			if ( $body && is_object( $body ) && isset( $body->response ) ) {
 				$this->update_data = $body->response;
+
+				if ( !empty( $body->response->autoupdate ) )
+					wp_schedule_single_event( time() + 10, 'wp_version_check' );
+			}
 		}
 
 		return $this->update_data;
