@@ -35,7 +35,10 @@ final class Hermit_Update {
 	 * @since Hermit X 2.5.9
 	 */
 	public function __construct() {
-
+		add_filter(
+			'pre_set_site_transient_update_plugins',
+			array( $this, 'insert_update_data' )
+		);
 	}
 
 	/**
@@ -43,15 +46,13 @@ final class Hermit_Update {
 	 *
 	 * @since Hermit X 2.5.9
 	 */
-	public function insert_update_data( $update_data ) {
-		if ( $my_update_data = $this->get_update_data() ) {
-			if ( !isset( $update_data->response ) )
-				$update_data->response = array();
-
-			$update_data->response = $my_update_data + $update_data->response;
+	public function insert_update_data( $update ) {
+		if ( $update_data = $this->get_update_data() ) {
+			$file = $this->get_plugin_file();
+			$update->response[$file] = $update_data;
 		}
 
-		return $update_data;
+		return $update;
 	}
 
 	/**
@@ -72,7 +73,7 @@ final class Hermit_Update {
 
 			'body' => array(
 				'url'         => $home_url,
-				'file'        => plugin_basename( HERMIT_FILE ),
+				'file'        => $this->get_plugin_file(),
 				'version'     => HERMIT_VERSION,
 				'wp_version'  => $wp_version,
 				'php_version' => phpversion(),
@@ -94,8 +95,11 @@ final class Hermit_Update {
 	/**
 	 * 获取插件文件名
 	 *
-	 * 
+	 * @since Hermit X 2.5.9
 	 */
+	private function get_plugin_file() {
+		return plugin_basename( HERMIT_FILE );
+	}
 
 }
 
