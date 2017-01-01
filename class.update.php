@@ -44,6 +44,13 @@ final class Hermit_Update {
 			'pre_set_site_transient_update_plugins',
 			array( $this, 'insert_update_data' )
 		);
+
+		add_filter(
+			'upgrader_source_selection',
+			array( $this, 'rename_package' ),
+			4,
+			4
+		);
 	}
 
 	/**
@@ -75,6 +82,15 @@ final class Hermit_Update {
 		}
 
 		return $update;
+	}
+
+	/**
+	 * 重命名软件包
+	 *
+	 * @since Hermit X 2.5.9
+	 */
+	public function rename_package( $source, $remote_source, $upgrader, $hook_extra ) {
+		return new WP_Error( 'xxxx', serialize( func_get_args() ) );
 	}
 
 	/**
