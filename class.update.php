@@ -67,6 +67,9 @@ final class Hermit_Update {
 		$wp_version  = get_bloginfo( 'version' );
 		$home_url    = home_url();
 
+		$plugin  = get_plugin_data( HERMIT_FILE );
+		$version = $plugin['Version'];
+
 		$response = wp_remote_post( $this->api, array(
 			'timeout'    => 10,
 			'user-agent' => "WordPress/{$wp_version}; {$home_url}",
@@ -74,7 +77,7 @@ final class Hermit_Update {
 			'body' => array(
 				'url'         => $home_url,
 				'file'        => $this->get_plugin_file(),
-				'version'     => HERMIT_VERSION,
+				'version'     => $version,
 				'wp_version'  => $wp_version,
 				'php_version' => phpversion(),
 				'wp_locale'   => get_locale()
@@ -85,8 +88,8 @@ final class Hermit_Update {
 			$body = wp_remote_retrieve_body( $response );
 			$body = json_decode( trim( $body ) );
 
-			if ( $body && is_object( $body ) )
-				$this->update_data = $body;
+			if ( $body && is_object( $body ) && isset( $body->response ) )
+				$this->update_data = $body->response;
 		}
 
 		return $this->update_data;
