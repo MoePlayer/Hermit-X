@@ -8,6 +8,7 @@ Author: mufeng && liwanglin12 && DIYgod
 Author URI: https://blog.lwl12.com
 */
 
+define('HERMIT_FILE', __FILE__);
 define('HERMIT_VERSION', '2.5.8');
 define('HERMIT_URL', plugins_url('', __FILE__));
 define('HERMIT_PATH', dirname(__FILE__));
