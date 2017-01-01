@@ -26,7 +26,7 @@
 												  checked="checked">单曲</label>
 									<label><input type="radio" name="netease_type" value="netease_album">专辑</label>
 									<label><input type="radio" name="netease_type" value="netease_playlist">歌单</label>
-									<label><input type="radio" name="netease_type" value="netease_radio">电台</label>
+									<label><input type="radio" name="netease_type" value="netease_radio" disabled="true">电台</label>
 								</div>
 								<textarea class="hermit-textarea large-text code" cols="30" rows="9"
 										  placeholder="输入网易云音乐音乐地址。。。"></textarea>

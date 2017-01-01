@@ -41,7 +41,7 @@
 						</p>
 					</li>
 					<li>
-						<p><strong>电台</strong></p>
+						<p><strong>电台(现不支持)</strong></p>
 
 						<p>地址格式：<br/><code>http://music.163.com/#/<strong style="color: #3378AA">djradio</strong>?id=239</code>
 						</p>

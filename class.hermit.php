@@ -72,7 +72,11 @@ class hermit {
 	 * 添加文章短代码
 	 */
 	public function shortcode( $atts, $content = null ) {
-		$color = $atts["theme"] ?: $this->settings( 'color' );
+		if(empty($atts["theme"])){
+			$color = $this->settings( 'color' );
+		} else {
+			$color = $atts["theme"];
+		}
 		switch ($color) {
 			case 'default':
 				$color = "#5895be";
@@ -141,27 +145,40 @@ class hermit {
 			case 'songs' :
 				$result = array(
 					'status' => 200,
-					'msg'    => $HMTJSON->song_list( $id )
+					'msg'    => $HMTJSON->xiami_song_list( $id )
+				);
+				break;
+			case 'xiami_song_url' :
+				$result = array(
+					'status' => 200,
+					'msg'    => $HMTJSON->xiami_song_url( $id )
+				);
+				break;
+
+			case 'xiami_pic_url' :
+				$result = array(
+					'status' => 200,
+					'msg'    => $HMTJSON->xiami_pic_url( $id, $_GET['picid'] )
 				);
 				break;
 			case 'songlist' :
 				$result = array(
 					'status' => 200,
-					'msg'    => $HMTJSON->song_list( $id )
+					'msg'    => $HMTJSON->xiami_song_list( $id )
 				);
 				break;
 
 			case 'album':
 				$result = array(
 					'status' => 200,
-					'msg'    => $HMTJSON->album( $id )
+					'msg'    => $HMTJSON->xiami_album( $id )
 				);
 				break;
 
 			case 'collect':
 				$result = array(
 					'status' => 200,
-					'msg'    => $HMTJSON->collect( $id )
+					'msg'    => $HMTJSON->xiami_collect( $id )
 				);
 				break;
 
