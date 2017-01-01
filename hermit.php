@@ -17,6 +17,7 @@ global $HMT, $HMTJSON;
 
 require HERMIT_PATH . '/class.json.php';
 require HERMIT_PATH . '/class.hermit.php';
+require HERMIT_PATH . '/class.update.php';
 
 if (!isset($HMT)) {
 	$HMT = new hermit();
