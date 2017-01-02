@@ -103,7 +103,8 @@ final class Hermit_Update {
 			return;
 		}
 
-		$text = '警告：使用版本控制工具可能导致 Hermit X 更新失败，请删除。';
+		$text  = '警告：使用版本控制工具可能导致 Hermit X 更新失败';
+		$text .= '，请删除目录下的.git .svn或类似文件（夹）。';
 
 		echo '
 			<div class="error notice is-dismissible" id="vcs-warning">
