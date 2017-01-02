@@ -168,6 +168,19 @@ final class Hermit_Update {
 		return $plugin['Version'];
 	}
 
+	/**
+	 * 检测插件目录是否使用了版本控制工具
+	 *
+	 * @since Hermit X 2.5.9
+	 */
+	private function is_vcs_checkout() {
+		include_once( ABSPATH . '/wp-admin/includes/admin.php' );
+		include_once( ABSPATH . '/wp-admin/includes/class-wp-upgrader.php' );
+
+		$upgrader = new WP_Automatic_Updater;
+		return $upgrader->is_vcs_checkout( WP_PLUGIN_DIR );
+	}
+
 }
 
 // End of page.
