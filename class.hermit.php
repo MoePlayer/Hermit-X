@@ -104,6 +104,9 @@ class hermit
             case 'black':
                 $color = "#aaaaaa";
                 break;
+            case 'customize':
+                $color = $this->settings('color_customize');
+                break;
             default:
                 break;
         }
@@ -463,6 +466,7 @@ class hermit
             'roles'          => array( 'administrator' ),
             'albumSource'    => 0,
             'debug'          => 0,
+            'color_customize'=> '#5895be',
             'advanced_cache' => 0
         );
 

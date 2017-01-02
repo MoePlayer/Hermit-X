@@ -74,7 +74,8 @@
                         'yellow'  => '淡淡黄',
                         'pink'    => '少女粉',
                         'purple'  => '基情紫',
-                        'black'   => '暗色灰'
+                        'black'   => '暗色灰',
+                        'customize'   => '自定义'
                     );
                     foreach ($color_array as $key => $title) {
                         ?>
@@ -84,8 +85,13 @@
                             echo 'checked="checked"';
                         } ?>/>
 							<span><?php echo $title; ?></span>
+							<?php if ($key === "customize"): ?>
+								<input type="text" class="regular-text" style="width:100px;" name="hermit_setting[color_customize]"
+									  value="<?php echo $this->settings('color_customize'); ?>"/>
+							<?php endif; ?>
 						</label>
 					<?php
+
                     }
                     ?>
 				</td>
@@ -117,6 +123,7 @@
 							<span><?php echo $title; ?></span>
 						</label>
 					<?php
+
                     }
                     ?>
 					<p class="description">实际音质<b>小于等于</b>所选音质。默认极高</p>
@@ -198,6 +205,7 @@
 							<span><?php echo $val; ?></span>
 						</label>
 					<?php
+
                     }
                     ?>
 					<p class="description">默认：<strong>管理员权限</strong> 才可以在新建或编辑文章时添加音乐</p>
