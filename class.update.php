@@ -104,7 +104,7 @@ final class Hermit_Update {
 			return;
 
 		if ( !$this->is_vcs_checkout() ) {
-			$dismissed[] = 'hermit-vcs-warning';
+/*			$dismissed[] = 'hermit-vcs-warning';
 			$dismissed   = implode( ',', $dismissed );
 
 			update_user_meta(
@@ -112,7 +112,7 @@ final class Hermit_Update {
 				'dismissed_wp_pointers',
 				$dismissed
 			);
-
+*/
 			return;
 		}
 
