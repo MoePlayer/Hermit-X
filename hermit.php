@@ -3,12 +3,13 @@
 Plugin Name: Hermit X
 Plugin URI: https://blog.lwl12.com/read/hermit-x.html
 Description: 音乐播放器 Hermit music player build for wordpress with APlayer
-Version: 2.5.8-RC1.0
+Version: 2.5.9-beta1.0
 Author: mufeng && liwanglin12 && DIYgod
 Author URI: https://blog.lwl12.com
 */
 
-define('HERMIT_VERSION', '2.5.8-RC1.0');
+define('HERMIT_FILE', __FILE__);
+define('HERMIT_VERSION', '2.5.9-beta1.0');
 define('HERMIT_URL', plugins_url('', __FILE__));
 define('HERMIT_PATH', dirname(__FILE__));
 define('HERMIT_ADMIN_URL', admin_url());
@@ -17,6 +18,7 @@ global $HMT, $HMTJSON;
 
 require HERMIT_PATH . '/class.json.php';
 require HERMIT_PATH . '/class.hermit.php';
+require HERMIT_PATH . '/class.update.php';
 
 if (!isset($HMT)) {
     $HMT = new hermit();
@@ -24,6 +26,10 @@ if (!isset($HMT)) {
 
 if (!isset($HMTJSON)) {
     $HMTJSON = new HermitJson();
+}
+
+if (!isset($hmt_update)) {
+    $hmt_update = new Hermit_Update();
 }
 
 /**
