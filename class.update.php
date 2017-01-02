@@ -90,10 +90,20 @@ final class Hermit_Update {
 		if ( in_array( 'hermit-vcs-warning', $dismissed ) )
 			return;
 
-		if ( !$this->is_vcs_checkout() )
-			return;
+		if ( !$this->is_vcs_checkout() ) {
+			$dismissed[] = 'hermit-vcs-warning';
+			$dismissed   = implode( ',', $dismissed );
 
-		$text = '警告：使用版本控制工具可能导致 Hermit-X 更新失败，请删除 （版本控制系统文件夹绝对路径）';
+			update_user_meta(
+				get_current_user_id(),
+				'dismissed_wp_pointers',
+				$dismissed
+			);
+
+			return;
+		}
+
+		$text = '警告：使用版本控制工具可能导致 Hermit X 更新失败，请删除。';
 
 		echo '
 			<div class="error notice is-dismissible" id="vcs-warning">
