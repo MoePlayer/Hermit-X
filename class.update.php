@@ -19,7 +19,7 @@ final class Hermit_Update {
 	 * @since Hermit X 2.5.9
 	 * @var object
 	 */
-	private $api = 'https://api.lwl12.com/project/hermit/update/';
+	private $api = 'https://api.lwl12.com/project/hermit/updateCheck';
 
 	/**
 	 * 更新数据
@@ -90,7 +90,19 @@ final class Hermit_Update {
 	 * @since Hermit X 2.5.9
 	 */
 	public function rename_package( $source, $remote_source, $upgrader, $hook_extra ) {
-		return new WP_Error( 'xxxx', serialize( func_get_args() ) );
+		if ( empty( $hook_extra['plugin'] ) )
+			return $source;
+
+		if ( $hook_extra['plugin'] != $this->get_plugin_file() )
+			return $source;
+
+		global $wp_filesystem;
+		$filename = dirname( $source ) . '/' . dirname( $this->get_plugin_file() );
+
+		if ( !$wp_filesystem->move( $source, $filename, true ) )
+			return new WP_Error( 'rename_failed', 'Rename Failed.' );
+
+		return $filename;
 	}
 
 	/**
