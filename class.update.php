@@ -40,6 +40,11 @@ final class Hermit_Update {
 			array( $this, 'force_check' )
 		);
 
+		add_action(
+			'admin_notices',
+			array( $this, 'vcs_warning' )
+		);
+
 		add_filter(
 			'pre_set_site_transient_update_plugins',
 			array( $this, 'insert_update_data' )
@@ -68,6 +73,40 @@ final class Hermit_Update {
 		}
 
 		wp_update_plugins();
+	}
+
+	/**
+	 * 输出版本控制工具使用警告
+	 *
+	 * @since Hermit X 2.5.9
+	 */
+	public function vcs_warning() {
+		if ( !current_user_can( 'activate_plugins' ) )
+			return;
+
+		$dismissed = get_user_meta( get_current_user_id(), 'dismissed_wp_pointers', true );
+		$dismissed = array_filter( explode( ',', (string) $dismissed ) );
+
+		if ( in_array( 'hermit-vcs-warning', $dismissed ) )
+			return;
+
+		if ( !$this->is_vcs_checkout() )
+			return;
+
+		$text = '警告：使用版本控制工具可能导致 Hermit-X 更新失败，请删除 （版本控制系统文件夹绝对路径）';
+
+		echo '
+			<div class="error notice is-dismissible" id="vcs-warning">
+				<p>' . $text . '</p>
+			</div>
+			<script type="text/javascript">
+				jQuery( document ).on( "click", "#vcs-warning .notice-dismiss", function() {
+					jQuery.post(
+						"' . esc_url_raw( admin_url( 'admin-ajax.php' ) ) . '",
+						"action=dismiss-wp-pointer&pointer=hermit-vcs-warning"
+					);
+				} );
+			</script>';
 	}
 
 	/**
