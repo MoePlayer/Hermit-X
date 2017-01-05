@@ -161,6 +161,7 @@ final class Hermit_Update {
 	 * 从远程服务器获取插件更新数据
 	 *
 	 * @since Hermit X 2.5.9
+	 * @since Hermit X 2.6.0 新增 TTL 的支持；修复启用插件时 HTTP 请求次数过多的问题。
 	 */
 	private function get_update_data() {
 		if ( isset( $this->update_data ) )
@@ -187,11 +188,23 @@ final class Hermit_Update {
 			$body = wp_remote_retrieve_body( $response );
 			$body = json_decode( trim( $body ) );
 
-			if ( $body && is_object( $body ) && isset( $body->response ) ) {
-				$this->update_data = $body->response;
+			if ( $body && is_object( $body ) ) {
+				if ( isset( $body->response ) ) {
+					$this->update_data = $body->response;
 
-				if ( !empty( $body->response->autoupdate ) )
-					wp_schedule_single_event( time() + 10, 'wp_version_check' );
+					if ( !empty( $body->response->autoupdate ) )
+						wp_schedule_single_event( time() + 10, 'wp_version_check' );
+				} else {
+					$this->update_data = false;
+				}
+
+				if ( !empty( $body->ttl ) ) {
+					$ttl  = (int) $body->ttl;
+					$ttl += time();
+
+					if ( $ttl < wp_next_scheduled( 'wp_version_check' ) )
+						wp_schedule_single_event( $ttl, 'wp_version_check' );
+				}
 			}
 		}
 
@@ -211,12 +224,13 @@ final class Hermit_Update {
 	 * 获取插件版本
 	 *
 	 * @since Hermit X 2.5.9
+	 * @since Hermit X 2.6.0 使用插件目录替换原来的 `WP_PLUGIN_DIR`。
 	 */
 	private function get_plugin_version() {
 		if ( !function_exists( 'get_plugin_data' ) )
 			require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
-		$plugin = get_plugin_data( HERMIT_FILE );
+		$plugin = get_plugin_data( HERMIT_PATH );
 		return $plugin['Version'];
 	}
 
