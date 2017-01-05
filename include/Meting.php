@@ -1,11 +1,11 @@
 <?php
 /*!
- * Meting - wow a powerful music framework
+ * Meting music framework
  *
  * @author   METO Sheel <i@i-meto.com>
  * @website  https://i-meto.com
  * @license  http://opensource.org/licenses/MIT
- * @version  0.7.12 beta
+ * @version  0.9.0 RC
  *
  * Suppose  search   song    album   playlist    lyric
  * netease  *        *       *       *           *
@@ -159,18 +159,18 @@ class Meting
                 'method' => 'GET',
                 'url'    => 'http://tingapi.ting.baidu.com/v1/restserver/ting',
                 'body'   => array(
-                    'method'=>'baidu.ting.search.merge',
-                    'isNew'=>1,
-                    'query'=>$keyword,
-                    'page_size'=>$limit,
-                    'page_no'=>$page,
-                    'type'=>0,
-                    'format'=>'json',
-                    'from'=>'ios',
-                    'channel'=>'(null)',
-                    'cuid'=>'appstore',
-                    'from'=>'ios',
-                    'version'=>'5.9.5',
+                    'method'    => 'baidu.ting.search.merge',
+                    'isNew'     => 1,
+                    'query'     => $keyword,
+                    'page_size' => $limit,
+                    'page_no'   => $page,
+                    'type'      => 0,
+                    'format'    => 'json',
+                    'from'      => 'ios',
+                    'channel'   => '(null)',
+                    'cuid'      => 'appstore',
+                    'from'      => 'ios',
+                    'version'   => '5.9.5',
                 ),
                 'format' => 'result#song_info#song_list',
             ),
@@ -228,10 +228,16 @@ class Meting
                 'method' => 'GET',
                 'url'    => 'http://tingapi.ting.baidu.com/v1/restserver/ting',
                 'body'   => array(
-                    'method'=>'baidu.ting.song.baseInfos',
-                    'song_id'   => $id,
+                    'method' => 'baidu.ting.song.play',
+                    'songid' => $id,
+                    'format' => 'json',
+                    'from'   => 'ios',
+                    'channel'=> '(null)',
+                    'cuid'   => 'appstore',
+                    'from'   => 'ios',
+                    'version'=> '5.9.5',
                 ),
-                'format' => 'result#items',
+                'format' => 'songinfo',
             ),
         );
         $raw=$this->curl($API[$this->_SITE]);
@@ -276,11 +282,11 @@ class Meting
                 'method' => 'GET',
                 'url'    => 'http://mobilecdn.kugou.com/api/v3/album/song',
                 'body'   => array(
-                    'albumid' => $id,
-                    'plat' => 2,
-                    'page' => 1,
+                    'albumid'  => $id,
+                    'plat'     => 2,
+                    'page'     => 1,
                     'pagesize' => -1,
-                    'version' => 8400,
+                    'version'  => 8400,
                 ),
                 'format' => 'data#info',
             ),
@@ -288,14 +294,14 @@ class Meting
                 'method' => 'GET',
                 'url'    => 'http://tingapi.ting.baidu.com/v1/restserver/ting',
                 'body'   => array(
-                    'method'=>'baidu.ting.album.getAlbumInfo',
-                    'album_id'=>$id,
-                    'format'=>'json',
-                    'from'=>'ios',
-                    'channel'=>'(null)',
-                    'cuid'=>'appstore',
-                    'from'=>'ios',
-                    'version'=>'5.9.5',
+                    'method'   => 'baidu.ting.album.getAlbumInfo',
+                    'album_id' => $id,
+                    'format'   => 'json',
+                    'from'     => 'ios',
+                    'channel'  => '(null)',
+                    'cuid'     => 'appstore',
+                    'from'     => 'ios',
+                    'version'  => '5.9.5',
                 ),
                 'format' => 'songlist',
             ),
@@ -347,10 +353,10 @@ class Meting
                 'url'    => 'http://mobilecdn.kugou.com/api/v3/special/song',
                 'body'   => array(
                     'specialid' => $id,
-                    'page' => 1,
-                    'plat' => 2,
-                    'pagesize' => -1,
-                    'version' => 8400,
+                    'page'      => 1,
+                    'plat'      => 2,
+                    'pagesize'  => -1,
+                    'version'   => 8400,
                 ),
                 'format' => 'data#info',
             ),
@@ -358,14 +364,14 @@ class Meting
                 'method' => 'GET',
                 'url'    => 'http://tingapi.ting.baidu.com/v1/restserver/ting',
                 'body'   => array(
-                    'method'=>'baidu.ting.diy.gedanInfo',
-                    'listid'   => $id,
-                    'format'=>'json',
-                    'from'=>'ios',
-                    'channel'=>'(null)',
-                    'cuid'=>'appstore',
-                    'from'=>'ios',
-                    'version'=>'5.9.5',
+                    'method' => 'baidu.ting.diy.gedanInfo',
+                    'listid' => $id,
+                    'format' => 'json',
+                    'from'   => 'ios',
+                    'channel'=> '(null)',
+                    'cuid'   => 'appstore',
+                    'from'   => 'ios',
+                    'version'=> '5.9.5',
                 ),
                 'format' => 'content',
             ),
@@ -409,17 +415,17 @@ class Meting
                 'method' => 'POST',
                 'url'    => 'http://media.store.kugou.com/v1/get_res_privilege',
                 'body'   => array(
-                    "relate"=>1,
-                    "userid"=>0,
-                    "vip"=>0,
-                    "appid"=>1390,
-                    "token"=>"",
-                    "behavior"=>"download",
-                    "clientver"=>"1",
+                    "relate"    => 1,
+                    "userid"    => 0,
+                    "vip"       => 0,
+                    "appid"     => 1390,
+                    "token"     => "",
+                    "behavior"  => "download",
+                    "clientver" => "1",
                     "resource"=>array(array(
-                        "id"=>0,
-                        "type"=>"audio",
-                        "hash"=>$id,
+                        "id"   => 0,
+                        "type" => "audio",
+                        "hash" => $id,
                     )),
                 ),
                 'encode' => 'kugou_json',
@@ -429,9 +435,9 @@ class Meting
                 'method' => 'GET',
                 'url'    => 'http://music.baidu.com/data/music/fmlink',
                 'body'   => array(
-                    'songIds'   => $id,
-                    'rate'=>$br,
-                    'type'=>'mp3',
+                    'songIds' => $id,
+                    'rate'    => $br,
+                    'type'    => 'mp3',
                 ),
                 'decode' => 'baidu_url',
             ),
@@ -494,10 +500,15 @@ class Meting
                 'method' => 'GET',
                 'url'    => 'http://tingapi.ting.baidu.com/v1/restserver/ting',
                 'body'   => array(
-                    'method'=>'baidu.ting.song.baseInfos',
-                    'song_id'   => $id,
+                    'method'=>'baidu.ting.song.lry',
+                    'songid'   => $id,
+                    'format'=>'json',
+                    'from'=>'ios',
+                    'channel'=>'(null)',
+                    'cuid'=>'appstore',
+                    'from'=>'ios',
+                    'version'=>'5.9.5',
                 ),
-                'decode' => 'baidu_lyric'
             ),
         );
         $raw=$this->curl($API[$this->_SITE]);
@@ -532,7 +543,7 @@ class Meting
                 break;
             case 'baidu':
                 $data=self::song($id);
-                $url=json_decode($data,1)['result']['items'][0]['pic_radio'];
+                $url=json_decode($data,1)['songinfo']['pic_radio'];
         }
         $arr=array('url'=>$url);
         return json_encode($arr);
@@ -574,7 +585,7 @@ class Meting
      * 正在努力重构这些代码 TAT
      */
     private function netease_AESECB($API){
-        $KEY='7246674226682325323F5E6544673A5130';
+        $KEY='7246674226682325323F5E6544673A51';
         $body=json_encode($API['body']);
         $body=openssl_encrypt($body,'aes-128-ecb',hex2bin($KEY));
         $body=strtoupper(bin2hex(base64_decode($body)));
@@ -722,8 +733,7 @@ class Meting
             'url' => $data['data']['songList'][0]['songLink'],
             'br'  => $data['data']['songList'][0]['rate'],
         );
-        preg_match('/baidu\.com(.*)\/(\d+)\/.+\.mp3/i',$url['url'],$id);
-        $url['url']='http://musicdata.baidu.com'.$id[1].'/'.$id[2].'/'.$id[2].'.mp3';
+        $url['url']=str_replace('http://yinyueshiting.baidu.com','https://gss0.bdstatic.com/y0s1hSulBw92lNKgpU_Z2jR7b2w6buu',$url['url']);
         return json_encode($url);
     }
     /**
@@ -746,18 +756,6 @@ class Meting
     private function kugou_lyric($result){
         $arr=array(
             'lyric' => $result,
-        );
-        return json_encode($arr);
-    }
-    private function baidu_lyric($result){
-        $result=json_decode($result,1);
-        $API=array(
-            'method' => 'GET',
-            'url'    => $result['result']['items'][0]['lrclink'],
-        );
-        $data=$this->curl($API);
-        $arr=array(
-            'lyric' => $data,
         );
         return json_encode($arr);
     }
