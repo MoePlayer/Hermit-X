@@ -224,13 +224,12 @@ final class Hermit_Update {
 	 * 获取插件版本
 	 *
 	 * @since Hermit X 2.5.9
-	 * @since Hermit X 2.6.0 使用插件目录替换原来的 `WP_PLUGIN_DIR`。
 	 */
 	private function get_plugin_version() {
 		if ( !function_exists( 'get_plugin_data' ) )
 			require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
-		$plugin = get_plugin_data( HERMIT_PATH );
+		$plugin = get_plugin_data( HERMIT_FILE );
 		return $plugin['Version'];
 	}
 
@@ -238,13 +237,14 @@ final class Hermit_Update {
 	 * 检测插件目录是否使用了版本控制工具
 	 *
 	 * @since Hermit X 2.5.9
+	 * @since Hermit X 2.6.0 使用插件目录替换原来的 `WP_PLUGIN_DIR`。
 	 */
 	private function is_vcs_checkout() {
 		include_once( ABSPATH . '/wp-admin/includes/admin.php' );
 		include_once( ABSPATH . '/wp-admin/includes/class-wp-upgrader.php' );
 
 		$upgrader = new WP_Automatic_Updater;
-		return $upgrader->is_vcs_checkout( WP_PLUGIN_DIR );
+		return $upgrader->is_vcs_checkout( HERMIT_PATH );
 	}
 
 }
