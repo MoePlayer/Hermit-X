@@ -10,12 +10,13 @@ class HermitJson
          ** 缓存插件设置
          */
         $this->_settings = get_option('hermit_setting');
-        global $Netease, $Xiami, $Kugou, $Tencent;
-        @require_once('include/Meting.php');
+        global $Netease, $Xiami, $Tencent, $Kugou, $Baidu;
+        require('include/Meting.php');
         $Netease = new Meting("netease");
         $Xiami = new Meting("xiami");
-        $Kugou = new Meting("kugou");
         $Tencent = new Meting("tencent");
+        $Kugou = new Meting("kugou");
+        $Baidu = new Meting("baidu");
     }
 
     public function xiami_song($music_id)
