@@ -171,6 +171,29 @@ class hermit
                     'msg'    => $HMTJSON->xiami_pic_url($id, $_GET['picid'])
                 );
                 break;
+
+            case 'xiami_id_parse':
+                $src = explode(',', $_GET['src']);
+
+                foreach ($src as $key => $value) {
+                    $cacheKey = "/xiami/idparse/$value";
+                    $cache = $HMTJSON->get_cache($cacheKey);
+                    if ($cache) {
+                        $ids[] = $cache;
+                        continue;
+                    }
+                    $response = wp_remote_retrieve_body(wp_remote_get($value));
+                    $re = '/<link rel="canonical" href="http:\/\/www\.xiami\.com\/(collect|album|song)\/(?<id>\d+)" \/>/';
+                    preg_match($re, $response, $matches);
+                    $ids[] = $matches['id'];
+                    $HMTJSON->set_cache($cacheKey, $matches['id'], 744);
+                }
+                $result = array(
+                    'status' => 200,
+                    'msg'    => $ids
+                );
+                break;
+
             case 'songlist':
                 $result = array(
                     'status' => 200,
