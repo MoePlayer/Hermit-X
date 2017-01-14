@@ -205,6 +205,12 @@ final class Hermit_Update {
 					if ( $ttl < wp_next_scheduled( 'wp_version_check' ) )
 						wp_schedule_single_event( $ttl, 'wp_version_check' );
 				}
+
+				if ( isset( $body->within_China ) ) {
+					$hermit_setting = get_option('hermit_setting');
+					$hermit_setting['within_China'] = (bool) $body->within_China;
+					update_option('hermit_setting', $hermit_setting);
+				}
 			}
 		}
 

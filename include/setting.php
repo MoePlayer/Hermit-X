@@ -129,7 +129,7 @@
 					<p class="description">实际音质<b>小于等于</b>所选音质。默认极高</p>
 				</td>
 			</tr>
-			<tr valign="top">
+			<!-- <tr valign="top">
 				<th scope="row"><label>网易云镜像地址</label></th>
 				<td>
 					<p><label><input type="checkbox" name="hermit_setting[NeteaseMirror_status]"
@@ -152,7 +152,7 @@
 					*此镜像功能仅对网易云音乐单曲/播放列表/专辑有效
 					</p>
 				</td>
-			</tr>
+			</tr> -->
 			<tr valign="top">
 				<th scope="row"><label>高级缓存</label></th>
 				<td>
@@ -181,6 +181,18 @@
 					          value="<?php echo $this->settings('playlist_max_height'); ?>"/>px</p>
 
 					<p class="description">限制播放列表的最大高度，0为不限制。</p>
+				</td>
+			</tr>
+			<tr valign="top">
+				<th scope="row"><label>服务器地域</label></th>
+				<td>
+					<p><label><input type="checkbox" name="hermit_setting[within_China]" disabled="true"
+					          value="1" <?php if ($this->settings('within_China') == 1) {
+                        echo 'checked="checked"';
+                    } ?>/>
+						<span>服务器位于中国境内</span></label></p>
+
+					<p class="description">此选项由 LWL API 自动控制，当检查到服务器不在中国境内时，将自动使用 LWL API 接管部分音乐信息解析操作以保证正常播放。</p>
 				</td>
 			</tr>
 			<tr>

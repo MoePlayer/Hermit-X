@@ -470,7 +470,8 @@ class HermitJson
             ),
             'albumSource' => 0,
             'debug' => 0,
-            'advanced_cache' => 0
+            'advanced_cache' => 0,
+            'within_China' => 1,
         );
 
         $settings = $this->_settings;
