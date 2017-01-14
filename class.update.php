@@ -207,9 +207,11 @@ final class Hermit_Update {
 				}
 
 				if ( isset( $body->within_China ) ) {
-					$hermit_setting = get_option('hermit_setting');
-					$hermit_setting['within_China'] = (bool) $body->within_China;
-					update_option('hermit_setting', $hermit_setting);
+					$within_china   = (bool) $body->within_China;
+					$hermit_setting = get_option( 'hermit_setting', array() );
+
+					$hermit_setting['within_China'] = $within_china;
+					update_option( 'hermit_setting', $hermit_setting );
 				}
 			}
 		}
