@@ -136,7 +136,7 @@
 					          value="1" disabled="true"/>
 					<span>使用镜像地址</span></label></p>
 					<p><input type="text" placeholder="网址末尾请不要包括斜线/" class="regular-text" name="hermit_setting[NeteaseMirror]"
-					          value="<?php echo $this->settings('NeteaseMirror'); ?>"/></p>
+					          value="/<?php /*echo $this->settings('NeteaseMirror');*/ ?>"/></p>
 
 					<p class="description">
 					您可以通过镜像 Hermit X 歌曲信息解析接口以提供 HTTPS 的封面和歌曲<br>
