@@ -173,24 +173,9 @@ class hermit
                 break;
 
             case 'xiami_id_parse':
-                $src = explode(',', $_GET['src']);
-
-                foreach ($src as $key => $value) {
-                    $cacheKey = "/xiami/idparse/$value";
-                    $cache = $HMTJSON->get_cache($cacheKey);
-                    if ($cache) {
-                        $ids[] = $cache;
-                        continue;
-                    }
-                    $response = wp_remote_retrieve_body(wp_remote_get($value));
-                    $re = '/<link rel="canonical" href="http:\/\/www\.xiami\.com\/(collect|album|song)\/(?<id>\d+)" \/>/';
-                    preg_match($re, $response, $matches);
-                    $ids[] = $matches['id'];
-                    $HMTJSON->set_cache($cacheKey, $matches['id'], 744);
-                }
                 $result = array(
                     'status' => 200,
-                    'msg'    => $ids
+                    'msg'    => $this->xiami_id_parse(explode(',', $_GET['src']))
                 );
                 break;
 
@@ -216,46 +201,12 @@ class hermit
                 break;
 
             //网易音乐部分
-            case 'netease_songs':
-                $result = array(
-                    'status' => 200,
-                    'msg'    => $HMTJSON->netease_songs($id)
-                );
-                break;
-            case 'netease_song_url':
-                $result = array(
-                    'status' => 200,
-                    'msg'    => $HMTJSON->netease_song_url($id)
-                );
-                break;
-
-            case 'netease_pic_url':
-                $result = array(
-                    'status' => 200,
-                    'msg'    => $HMTJSON->netease_pic_url($id, $_GET['picid'])
-                );
-                break;
-
-            case 'netease_album':
-                $result = array(
-                    'status' => 200,
-                    'msg'    => $HMTJSON->netease_album($id)
-                );
-                break;
-
-            case 'netease_playlist':
-                $result = array(
-                    'status' => 200,
-                    'msg'    => $HMTJSON->netease_playlist($id)
-                );
-                break;
-
-            case 'netease_radio':
-                $result = array(
-                    'status' => 200,
-                    'msg'    => $HMTJSON->netease_radio($id)
-                );
-                break;
+             case 'netease_pic_url':
+                 $result = array(
+                     'status' => 200,
+                     'msg'    => $HMTJSON->netease_pic_url($id, $_GET['picid'])
+                 );
+                 break;
 
             //本地音乐部分
             case 'remote':
@@ -265,11 +216,20 @@ class hermit
                 );
                 break;
 
+            //默认路由
             default:
-                $result = array(
-                    'status' => 400,
-                    'msg'    => null
-                );
+                if (method_exists($HMTJSON, $scope)) {
+                    $result = array(
+                        'status' => 200,
+                        'msg'    => $HMTJSON->$scope($id)
+                    );
+                } else {
+                    $result = array(
+                        'status' => 400,
+                        'msg'    => null
+                    );
+                }
+
         }
 
         //输出 JSON
@@ -278,6 +238,25 @@ class hermit
         exit($output);
     }
 
+    public function xiami_id_parse($src)
+    {
+        global $HMTJSON;
+
+        foreach ($src as $key => $value) {
+            $cacheKey = "/xiami/idparse/$value";
+            $cache = $HMTJSON->get_cache($cacheKey);
+            if ($cache) {
+                $ids[] = $cache;
+                continue;
+            }
+            $response = wp_remote_retrieve_body(wp_remote_get($value));
+            $re = '/<link rel="canonical" href="http:\/\/www\.xiami\.com\/(collect|album|song)\/(?<id>\d+)" \/>/';
+            preg_match($re, $response, $matches);
+            $ids[] = $matches['id'];
+            $HMTJSON->set_cache($cacheKey, $matches['id'], 744);
+        }
+        return $ids;
+    }
     /**
      * 输出https下图片格式
      */
