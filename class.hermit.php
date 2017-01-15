@@ -207,6 +207,11 @@ class hermit
                     } else {
                         $site = $matches['site'];
                     }
+                    if ($scope === 'songs') {
+                        $scope = 'songlist';
+                    } elseif ($scope === 'collect') {
+                        $scope = 'playlist';
+                    }
                     if (method_exists($HMTJSON, $scope)) {
                         if ($scope === 'pic_url') {
                             $result = array(
@@ -219,11 +224,6 @@ class hermit
                                 'msg' => $HMTJSON->$scope($site, explode(',', $_GET['src']))
                             );
                         } else {
-                            if ($scope === 'songs') {
-                                $scope = 'songlist';
-                            } elseif ($scope === 'collect') {
-                                $scope = 'playlist';
-                            }
                             $result = array(
                                 'status' => 200,
                                 'msg' => $HMTJSON->$scope($site, $id)
