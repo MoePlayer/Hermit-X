@@ -44,10 +44,11 @@ jQuery(document).ready(function(b) {
                     (a = a.match(/(http|https):\/\/y\.qq\.com\/portal\/song\//gi)) && 0 < a.length && (d.array = "Wating Parse...");
                     break;
                 case "tencent_album":
-                    (a = a.match(/y\.qq\.com\/portal\/playlist\/(\d+)\.html/gi)) && 0 < a.length && (d.array = a[0].replace(/y\.qq\.com\/portal\/album\/(\d+)\.html/gi, ""));
+                    (a = a.match(/y\.qq\.com\/portal\/album\/([A-Za-z0-9]+)/gi)) && 0 < a.length && (d.array = a[0].replace(/y\.qq\.com\/portal\/album\//gi, ""));
+                    console.log(a);
                     break;
                 case "tencent_playlist":
-                    (a = a.match(/y\.qq\.com\/portal\/playlist\/(\d+)\.html/gi)) && 0 < a.length && (d.array = a[0].replace(/y\.qq\.com\/portal\/playlist\/(\d+)\.html/gi, ""))
+                    (a = a.match(/y\.qq\.com\/portal\/playlist\/(\d+)/gi)) && 0 < a.length && (d.array = a[0].replace(/y\.qq\.com\/portal\/playlist\//gi, ""))
             }
         }
         "remote" == c && (d.type = "remote", d.array = a);
@@ -147,9 +148,6 @@ jQuery(document).ready(function(b) {
                 break;
             case 'tencent':
                 b("#hermit-shell-insert").text("Tencent Music ID Parsing...");
-                break;
-            default:
-                break;
         }
         b.ajax({
             url: hermit.ajax_url,

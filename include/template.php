@@ -13,6 +13,9 @@
 						<div class="media-router">
 							<a href="javascript:;" class="media-menu-item active">网易音乐</a>
 							<a href="javascript:;" class="media-menu-item">虾米音乐</a>
+							<a href="javascript:;" class="media-menu-item">腾讯音乐</a>
+							<a href="javascript:;" class="media-menu-item">酷狗音乐</a>
+							<a href="javascript:;" class="media-menu-item">百度音乐</a>
 							<a href="javascript:;" class="media-menu-item">本地音乐</a>
 						</div>
 						<a class="hermit-help" href="<?php echo admin_url("admin.php?page=hermit-help"); ?>"
