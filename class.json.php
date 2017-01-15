@@ -43,6 +43,7 @@ class HermitJson
 
     public function id_parse($site, $src)
     {
+
         foreach ($src as $key => $value) {
             $cacheKey = "/$site/idparse/$value";
             $cache    = $this->get_cache($cacheKey);
@@ -50,7 +51,27 @@ class HermitJson
                 $ids[] = $cache;
                 continue;
             }
-            $response = wp_remote_retrieve_body(wp_remote_get($value));
+
+            switch ($site) {
+                case 'tencent':
+                $request = array(
+                    'url'    => $value,
+                    'referer'   => 'http://y.qq.com/portal/player.html',
+                    'cookie'    => 'qqmusic_uin=12345678; qqmusic_key=12345678; qqmusic_fromtag=30; ts_last=y.qq.com/portal/player.html;',
+                    'useragent' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.30 Safari/537.36',
+                );
+                    break;
+
+                case 'xiami':
+                $request = array(
+                    'url'    => $value,
+                    'referer'   => 'http://h.xiami.com/',
+                    'cookie'    => 'user_from=2;XMPLAYER_addSongsToggler=0;XMPLAYER_isOpen=0;_xiamitoken=123456789;',
+                    'useragent' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.30 Safari/537.36',
+                );
+                    break;
+            }
+            $response = $this->curl($request);
             switch ($site) {
                 case 'xiami':
                     $re       = '/<link rel="canonical" href="http:\/\/www\.xiami\.com\/(collect|album|song)\/(?<id>\d+)" \/>/';
@@ -220,6 +241,22 @@ class HermitJson
         }
 
         return false;
+    }
+
+    public function curl($API){
+
+        $curl=curl_init();
+        if(isset($API['body']))$API['url']=$API['url'].'?'.http_build_query($API['body']);
+        curl_setopt($curl,CURLOPT_URL,$API['url']);
+        curl_setopt($curl,CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($curl,CURLOPT_CONNECTTIMEOUT,10);
+        curl_setopt($curl,CURLOPT_COOKIE,$API['cookie']);
+        curl_setopt($curl,CURLOPT_REFERER,$API['referer']);
+        curl_setopt($curl,CURLOPT_USERAGENT,$API['useragent']);
+
+        $result=curl_exec($curl);
+        curl_close($curl);
+        return $result;
     }
 
     public function get_cache($key)
