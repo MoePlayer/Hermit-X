@@ -23,7 +23,7 @@
 						<ul class="hermit-ul">
 							<li class="hermit-li active" data-type="netease">
 								<div>
-									<label><input type="radio" name="netease_type" value="netease_songs" checked="checked">单曲</label>
+									<label><input type="radio" name="netease_type" value="netease_songlist" checked="checked">单曲</label>
 									<label><input type="radio" name="netease_type" value="netease_album">专辑</label>
 									<label><input type="radio" name="netease_type" value="netease_playlist">歌单</label>
 								</div>
