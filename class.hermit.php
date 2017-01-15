@@ -218,17 +218,20 @@ class hermit
 
             //默认路由
             default:
-                if (method_exists($HMTJSON, $scope)) {
-                    $result = array(
-                        'status' => 200,
-                        'msg'    => $HMTJSON->$scope($id)
-                    );
-                } else {
-                    $result = array(
-                        'status' => 400,
-                        'msg'    => null
-                    );
+                if ((strpos($scope, 'netease') !== false) || (strpos($scope, 'netease') !== false) || (strpos($scope, 'xiami') !== false) || (strpos($scope, 'tencent') !== false) || (strpos($scope, 'kugou') !== false) || (strpos($scope, 'baidu') !== false)) { // For Security
+                    if (method_exists($HMTJSON, $scope)) {
+                        $result = array(
+                            'status' => 200,
+                            'msg'    => $HMTJSON->$scope($id)
+                        );
+                    } else {
+                        $result = array(
+                            'status' => 400,
+                            'msg'    => null
+                        );
+                    }
                 }
+
 
         }
 
