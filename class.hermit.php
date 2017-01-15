@@ -230,9 +230,12 @@ class hermit
                             'msg'    => null
                         );
                     }
+                } else {
+                    $result = array(
+                        'status' => 400,
+                        'msg'    => null
+                    );
                 }
-
-
         }
 
         //输出 JSON
