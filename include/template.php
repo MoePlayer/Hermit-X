@@ -22,8 +22,7 @@
 						<ul class="hermit-ul">
 							<li class="hermit-li active" data-type="netease">
 								<div>
-									<label><input type="radio" name="netease_type" value="netease_songs"
-												  checked="checked">单曲</label>
+									<label><input type="radio" name="netease_type" value="netease_songs" checked="checked">单曲</label>
 									<label><input type="radio" name="netease_type" value="netease_album">专辑</label>
 									<label><input type="radio" name="netease_type" value="netease_playlist">歌单</label>
 								</div>
@@ -32,12 +31,39 @@
 							</li>
 							<li class="hermit-li" data-type="xiami">
 								<div>
-									<label><input type="radio" name="type" value="xiami_songlist" checked="checked">单曲</label>
-									<label><input type="radio" name="type" value="xiami_album">专辑</label>
-									<label><input type="radio" name="type" value="xiami_collect">精选集</label>
+									<label><input type="radio" name="xiami_type" value="xiami_songlist" checked="checked">单曲</label>
+									<label><input type="radio" name="xiami_type" value="xiami_album">专辑</label>
+									<label><input type="radio" name="xiami_type" value="xiami_playlist">精选集</label>
 								</div>
 								<textarea class="hermit-textarea large-text code" cols="30" rows="9"
 										  placeholder="输入虾米音乐地址。。。"></textarea>
+							</li>
+							<li class="hermit-li" data-type="tencent">
+								<div>
+									<label><input type="radio" name="tencent_type" value="tencent_songlist" checked="checked">单曲</label>
+									<label><input type="radio" name="tencent_type" value="tencent_album">专辑</label>
+									<label><input type="radio" name="tencent_type" value="tencent_playlist">歌单</label>
+								</div>
+								<textarea class="hermit-textarea large-text code" cols="30" rows="9"
+										  placeholder="输入QQ音乐地址。。。"></textarea>
+							</li>
+							<li class="hermit-li" data-type="kugou">
+								<div>
+									<label><input type="radio" name="kugou_type" value="kugou_songlist" checked="checked">单曲</label>
+									<label><input type="radio" name="kugou_type" value="kugou_album">专辑</label>
+									<label><input type="radio" name="kugou_type" value="kugou_playlist">歌单</label>
+								</div>
+								<textarea class="hermit-textarea large-text code" cols="30" rows="9"
+										  placeholder="输入酷狗音乐地址。。。"></textarea>
+							</li>
+							<li class="hermit-li" data-type="baidu">
+								<div>
+									<label><input type="radio" name="baidu_type" value="baidu_songlist" checked="checked">单曲</label>
+									<label><input type="radio" name="baidu_type" value="baidu_album">专辑</label>
+									<label><input type="radio" name="baidut_type" value="baidu_playlist">歌单</label>
+								</div>
+								<textarea class="hermit-textarea large-text code" cols="30" rows="9"
+										  placeholder="输入百度音乐地址。。。"></textarea>
 							</li>
 							<li class="hermit-li" data-type="remote">
 								<div id="hermit-remote-content">

@@ -17,14 +17,14 @@ jQuery(document).ready(function(b) {
                 case "xiami_album":
                     (a = a.match(/(http|https):\/\/(www.)?xiami.com\/album\//gi)) && 0 < a.length && (d.array = "Wating Parse...");
                     break;
-                case "xiami_collect":
+                case "xiami_playlist":
                     (a = a.match(/(http|https):\/\/(www.)?xiami.com\/collect\//gi)) && 0 < a.length && (d.array = "Wating Parse...");
                     break
             }
         }
         if ("netease" == c) {
             switch (d.type) {
-                case "netease_songs":
+                case "netease_songlist":
                     (a = a.match(/song\?id=(\d+)/gi)) && 0 < a.length && (e = [], b.each(a,
                         function(a, c) {
                             -1 === b.inArray(c, e) && e.push(c)
@@ -35,6 +35,19 @@ jQuery(document).ready(function(b) {
                     break;
                 case "netease_playlist":
                     (a = a.match(/playlist\?id=(\d+)/gi)) && 0 < a.length && (d.array = a[0].replace(/playlist\?id=/g, ""))
+            }
+        }
+
+        if ("tencent" == c) {
+            switch (d.type) {
+                case "tencent_songlist":
+                    (a = a.match(/(http|https):\/\/y\.qq\.com\/portal\/song\//gi)) && 0 < a.length && (d.array = "Wating Parse...");
+                    break;
+                case "tencent_album":
+                    (a = a.match(/y\.qq\.com\/portal\/playlist\/(\d+)\.html/gi)) && 0 < a.length && (d.array = a[0].replace(/y\.qq\.com\/portal\/album\/(\d+)\.html/gi, ""));
+                    break;
+                case "tencent_playlist":
+                    (a = a.match(/y\.qq\.com\/portal\/playlist\/(\d+)\.html/gi)) && 0 < a.length && (d.array = a[0].replace(/y\.qq\.com\/portal\/playlist\/(\d+)\.html/gi, ""))
             }
         }
         "remote" == c && (d.type = "remote", d.array = a);
@@ -119,29 +132,43 @@ jQuery(document).ready(function(b) {
     e.on("click", "#hermit-shell-insert",
         function() {
             if (f == "xiami") {
-                b("#hermit-shell-insert").text("Xiami Music ID Parsing...");
-                b.ajax({
-                    url: hermit.ajax_url,
-                    data: {
-                        action: "hermit",
-                        scope: "xiami_id_parse",
-                        src: b(".hermit-li.active .hermit-textarea").val().replace(/\n/g, ","),
-                    },
-                    success: function(c) {
-                        b("#hermit-shell-insert").text("插入至文章");
-                        "disabled" != b(this).attr("disabled") && (send_to_editor(l.replace("Wating Parse...", c.msg.join(",").replace(/,+$/g, ""))), b("#hermit-shell").remove());
-                        b("body").removeClass("hermit-hidden")
-                    },
-                    error: function() {
-                        b("#hermit-shell-insert").text("插入至文章");
-                        alert("\u83b7\u53d6\u5931\u8d25, \u8bf7\u7a0d\u5019\u91cd\u8bd5")
-                    }
-                })
+                id_parse('xiami');
+            } else if (d.type == "tencent_songlist") {
+                id_parse('tencent');
             } else {
                 "disabled" != b(this).attr("disabled") && (send_to_editor(l.replace(/,+$/g, "")), b("#hermit-shell").remove());
                 b("body").removeClass("hermit-hidden")
             }
         });
+    function id_parse(site) {
+        switch (site) {
+            case 'xiami':
+                b("#hermit-shell-insert").text( "Xiami Music ID Parsing...");
+                break;
+            case 'tencent':
+                b("#hermit-shell-insert").text("Tencent Music ID Parsing...");
+                break;
+            default:
+                break;
+        }
+        b.ajax({
+            url: hermit.ajax_url,
+            data: {
+                action: "hermit",
+                scope: site + "_id_parse",
+                src: b(".hermit-li.active .hermit-textarea").val().replace(/\n/g, ","),
+            },
+            success: function(c) {
+                b("#hermit-shell-insert").text("插入至文章");
+                "disabled" != b(this).attr("disabled") && (send_to_editor(l.replace("Wating Parse...", c.msg.join(",").replace(/,+$/g, ""))), b("#hermit-shell").remove());
+                b("body").removeClass("hermit-hidden")
+            },
+            error: function() {
+                b("#hermit-shell-insert").text("插入至文章");
+                alert("\u83b7\u53d6\u5931\u8d25, \u8bf7\u7a0d\u5019\u91cd\u8bd5")
+            }
+        })
+    }
     e.on("click", "#hermit-remote-content ul li",
         function() {
             var c = b(this),

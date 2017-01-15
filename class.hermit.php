@@ -187,51 +187,6 @@ class hermit
         $id    = $_GET['id'];
 
         switch ($scope) {
-            //虾米部分
-            case 'songs':
-                $result = array(
-                    'status' => 200,
-                    'msg' => $HMTJSON->xiami_songlist($id)
-                );
-                break;
-            case 'songlist':
-                $result = array(
-                    'status' => 200,
-                    'msg' => $HMTJSON->xiami_songlist($id)
-                );
-                break;
-            case 'album':
-                $result = array(
-                    'status' => 200,
-                    'msg' => $HMTJSON->xiami_album($id)
-                );
-                break;
-            case 'collect':
-                $result = array(
-                    'status' => 200,
-                    'msg' => $HMTJSON->xiami_collect($id)
-                );
-                break;
-            case 'xiami_pic_url':
-                $result = array(
-                    'status' => 200,
-                    'msg' => $HMTJSON->xiami_pic_url($id, $_GET['picid'])
-                );
-                break;
-            case 'xiami_id_parse':
-                $result = array(
-                    'status' => 200,
-                    'msg' => $this->xiami_id_parse(explode(',', $_GET['src']))
-                );
-                break;
-
-            //网易音乐部分
-            case 'netease_pic_url':
-                $result = array(
-                    'status' => 200,
-                    'msg' => $HMTJSON->netease_pic_url($id, $_GET['picid'])
-                );
-                break;
 
             //本地音乐部分
             case 'remote':
@@ -243,14 +198,37 @@ class hermit
 
             //默认路由
             default:
-            $re = '/^(netease|xiami|tencent|kugou|baidu)_(song|songs|songlist|album|playlist|collect|artist|song_url)$/i';
+            $re = '/^(?<site>(netease|xiami|tencent|kugou|baidu)?)_?(?<scope>songs|songlist|album|playlist|collect|artist|song_url|pic_url|id_parse)$/i';
             preg_match($re, $scope, $matches);
-                if (count($matches[0] !== 0)) {
+                if (!empty($matches['scope'])) {
+                    $scope = $matches['scope'];
+                    if (empty($matches['site'])) {
+                        $site = 'xiami';
+                    } else {
+                        $site = $matches['site'];
+                    }
                     if (method_exists($HMTJSON, $scope)) {
-                        $result = array(
-                            'status' => 200,
-                            'msg' => $HMTJSON->$scope($id)
-                        );
+                        if ($scope === 'pic_url') {
+                            $result = array(
+                                'status' => 200,
+                                'msg' => $HMTJSON->$scope($site, $id, $_GET['picid'])
+                            );
+                        } elseif ($scope === 'id_parse') {
+                            $result = array(
+                                'status' => 200,
+                                'msg' => $HMTJSON->$scope($site, explode(',', $_GET['src']))
+                            );
+                        } else {
+                            if ($scope === 'songs') {
+                                $scope = 'songlist';
+                            } elseif ($scope === 'collect') {
+                                $scope = 'playlist';
+                            }
+                            $result = array(
+                                'status' => 200,
+                                'msg' => $HMTJSON->$scope($site, $id)
+                            );
+                        }
                     } else {
                         $result = array(
                             'status' => 400,
@@ -271,25 +249,6 @@ class hermit
         exit($output);
     }
 
-    public function xiami_id_parse($src)
-    {
-        global $HMTJSON;
-
-        foreach ($src as $key => $value) {
-            $cacheKey = "/xiami/idparse/$value";
-            $cache    = $HMTJSON->get_cache($cacheKey);
-            if ($cache) {
-                $ids[] = $cache;
-                continue;
-            }
-            $response = wp_remote_retrieve_body(wp_remote_get($value));
-            $re       = '/<link rel="canonical" href="http:\/\/www\.xiami\.com\/(collect|album|song)\/(?<id>\d+)" \/>/';
-            preg_match($re, $response, $matches);
-            $ids[] = $matches['id'];
-            $HMTJSON->set_cache($cacheKey, $matches['id'], 744);
-        }
-        return $ids;
-    }
     /**
      * 输出https下图片格式
      */
@@ -514,7 +473,7 @@ class hermit
             'strategy' => 1,
             'color' => 'default',
             'playlist_max_height' => '349',
-            'Netease_Quality' => '320',
+            'quality' => '320',
             'jsplace' => 0,
             'prePage' => 20,
             'remainTime' => 10,
