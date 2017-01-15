@@ -13,32 +13,60 @@
 						<div class="media-router">
 							<a href="javascript:;" class="media-menu-item active">网易音乐</a>
 							<a href="javascript:;" class="media-menu-item">虾米音乐</a>
+							<a href="javascript:;" class="media-menu-item">腾讯音乐</a>
+							<a href="javascript:;" class="media-menu-item">酷狗音乐</a>
+							<a href="javascript:;" class="media-menu-item">百度音乐</a>
 							<a href="javascript:;" class="media-menu-item">本地音乐</a>
 						</div>
-						<a class="hermit-help" href="<?php echo admin_url("admin.php?page=hermit-help"); ?>"
-						   target="_blank">帮助?</a>
 					</div>
 					<div class="media-frame-content">
 						<ul class="hermit-ul">
 							<li class="hermit-li active" data-type="netease">
 								<div>
-									<label><input type="radio" name="netease_type" value="netease_songs"
-												  checked="checked">单曲</label>
+									<label><input type="radio" name="netease_type" value="netease_songs" checked="checked">单曲</label>
 									<label><input type="radio" name="netease_type" value="netease_album">专辑</label>
 									<label><input type="radio" name="netease_type" value="netease_playlist">歌单</label>
-									<label><input type="radio" name="netease_type" value="netease_radio" disabled="true">电台</label>
 								</div>
 								<textarea class="hermit-textarea large-text code" cols="30" rows="9"
-										  placeholder="输入网易云音乐音乐地址。。。"></textarea>
+										  placeholder="输入网易云音乐音乐地址……"></textarea>
 							</li>
 							<li class="hermit-li" data-type="xiami">
 								<div>
-									<label><input type="radio" name="type" value="songlist" checked="checked">单曲</label>
-									<label><input type="radio" name="type" value="album">专辑</label>
-									<label><input type="radio" name="type" value="collect">精选集</label>
+									<label><input type="radio" name="xiami_type" value="xiami_songlist" checked="checked">单曲</label>
+									<label><input type="radio" name="xiami_type" value="xiami_album">专辑</label>
+									<label><input type="radio" name="xiami_type" value="xiami_playlist">精选集</label>
 								</div>
 								<textarea class="hermit-textarea large-text code" cols="30" rows="9"
-										  placeholder="输入虾米音乐地址。。。"></textarea>
+										  placeholder="输入虾米音乐地址……"></textarea>
+							</li>
+							<li class="hermit-li" data-type="tencent">
+								<div>
+									<label><input type="radio" name="tencent_type" value="tencent_songlist" checked="checked">单曲</label>
+									<label><input type="radio" name="tencent_type" value="tencent_album">专辑</label>
+									<label><input type="radio" name="tencent_type" value="tencent_playlist">歌单</label>
+								</div>
+								<textarea class="hermit-textarea large-text code" cols="30" rows="9"
+										  placeholder="输入QQ音乐地址……"></textarea>
+							</li>
+							<li class="hermit-li" data-type="kugou">
+								<div>
+									<label><input type="radio" name="kugou_type" value="kugou_songlist" checked="checked">单曲</label>
+									<label><input type="radio" name="kugou_type" value="kugou_album">专辑</label>
+									<label><input type="radio" name="kugou_type" value="kugou_playlist">歌单</label>
+								</div>
+								<textarea class="hermit-textarea large-text code" cols="30" rows="9"  placeholder="直接输入酷狗音乐歌曲/专辑/播放列表ID
+如不知道歌曲 ID, 可使用 https://api.lwl12.com/music/kugou/search?output=pre&keyword=歌曲名 进行搜索。
+将该页面返回结果中 [id] => 后字符串复制至该输入框即可。
+（PS：[name] => 对应歌名，[artist] => 对应所有歌手名）"></textarea>
+							</li>
+							<li class="hermit-li" data-type="baidu">
+								<div>
+									<label><input type="radio" name="baidu_type" value="baidu_songlist" checked="checked">单曲</label>
+									<label><input type="radio" name="baidu_type" value="baidu_album">专辑</label>
+									<label><input type="radio" name="baidut_type" value="baidu_playlist">歌单</label>
+								</div>
+								<textarea class="hermit-textarea large-text code" cols="30" rows="9"
+										  placeholder="输入百度音乐地址……"></textarea>
 							</li>
 							<li class="hermit-li" data-type="remote">
 								<div id="hermit-remote-content">

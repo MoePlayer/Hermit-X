@@ -116,8 +116,8 @@
                     foreach ($quality_array as $key => $title) {
                         ?>
 						<label title="<?php echo $title; ?>">
-							<input type="radio" name="hermit_setting[Netease_Quality]"
-							       value="<?php echo $key; ?>" <?php if ($this->settings('Netease_Quality') == $key) {
+							<input type="radio" name="hermit_setting[quality]"
+							       value="<?php echo $key; ?>" <?php if ($this->settings('quality') == $key) {
                             echo 'checked="checked"';
                         } ?>/>
 							<span><?php echo $title; ?></span>

@@ -10,208 +10,121 @@ class HermitJson
          ** 缓存插件设置
          */
         $this->_settings = get_option('hermit_setting');
-        global $Netease, $Xiami, $Kugou, $Tencent;
-        @require_once('include/Meting.php');
-        $Netease = new Meting("netease");
-        $Xiami = new Meting("xiami");
-        $Kugou = new Meting("kugou");
-        $Tencent = new Meting("tencent");
+        require('include/Meting.php');
     }
 
-    public function xiami_song($music_id)
+    public function song_url($site, $music_id)
     {
-        global $Xiami;
-        $cache_key = "/xiami/song/$music_id";
+        $Meting = new Meting($site);
 
-        $cache = $this->get_cache($cache_key);
-            // if ($cache)
-            //     return $cache;
-
-            $response = json_decode($Xiami->format()->song($music_id), true);
-
-        if (!empty($response[0]["id"])) {
-            //处理音乐信息
-                $mp3_url    = admin_url() . "admin-ajax.php" . '?action=hermit&scope=xiami_song_url&id=' . $music_id;
-            $music_name = $response[0]["name"];
-            $cover      = admin_url() . "admin-ajax.php" . '?action=hermit&scope=xiami_pic_url&picid=' . $response[0]['pic_id'] . '&id=' . $music_id;
-            $artists    = $response[0]["artist"];
-
-            $artists = implode(",", $artists);
-
-            $result = array(
-                    "title" => $music_name,
-                    "author" => $artists,
-                    "url" => $mp3_url,
-                    "pic" => $cover,
-                    "lrc" => 'https://api.lwl12.com/music/xiami/lyric?raw=true&id=' . $music_id
-                );
-
-            $this->set_cache($cache_key, $result, 24);
-            return $result;
-        }
-
-        return false;
-    }
-    public function xiami_song_url($music_id)
-    {
-        global $Xiami;
-            // if ($this->settings( 'XiamiMirror_status' ) == 1 && strpos($_SERVER['REQUEST_URI'], "admin-ajax.php") !== FALSE) {
-            //     Header("Location: " . $this->settings('XiamiMirror') . "/xiami_song_url/id/" . $music_id);
-            //     exit;
-            // } Unavaliable in xiami
-
-        $url = json_decode($Xiami->format()->url($music_id/*, $this->settings( 'Xiami_Quality' )*/), true);
+        $url = json_decode($Meting->format()->url($music_id, $this->settings('quality')), true);
         $url = $url['url'];
         if (empty($url)) {
-            Header("Location: " . 'http://tts.baidu.com/text2audio?lan=zh&pid=101&ie=UTF-8&spd=6&text=%E9%9D%9E%E5%B8%B8%E6%8A%B1%E6%AD%89%EF%BC%8C%E6%AD%A4%E6%AD%8C%E6%9B%B2%E5%9B%A0%E7%89%88%E6%9D%83%E5%8E%9F%E5%9B%A0%E6%88%96%E5%9B%A0%E8%99%BE%E7%B1%B3%E6%8A%BD%E9%A3%8E%E6%97%A0%E6%B3%95%E6%92%AD%E6%94%BE%EF%BC%81');
+            if ($this->settings('within_China')) {
+                Header("Location: " . 'https://api.lwl12.com/music/netease/song?id=607441');
+            } else {
+                Header("Location: " . "https://api.lwl12.com/music/$site/song?id=" . $music_id);
+            }
+
             exit;
         }
         Header("Location: " . $url);
         exit;
     }
-    public function xiami_pic_url($id, $pic)
+
+    public function pic_url($site, $id, $pic)
     {
-        global $Xiami;
-            // if ($this->settings( 'XiamiMirror_status' ) == 1 && strpos($_SERVER['REQUEST_URI'], "admin-ajax.php") !== FALSE) {
-            //     Header("Location: " . $this->settings('XiamiMirror') . "/xiami_pic_url/id/" . $id . "/picid/" . $pic);
-            //     exit;
-            // } Unavaliable in xiami
-            $pic = json_decode($Xiami->pic($pic), true);
+        $Meting = new Meting($site);
+
+        $pic = json_decode($Meting->pic($pic), true);
+        if (empty($pic["url"])) {
+            $return = array(
+                'code' => 501,
+                'msg' => 'Invalid song or Music site server error'
+            );
+            exit(json_encode($return));
+        }
         Header("Location: " . $pic["url"]);
         exit;
     }
-    public function xiami_song_list($song_list)
+
+    public function id_parse($site, $src)
     {
-        if (!$song_list) {
-            return false;
-        }
 
-        $songs_array = explode(",", $song_list);
-        $songs_array = array_unique($songs_array);
-
-        if (!empty($songs_array)) {
-            $result = array();
-            foreach ($songs_array as $song_id) {
-                $result['songs'][] = $this->xiami_song($song_id);
-            }
-            return $result;
-        }
-
-        return false;
-    }
-
-    public function xiami_album($album_id)
-    {
-        global $Xiami;
-        $key = "/xiami/album/$album_id";
-
-        $cache = $this->get_cache($key);
-            // if ($cache)
-            //     return $cache;
-
-            $response = json_decode($Xiami->format()->album($album_id), true);
-
-        if (!empty($response[0]['id'])) {
-            //处理音乐信息
-                $result = $response;
-            $count  = count($result);
-
-            if ($count < 1) {
-                return false;
+        foreach ($src as $key => $value) {
+            $cacheKey = "/$site/idparse/$value";
+            $cache    = $this->get_cache($cacheKey);
+            if ($cache) {
+                $ids[] = $cache;
+                continue;
             }
 
-            $album = array(
-                    "album_id" => $album_id,
-                    "album_type" => "albums",
-                    "album_count" => $count
+            switch ($site) {
+                case 'tencent':
+                $request = array(
+                    'url'    => $value,
+                    'referer'   => 'http://y.qq.com/portal/player.html',
+                    'cookie'    => 'qqmusic_uin=12345678; qqmusic_key=12345678; qqmusic_fromtag=30; ts_last=y.qq.com/portal/player.html;',
+                    'useragent' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.30 Safari/537.36',
                 );
+                    break;
 
-            foreach ($result as $k => $value) {
-                $mp3_url          = admin_url() . "admin-ajax.php" . '?action=hermit&scope=xiami_song_url&id=' . $value["id"];
-                $album["songs"][] = array(
-                        "title" => $value["name"],
-                        "url" => $mp3_url,
-                        "author" => $album_author = implode(",", $value['artist']),
-                        "pic" => admin_url() . "admin-ajax.php" . '?action=hermit&scope=xiami_pic_url&picid=' . $value["pic_id"] . '&id=' . $value["id"],
-                        "lrc" => 'https://api.lwl12.com/music/xiami/lyric?raw=true&id=' . $value["id"]
-                    );
-            }
-
-            $this->set_cache($key, $album, 24);
-            return $album;
-        }
-
-        return false;
-    }
-
-    public function xiami_collect($playlist_id)
-    {
-        global $Xiami;
-        $key = "/xiami/playlist/$playlist_id";
-
-        $cache = $this->get_cache($key);
-        if ($cache) {
-            return $cache;
-        }
-
-        $response = json_decode($Xiami->format()->playlist($playlist_id), true);
-
-        if (!empty($response[0])) {
-            //处理音乐信息
-                $result = $response;
-            $count  = count($result);
-
-            if ($count < 1) {
-                return false;
-            }
-
-            $collect = array(
-                    "collect_id" => $playlist_id,
-                    "collect_type" => "collects",
-                    "collect_count" => $count
+                case 'xiami':
+                $request = array(
+                    'url'    => $value,
+                    'referer'   => 'http://h.xiami.com/',
+                    'cookie'    => 'user_from=2;XMPLAYER_addSongsToggler=0;XMPLAYER_isOpen=0;_xiamitoken=123456789;',
+                    'useragent' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.30 Safari/537.36',
                 );
-
-            foreach ($result as $k => $value) {
-                $mp3_url = admin_url() . "admin-ajax.php" . '?action=hermit&scope=xiami_song_url&id=' . $value["id"];
-                $artists = $value["artist"];
-
-                $artists = implode(",", $artists);
-
-                $collect["songs"][] = array(
-                        "title" => $value["name"],
-                        "url" => $mp3_url,
-                        "author" => $album_author = implode(",", $value['artist']),
-                        "pic" => admin_url() . "admin-ajax.php" . '?action=hermit&scope=xiami_pic_url&picid=' . $value["pic_id"] . '&id=' . $value["id"],
-                        "lrc" => 'https://api.lwl12.com/music/xiami/lyric?raw=true&id=' . $value["id"]
-                    );
+                    break;
+            }
+            $response = $this->curl($request);
+            switch ($site) {
+                case 'xiami':
+                    $re       = '/<link rel="canonical" href="http:\/\/www\.xiami\.com\/(collect|album|song)\/(?<id>\d+)" \/>/';
+                    break;
+                case 'tencent':
+                    $re = '/g_SongData.*"songmid":"(?<id>[A-Za-z0-9]+)".*"songtype"/';
+                    break;
+                default:
+                    return false;
+                    break;
             }
 
-            $this->set_cache($key, $collect, 24);
-            return $collect;
+            preg_match($re, $response, $matches);
+            $ids[] = $matches['id'];
+            $this->set_cache($cacheKey, $matches['id'], 744);
         }
-
-        return false;
+        return $ids;
     }
 
-    public function netease_song($music_id)
+    public function song($site, $music_id)
     {
-        global $Netease;
-        $cache_key = "/netease/song/$music_id";
+        $Meting = new Meting($site);
+        $cache_key = "/$site/song/$music_id";
 
         $cache = $this->get_cache($cache_key);
         if ($cache) {
             return $cache;
         }
 
-        $response = json_decode($Netease->format()->song($music_id), true);
+        $response = json_decode($Meting->format()->song($music_id), true);
 
         if (!empty($response[0]["id"])) {
             //处理音乐信息
-            $mp3_url    = admin_url() . "admin-ajax.php" . '?action=hermit&scope=netease_song_url&id=' . $music_id;
+            $mp3_url    = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_song_url&id=" . $response[0]['url_id'];
             $music_name = $response[0]['name'];
-            $cover      = admin_url() . "admin-ajax.php" . '?action=hermit&scope=netease_pic_url&picid=' . $response[0]['pic_id'] . '&id=' . $music_id;
+            if ($site == 'baidu') {
+                $pic = json_decode($Meting->pic($response[0]['pic_id']), true);
+                if (empty($pic["url"])) {
+                    $cover = null;
+                } else {
+                    $cover = $pic["url"];
+                }
+            } else {
+                $cover      = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $response[0]['pic_id'] . '&id=' . $music_id;
+            }
             $artists    = $response[0]['artist'];
-
             $artists = implode(",", $artists);
 
             $result = array(
@@ -219,7 +132,7 @@ class HermitJson
                 "author" => $artists,
                 "url" => $mp3_url,
                 "pic" => $cover,
-                "lrc" => 'https://api.lwl12.com/music/netease/lyric?raw=true&id=' . $music_id
+                "lrc" => "https://api.lwl12.com/music/$site/lyric?raw=true&id=" . $music_id
             );
 
             $this->set_cache($cache_key, $result, 24);
@@ -229,40 +142,8 @@ class HermitJson
 
         return false;
     }
-    public function netease_song_url($music_id)
-    {
-        global $Netease;
-        // if ($this->settings('NeteaseMirror_status') == 1 && strpos($_SERVER['REQUEST_URI'], "admin-ajax.php") !== false) {
-        //     Header("Location: " . $this->settings('NeteaseMirror') . "/netease_song_url/id/" . $music_id);
-        //     exit;
-        // } Not nessrary in this version
 
-        $url = json_decode($Netease->format()->url($music_id, $this->settings('Netease_Quality')), true);
-        $url = $url['url'];
-        if (empty($url)) {
-            if ($this->settings('within_China')) {
-                Header("Location: " . 'http://tts.baidu.com/text2audio?lan=zh&pid=101&ie=UTF-8&spd=6&text=%E9%9D%9E%E5%B8%B8%E6%8A%B1%E6%AD%89%EF%BC%8C%E6%AD%A4%E6%AD%8C%E6%9B%B2%E5%9B%A0%E7%89%88%E6%9D%83%E5%8E%9F%E5%9B%A0%E6%88%96%E5%9B%A0%E7%BD%91%E6%98%93%E4%BA%91%E6%8A%BD%E9%A3%8E%E6%97%A0%E6%B3%95%E6%92%AD%E6%94%BE');
-            } else {
-                Header("Location: " . 'https://api.lwl12.com/music/netease/song?id=' . $music_id);
-            }
-
-            exit;
-        }
-        Header("Location: " . $url);
-        exit;
-    }
-    public function netease_pic_url($id, $pic)
-    {
-        global $Netease;
-        // if ($this->settings('NeteaseMirror_status') == 1 && strpos($_SERVER['REQUEST_URI'], "admin-ajax.php") !== false) {
-        //     Header("Location: " . $this->settings('NeteaseMirror') . "/netease_pic_url/id/" . $id . "/picid/" . $pic);
-        //     exit;
-        // } Not nessrary in this version
-        $pic = json_decode($Netease->pic($pic), true);
-        Header("Location: " . $pic["url"]);
-        exit;
-    }
-    public function netease_songs($song_list)
+    public function songlist($site, $song_list)
     {
         if (!$song_list) {
             return false;
@@ -274,7 +155,7 @@ class HermitJson
         if (!empty($songs_array)) {
             $result = array();
             foreach ($songs_array as $song_id) {
-                $result['songs'][] = $this->netease_song($song_id);
+                $result['songs'][] = $this->song($site, $song_id);
             }
             return $result;
         }
@@ -282,17 +163,17 @@ class HermitJson
         return false;
     }
 
-    public function netease_album($album_id)
+    public function album($site, $album_id)
     {
-        global $Netease;
-        $key = "/netease/album/$album_id";
+        $Meting = new Meting($site);
+        $cache_key = "/$site/album/$album_id";
 
-        $cache = $this->get_cache($key);
+        $cache = $this->get_cache($cache_key);
         if ($cache) {
             return $cache;
         }
 
-        $response = json_decode($Netease->format()->album($album_id), true);
+        $response = json_decode($Meting->format()->album($album_id), true);
 
         if (!empty($response[0])) {
             //处理音乐信息
@@ -311,13 +192,23 @@ class HermitJson
 
 
             foreach ($result as $k => $value) {
-                $mp3_url          = admin_url() . "admin-ajax.php" . '?action=hermit&scope=netease_song_url&id=' . $value["id"];
+                $mp3_url          = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_song_url&id=" . $value["url_id"];
+                if ($site == 'baidu') {
+                    $pic = json_decode($Meting->pic($value['pic_id']), true);
+                    if (empty($pic["url"])) {
+                        $cover = null;
+                    } else {
+                        $cover = $pic["url"];
+                    }
+                } else {
+                    $cover = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $value['pic_id'] . '&id=' . $value['id'];
+                }
                 $album["songs"][] = array(
                     "title" => $value["name"],
                     "url" => $mp3_url,
                     "author" => $album_author = implode(",", $value['artist']),
-                    "pic" => admin_url() . "admin-ajax.php" . '?action=hermit&scope=netease_pic_url&picid=' . $value['pic_id'] . '&id=' . $value['id'],
-                    "lrc" => 'https://api.lwl12.com/music/netease/lyric?raw=true&id=' . $value["id"]
+                    "pic" => $cover,
+                    "lrc" => "https://api.lwl12.com/music/$site/lyric?raw=true&id=" . $value["id"]
                 );
             }
 
@@ -328,17 +219,17 @@ class HermitJson
         return false;
     }
 
-    public function netease_playlist($playlist_id)
+    public function playlist($site, $playlist_id)
     {
-        global $Netease;
-        $key = "/netease/playlist/$playlist_id";
+        $Meting = new Meting($site);
+        $cache_key = "/$site/playlist/$playlist_id";
 
-        $cache = $this->get_cache($key);
+        $cache = $this->get_cache($cache_key);
         if ($cache) {
             return $cache;
         }
 
-        $response = json_decode($Netease->format()->playlist($playlist_id), true);
+        $response = json_decode($Meting->format()->playlist($playlist_id), true);
 
         if (!empty($response[0])) {
             //处理音乐信息
@@ -349,80 +240,59 @@ class HermitJson
                 return false;
             }
 
-            $collect = array(
-                "collect_id" => $playlist_id,
-                "collect_type" => "collects",
-                "collect_count" => $count
+            $playlist = array(
+                "playlist_id" => $playlist_id,
+                "playlist_type" => "playlists",
+                "playlist_count" => $count
             );
 
             foreach ($result as $k => $value) {
-                $mp3_url = admin_url() . "admin-ajax.php" . '?action=hermit&scope=netease_song_url&id=' . $value["id"];
+                $mp3_url = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_song_url&id=" . $value["url_id"];
                 $artists = $value["artist"];
 
                 $artists = implode(",", $artists);
 
-                $collect["songs"][] = array(
+                if ($site == 'baidu') {
+                    $pic = json_decode($Meting->pic($value['pic_id']), true);
+                    if (empty($pic["url"])) {
+                        $cover = null;
+                    } else {
+                        $cover = $pic["url"];
+                    }
+                } else {
+                    $cover = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $value['pic_id'] . '&id=' . $value['id'];
+                }
+
+                $playlist["songs"][] = array(
                     "title" => $value["name"],
                     "url" => $mp3_url,
                     "author" => $artists,
-                    "pic" => admin_url() . "admin-ajax.php" . '?action=hermit&scope=netease_pic_url&picid=' . $value['pic_id'] . '&id=' . $value['id'],
-                    "lrc" => 'https://api.lwl12.com/music/netease/lyric?raw=true&id=' . $value["id"]
+                    "pic" => $cover,
+                    "lrc" => "https://api.lwl12.com/music/$site/lyric?raw=true&id=" . $value["id"]
                 );
             }
 
-            $this->set_cache($key, $collect, 24);
-            return $collect;
+            $this->set_cache($cache_key, $playlist, 24);
+            return $playlist;
         }
 
         return false;
     }
 
-    public function netease_radio($radio_id)
-    {
-        return false; //In Meting, this function has been takedown.
-        global $Netease;
-        $key = "/netease/radios/$radio_id";
+    public function curl($API){
 
-        $cache = $this->get_cache($key);
-        if ($cache) {
-            return $cache;
-        }
+        $curl=curl_init();
+        if(isset($API['body']))$API['url']=$API['url'].'?'.http_build_query($API['body']);
+        curl_setopt($curl,CURLOPT_URL,$API['url']);
+        curl_setopt($curl,CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($curl,CURLOPT_CONNECTTIMEOUT,10);
+        curl_setopt($curl,CURLOPT_COOKIE,$API['cookie']);
+        curl_setopt($curl,CURLOPT_REFERER,$API['referer']);
+        curl_setopt($curl,CURLOPT_USERAGENT,$API['useragent']);
 
-        $response = json_decode($Netease->DJ($radio_id), true);
-        if ($response["code"] == 200 && $response["programs"]) {
-            //处理音乐信息
-            $result = $response["programs"];
-            $count  = count($result);
-
-            if ($count < 1) {
-                return false;
-            }
-
-            $collect = array(
-                "collect_id" => $radio_id,
-                "collect_title" => '',
-                "collect_author" => '多人',
-                "collect_type" => "radios",
-                "collect_count" => $count
-            );
-
-            foreach ($result as $k => $val) {
-                $collect["songs"][] = array(
-                    "title" => $val['mainSong']['name'],
-                    "url" => $val['mainSong']['mp3Url'],
-                    "author" => $val['mainSong']["album"]['artist']['name'],
-                    "pic" => $val['mainSong']['album']['picUrl'],
-                    "lyc" => ""
-                );
-            }
-
-            $collect['collect_title'] = $collect["songs"][0]["song_author"];
-
-            $this->set_cache($key, $collect, 24);
-            return $collect;
-        }
-
-        return false;
+        $result=curl_exec($curl);
+        curl_close($curl);
+        return $result;
     }
 
     public function get_cache($key)
@@ -466,7 +336,7 @@ class HermitJson
             'strategy' => 1,
             'color' => 'default',
             'playlist_max_height' => '349',
-            'Netease_Quality' => '320',
+            'quality' => '320',
             'jsplace' => 0,
             'prePage' => 20,
             'remainTime' => 10,
