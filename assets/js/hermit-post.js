@@ -45,10 +45,39 @@ jQuery(document).ready(function(b) {
                     break;
                 case "tencent_album":
                     (a = a.match(/y\.qq\.com\/portal\/album\/([A-Za-z0-9]+)/gi)) && 0 < a.length && (d.array = a[0].replace(/y\.qq\.com\/portal\/album\//gi, ""));
-                    console.log(a);
                     break;
                 case "tencent_playlist":
                     (a = a.match(/y\.qq\.com\/portal\/playlist\/(\d+)/gi)) && 0 < a.length && (d.array = a[0].replace(/y\.qq\.com\/portal\/playlist\//gi, ""))
+            }
+        }
+         if ("kugou" == c) {
+             switch (d.type) {
+                 case "kugou_songlist":
+                     (a = a.match(/[A-Za-z0-9]+/gi)) && 0 < a.length && (e = [], b.each(a,
+                     function(a, c) {
+                         -1 === b.inArray(c, e) && e.push(c)
+                     }), d.array = e.join(","));
+                     break;
+                 case "kugou_album":
+                     (a = a.match(/[A-Za-z0-9]+/gi)) && 0 < a.length && (d.array = a[0]);
+                     break;
+                 case "kugou_playlist":
+                     (a = a.match(/[A-Za-z0-9]+/gi)) && 0 < a.length && (d.array = a[0]);
+             }
+        }
+        if ("baidu" == c) {
+            switch (d.type) {
+                case "baidu_songlist":
+                    (a = a.match(/music\.baidu\.com\/song\/\d+/gi)) && 0 < a.length && (e = [], b.each(a,
+                    function(a, c) {
+                        -1 === b.inArray(c, e) && e.push(c)
+                    }), d.array = e.join(",").replace(/music\.baidu\.com\/song\//gi, ""));
+                    break;
+                case "baidu_album":
+                    (a = a.match(/music\.baidu\.com\/album\/\d+/gi)) && 0 < a.length && (d.array = a[0].replace(/music\.baidu\.com\/album\//gi, ""));
+                    break;
+                case "baidu_playlist":
+                    (a = a.match(/music\.baidu\.com\/songlist\/\d+/gi)) && 0 < a.length && (d.array = a[0].replace(/music\.baidu\.com\/songlist\//gi, ""))
             }
         }
         "remote" == c && (d.type = "remote", d.array = a);

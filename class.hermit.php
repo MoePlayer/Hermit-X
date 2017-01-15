@@ -390,10 +390,6 @@ class hermit
             $this,
             'setting'
         ));
-        add_submenu_page('hermit', '帮助', '帮助', 'manage_options', 'hermit-help', array(
-            $this,
-            'help'
-        ));
 
         add_action('admin_init', array(
             $this,
@@ -417,13 +413,6 @@ class hermit
         @require_once('include/setting.php');
     }
 
-    /**
-     * 帮助
-     */
-    public function help()
-    {
-        @require_once('include/help.php');
-    }
 
     /**
      * 注册设置数组

@@ -37,6 +37,13 @@ class HermitJson
         $Meting = new Meting($site);
 
         $pic = json_decode($Meting->pic($pic), true);
+        if (empty($pic["url"])) {
+            $return = array(
+                'code' => 501,
+                'msg' => 'Invalid song or Music site server error'
+            );
+            exit(json_encode($return));
+        }
         Header("Location: " . $pic["url"]);
         exit;
     }
@@ -107,9 +114,17 @@ class HermitJson
             //处理音乐信息
             $mp3_url    = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_song_url&id=" . $response[0]['url_id'];
             $music_name = $response[0]['name'];
-            $cover      = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $response[0]['pic_id'] . '&id=' . $music_id;
+            if ($site == 'baidu') {
+                $pic = json_decode($Meting->pic($response[0]['pic_id']), true);
+                if (empty($pic["url"])) {
+                    $cover = null;
+                } else {
+                    $cover = $pic["url"];
+                }
+            } else {
+                $cover      = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $response[0]['pic_id'] . '&id=' . $music_id;
+            }
             $artists    = $response[0]['artist'];
-
             $artists = implode(",", $artists);
 
             $result = array(
@@ -178,11 +193,21 @@ class HermitJson
 
             foreach ($result as $k => $value) {
                 $mp3_url          = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_song_url&id=" . $value["url_id"];
+                if ($site == 'baidu') {
+                    $pic = json_decode($Meting->pic($value['pic_id']), true);
+                    if (empty($pic["url"])) {
+                        $cover = null;
+                    } else {
+                        $cover = $pic["url"];
+                    }
+                } else {
+                    $cover = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $value['pic_id'] . '&id=' . $value['id'];
+                }
                 $album["songs"][] = array(
                     "title" => $value["name"],
                     "url" => $mp3_url,
                     "author" => $album_author = implode(",", $value['artist']),
-                    "pic" => admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $value['pic_id'] . '&id=' . $value['id'],
+                    "pic" => $cover,
                     "lrc" => "https://api.lwl12.com/music/$site/lyric?raw=true&id=" . $value["id"]
                 );
             }
@@ -227,11 +252,22 @@ class HermitJson
 
                 $artists = implode(",", $artists);
 
+                if ($site == 'baidu') {
+                    $pic = json_decode($Meting->pic($value['pic_id']), true);
+                    if (empty($pic["url"])) {
+                        $cover = null;
+                    } else {
+                        $cover = $pic["url"];
+                    }
+                } else {
+                    $cover = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $value['pic_id'] . '&id=' . $value['id'];
+                }
+
                 $playlist["songs"][] = array(
                     "title" => $value["name"],
                     "url" => $mp3_url,
                     "author" => $artists,
-                    "pic" => admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $value['pic_id'] . '&id=' . $value['id'],
+                    "pic" => $cover,
                     "lrc" => "https://api.lwl12.com/music/$site/lyric?raw=true&id=" . $value["id"]
                 );
             }
