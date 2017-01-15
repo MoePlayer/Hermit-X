@@ -11,13 +11,13 @@ jQuery(document).ready(function(b) {
     function n(c, a) {
         if (d.array = "", "xiami" == c) {
             switch (d.type) {
-                case "songlist":
+                case "xiami_songlist":
                     (a = a.match(/(http|https):\/\/(www.)?xiami.com\/song\//gi)) && 0 < a.length && (d.array = "Wating Parse...");
                     break;
-                case "album":
+                case "xiami_album":
                     (a = a.match(/(http|https):\/\/(www.)?xiami.com\/album\//gi)) && 0 < a.length && (d.array = "Wating Parse...");
                     break;
-                case "collect":
+                case "xiami_collect":
                     (a = a.match(/(http|https):\/\/(www.)?xiami.com\/collect\//gi)) && 0 < a.length && (d.array = "Wating Parse...");
                     break
             }
@@ -29,9 +29,6 @@ jQuery(document).ready(function(b) {
                         function(a, c) {
                             -1 === b.inArray(c, e) && e.push(c)
                         }), d.array = e.join(",").replace(/song\?id=/g, ""));
-                    break;
-                case "netease_radio":
-                    (a = a.match(/djradio\?id=(\d+)/gi)) && 0 < a.length && (d.array = a[0].replace(/djradio\?id=/g, ""));
                     break;
                 case "netease_album":
                     (a = a.match(/album\?id=(\d+)/gi)) && 0 < a.length && (d.array = a[0].replace(/album\?id=/g, ""));

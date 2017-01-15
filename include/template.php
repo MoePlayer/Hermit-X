@@ -26,16 +26,15 @@
 												  checked="checked">单曲</label>
 									<label><input type="radio" name="netease_type" value="netease_album">专辑</label>
 									<label><input type="radio" name="netease_type" value="netease_playlist">歌单</label>
-									<label><input type="radio" name="netease_type" value="netease_radio" disabled="true">电台</label>
 								</div>
 								<textarea class="hermit-textarea large-text code" cols="30" rows="9"
 										  placeholder="输入网易云音乐音乐地址。。。"></textarea>
 							</li>
 							<li class="hermit-li" data-type="xiami">
 								<div>
-									<label><input type="radio" name="type" value="songlist" checked="checked">单曲</label>
-									<label><input type="radio" name="type" value="album">专辑</label>
-									<label><input type="radio" name="type" value="collect">精选集</label>
+									<label><input type="radio" name="type" value="xiami_songlist" checked="checked">单曲</label>
+									<label><input type="radio" name="type" value="xiami_album">专辑</label>
+									<label><input type="radio" name="type" value="xiami_collect">精选集</label>
 								</div>
 								<textarea class="hermit-textarea large-text code" cols="30" rows="9"
 										  placeholder="输入虾米音乐地址。。。"></textarea>

@@ -81,7 +81,7 @@ class HermitJson
         Header("Location: " . $pic["url"]);
         exit;
     }
-    public function xiami_song_list($song_list)
+    public function xiami_songlist($song_list)
     {
         if (!$song_list) {
             return false;
@@ -370,54 +370,6 @@ class HermitJson
                     "lrc" => 'https://api.lwl12.com/music/netease/lyric?raw=true&id=' . $value["id"]
                 );
             }
-
-            $this->set_cache($key, $collect, 24);
-            return $collect;
-        }
-
-        return false;
-    }
-
-    public function netease_radio($radio_id)
-    {
-        return false; //In Meting, this function has been takedown.
-        global $Netease;
-        $key = "/netease/radios/$radio_id";
-
-        $cache = $this->get_cache($key);
-        if ($cache) {
-            return $cache;
-        }
-
-        $response = json_decode($Netease->DJ($radio_id), true);
-        if ($response["code"] == 200 && $response["programs"]) {
-            //处理音乐信息
-            $result = $response["programs"];
-            $count  = count($result);
-
-            if ($count < 1) {
-                return false;
-            }
-
-            $collect = array(
-                "collect_id" => $radio_id,
-                "collect_title" => '',
-                "collect_author" => '多人',
-                "collect_type" => "radios",
-                "collect_count" => $count
-            );
-
-            foreach ($result as $k => $val) {
-                $collect["songs"][] = array(
-                    "title" => $val['mainSong']['name'],
-                    "url" => $val['mainSong']['mp3Url'],
-                    "author" => $val['mainSong']["album"]['artist']['name'],
-                    "pic" => $val['mainSong']['album']['picUrl'],
-                    "lyc" => ""
-                );
-            }
-
-            $collect['collect_title'] = $collect["songs"][0]["song_author"];
 
             $this->set_cache($key, $collect, 24);
             return $collect;
