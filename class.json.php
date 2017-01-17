@@ -128,6 +128,7 @@ class HermitJson
             $artists = implode(",", $artists);
 
             $result = array(
+                "id" => $response[0]["id"],
                 "title" => $music_name,
                 "author" => $artists,
                 "url" => $mp3_url,
@@ -204,6 +205,7 @@ class HermitJson
                     $cover = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $value['pic_id'] . '&id=' . $value['id'];
                 }
                 $album["songs"][] = array(
+                    "id" => $value["id"],
                     "title" => $value["name"],
                     "url" => $mp3_url,
                     "author" => $album_author = implode(",", $value['artist']),
@@ -264,6 +266,7 @@ class HermitJson
                 }
 
                 $playlist["songs"][] = array(
+                    "id" => $value["id"],
                     "title" => $value["name"],
                     "url" => $mp3_url,
                     "author" => $artists,
