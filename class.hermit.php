@@ -183,70 +183,81 @@ class hermit
     {
         global $HMTJSON;
 
-        $scope = $_GET['scope'];
-        $id    = $_GET['id'];
+        if (!empty($_SERVER["HTTP_REFERER"])) {
+            $referer = parse_url($_SERVER["HTTP_REFERER"]);
+            $host = strtolower($referer['host']);
+        }
+            if (empty($_SERVER["HTTP_REFERER"]) || $host === parse_url(home_url())['host']) {
+                $scope = $_GET['scope'];
+                $id    = $_GET['id'];
 
-        switch ($scope) {
+                switch ($scope) {
+                    //本地音乐部分
+                    case 'remote':
+                        $result = array(
+                            'status' => 200,
+                            'msg' => $this->music_remote($id)
+                        );
+                        break;
 
-            //本地音乐部分
-            case 'remote':
-                $result = array(
-                    'status' => 200,
-                    'msg' => $this->music_remote($id)
-                );
-                break;
-
-            //默认路由
-            default:
-            $re = '/^(?<site>(netease|xiami|tencent|kugou|baidu)?)_?(?<scope>songs|songlist|album|playlist|collect|artist|song_url|pic_url|id_parse)$/i';
-            preg_match($re, $scope, $matches);
-                if (!empty($matches['scope'])) {
-                    $scope = $matches['scope'];
-                    if (empty($matches['site'])) {
-                        $site = 'xiami';
-                    } else {
-                        $site = $matches['site'];
-                    }
-                    if ($scope === 'songs') {
-                        $scope = 'songlist';
-                    } elseif ($scope === 'collect') {
-                        $scope = 'playlist';
-                    }
-                    if (method_exists($HMTJSON, $scope)) {
-                        if ($scope === 'pic_url') {
-                            $result = array(
-                                'status' => 200,
-                                'msg' => $HMTJSON->$scope($site, $id, $_GET['picid'])
-                            );
-                        } elseif ($scope === 'id_parse') {
-                            $result = array(
-                                'status' => 200,
-                                'msg' => $HMTJSON->$scope($site, explode(',', $_GET['src']))
-                            );
+                    //默认路由
+                    default:
+                    $re = '/^(?<site>(netease|xiami|tencent|kugou|baidu)?)_?(?<scope>songs|songlist|album|playlist|collect|artist|song_url|pic_url|id_parse)$/i';
+                    preg_match($re, $scope, $matches);
+                        if (!empty($matches['scope'])) {
+                            $scope = $matches['scope'];
+                            if (empty($matches['site'])) {
+                                $site = 'xiami';
+                            } else {
+                                $site = $matches['site'];
+                            }
+                            if ($scope === 'songs') {
+                                $scope = 'songlist';
+                            } elseif ($scope === 'collect') {
+                                $scope = 'playlist';
+                            }
+                            if (method_exists($HMTJSON, $scope)) {
+                                if ($scope === 'pic_url') {
+                                    $result = array(
+                                        'status' => 200,
+                                        'msg' => $HMTJSON->$scope($site, $id, $_GET['picid'])
+                                    );
+                                } elseif ($scope === 'id_parse') {
+                                    $result = array(
+                                        'status' => 200,
+                                        'msg' => $HMTJSON->$scope($site, explode(',', $_GET['src']))
+                                    );
+                                } else {
+                                    $result = array(
+                                        'status' => 200,
+                                        'msg' => $HMTJSON->$scope($site, $id)
+                                    );
+                                }
+                            } else {
+                                $result = array(
+                                    'status' => 400,
+                                    'msg' => null
+                                );
+                            }
                         } else {
                             $result = array(
-                                'status' => 200,
-                                'msg' => $HMTJSON->$scope($site, $id)
+                                'status' => 400,
+                                'msg' => null
                             );
                         }
-                    } else {
-                        $result = array(
-                            'status' => 400,
-                            'msg' => null
-                        );
-                    }
-                } else {
-                    $result = array(
-                        'status' => 400,
-                        'msg' => null
-                    );
                 }
-        }
+            } else {
+                $result = array(
+                    'status' => 403,
+                    'msg' => null
+                );
+            }
+
+
 
         //输出 JSON
-        $output = json_encode($result);
         header('Content-type: application/json;charset=UTF-8');
-        exit($output);
+        exit(json_encode($result));
     }
 
     /**
