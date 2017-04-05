@@ -15,7 +15,7 @@ class HermitJson
 
     public function song_url($site, $music_id)
     {
-        $Meting = new Meting($site);
+        $Meting = new \Metowolf\Meting($site);
 
         $url = json_decode($Meting->format()->url($music_id, $this->settings('quality')), true);
         $url = $url['url'];
@@ -34,7 +34,7 @@ class HermitJson
 
     public function pic_url($site, $id, $pic)
     {
-        $Meting = new Meting($site);
+        $Meting = new \Metowolf\Meting($site);
 
         $pic = json_decode($Meting->pic($pic), true);
         if (empty($pic["url"])) {
@@ -100,7 +100,7 @@ class HermitJson
 
     public function song($site, $music_id)
     {
-        $Meting = new Meting($site);
+        $Meting = new \Metowolf\Meting($site);
         $cache_key = "/$site/song/$music_id";
 
         $cache = $this->get_cache($cache_key);
@@ -166,7 +166,7 @@ class HermitJson
 
     public function album($site, $album_id)
     {
-        $Meting = new Meting($site);
+        $Meting = new \Metowolf\Meting($site);
         $cache_key = "/$site/album/$album_id";
 
         $cache = $this->get_cache($cache_key);
@@ -223,7 +223,7 @@ class HermitJson
 
     public function playlist($site, $playlist_id)
     {
-        $Meting = new Meting($site);
+        $Meting = new \Metowolf\Meting($site);
         $cache_key = "/$site/playlist/$playlist_id";
 
         $cache = $this->get_cache($cache_key);
