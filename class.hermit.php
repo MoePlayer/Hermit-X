@@ -55,6 +55,10 @@ class hermit
             $this,
             'aplayer_init'
         ));
+        add_filter('clean_url', array(
+            $this,
+            'add_async_forscript'
+        ), 11, 1);
 
         /**
          ** 封面来源
@@ -187,11 +191,11 @@ class hermit
             $referer = parse_url($_SERVER["HTTP_REFERER"]);
             $host = strtolower($referer['host']);
         }
-            if (empty($_SERVER["HTTP_REFERER"]) || $host === parse_url(home_url())['host']) {
-                $scope = $_GET['scope'];
-                $id    = $_GET['id'];
+        if (empty($_SERVER["HTTP_REFERER"]) || $host === parse_url(home_url())['host']) {
+            $scope = $_GET['scope'];
+            $id    = $_GET['id'];
 
-                switch ($scope) {
+            switch ($scope) {
                     //本地音乐部分
                     case 'remote':
                         $result = array(
@@ -246,12 +250,12 @@ class hermit
                             );
                         }
                 }
-            } else {
-                $result = array(
+        } else {
+            $result = array(
                     'status' => 403,
                     'msg' => null
                 );
-            }
+        }
 
 
 
@@ -755,6 +759,18 @@ class hermit
             wp_enqueue_script($val, $js_path, false, HERMIT_VERSION, $js_place);
         }
     }
+
+    public function add_async_forscript($url)
+    {
+        if (strpos($url, 'APlayer.min.js')===false) {
+            return $url;
+        } elseif (is_admin()) {
+            return $url;
+        } else {
+            return $url."' async='async";
+        }
+    }
+
 
     private function post($key)
     {
