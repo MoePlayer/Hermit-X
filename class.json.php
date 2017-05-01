@@ -15,25 +15,44 @@ class HermitJson
 
     public function song_url($site, $music_id)
     {
-        $Meting = new \Metowolf\Meting($site);
-
-        $url = json_decode($Meting->format()->url($music_id, $this->settings('quality')), true);
-        $url = $url['url'];
-        if (empty($url)) {
-            if ($this->settings('within_China')) {
-                Header("Location: " . 'https://api.lwl12.com/music/netease/song?id=607441');
-            } else {
-                Header("Location: " . "https://api.lwl12.com/music/$site/song?id=" . $music_id);
-            }
-
+        $cacheKey = "/$site/song_url/$music_id";
+        $url = $this->get_cache($cacheKey);
+        if ($url) {
+            Header("X-Hermit-Cached: From Cache");
+            Header("Location: " . $url);
             exit;
         }
+        $Meting = new \Metowolf\Meting($site);
+        $i = -1;
+        while(substr($url, 0, 10) !== 'https://m8' && ($i++ < 2)){
+            $url = json_decode($Meting->format()->url($music_id, $this->settings('quality')), true);
+            $url = $url['url'];
+            if (empty($url)) {
+                if ($this->settings('within_China')) {
+                    Header("Location: " . 'https://api.lwl12.com/music/netease/song?id=607441');
+                } else {
+                    Header("Location: " . "https://api.lwl12.com/music/$site/song?id=" . $music_id);
+                }
+                exit;
+            }
+        }
+        if($i > 0) Header("X-Hermit-Retrys: $i");
+
+        $url = str_replace('http://m7', 'https://m8', $url);
+        $this->set_cache($cacheKey, $url, 0.25);
         Header("Location: " . $url);
         exit;
     }
 
     public function pic_url($site, $id, $pic)
     {
+        $cacheKey = "/$site/pic_url/$pic";
+        $url = $this->get_cache($cacheKey);
+        if ($url) {
+            Header("X-Hermit-Cached: From Cache");
+            Header("Location: " . $url);
+            return 0;
+        }
         $Meting = new \Metowolf\Meting($site);
 
         $pic = json_decode($Meting->pic($pic), true);
@@ -44,6 +63,7 @@ class HermitJson
             );
             exit(json_encode($return));
         }
+        $this->set_cache($cacheKey, $pic["url"], 168);
         Header("Location: " . $pic["url"]);
         exit;
     }
