@@ -23,7 +23,7 @@ class HermitJson
             exit;
         }
         $Meting = new \Metowolf\Meting($site);
-        $i = -1;
+        $i = ($site !== "netease") ? 1 : -1;
         while(substr($url, 0, 10) !== 'https://m8' && ($i++ < 2)){
             $url = json_decode($Meting->format()->url($music_id, $this->settings('quality')), true);
             $url = $url['url'];
@@ -36,9 +36,11 @@ class HermitJson
                 exit;
             }
         }
-        if($i > 0) Header("X-Hermit-Retrys: $i");
+        if($i > 0 && $site === "netease") Header("X-Hermit-Retrys: $i");
 
-        $url = str_replace('http://m7', 'https://m8', $url);
+        if($site === "netease") $url = str_replace('http://m7', 'https://m8', $url);
+        if($site === "xiami") $url = str_replace('http://', 'https://', $url);
+
         $this->set_cache($cacheKey, $url, 0.25);
         Header("Location: " . $url);
         exit;
