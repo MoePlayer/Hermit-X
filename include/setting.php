@@ -198,28 +198,13 @@
 			<tr>
 				<th scope="row"><label>新建权限</label></th>
 				<td>
-					<?php
-                    $role_array = array(
-                        'subscriber'    => '订阅者',
-                        'author'        => '作者',
-                        'contributor'   => '投稿者',
-                        'editor'        => '编辑',
-                        'administrator' => '管理员'
-                    );
-
-                    foreach ($role_array as $key => $val) {
-                        ?>
+					<?php foreach (get_editable_roles() as $role => $details) { ?>
 						<label title="开启调试信息">
 							<input type="checkbox" name="hermit_setting[roles][]"
-							       value="<?php echo $key; ?>" <?php if (in_array($key, $this->settings('roles'))) {
-                            echo 'checked="checked"';
-                        } ?>/>
-							<span><?php echo $val; ?></span>
+							       value="<?php echo esc_attr($role); ?>" <?php checked(in_array(esc_attr($role), $this->settings( 'roles' ))); ?> />
+							<span><?php echo translate_user_role($details['name']); ?></span>
 						</label>
-					<?php
-
-                    }
-                    ?>
+					<?php } ?>
 					<p class="description">默认：<strong>管理员权限</strong> 才可以在新建或编辑文章时添加音乐</p>
 				</td>
 			</tr>
