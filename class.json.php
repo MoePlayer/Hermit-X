@@ -24,21 +24,24 @@ class HermitJson
         }
         $Meting = new \Metowolf\Meting($site);
         $i = ($site !== "netease") ? 1 : -1;
+        if (!empty(($cookies = $this->settings('netease_cookies'))) && $site === "netease") {
+            $Meting->cookie($cookies);
+        }
         while(substr($url, 0, 10) !== 'https://m8' && ($i++ < 2)){
             $url = json_decode($Meting->format()->url($music_id, $this->settings('quality')), true);
             $url = $url['url'];
             if (empty($url)) {
-                if ($this->settings('within_China')) {
-                    Header("Location: " . 'https://api.lwl12.com/music/netease/song?id=607441');
-                } else {
-                    Header("Location: " . "https://api.lwl12.com/music/$site/song?id=" . $music_id);
-                }
+                //if ($this->settings('within_China')) {
+            Header("Location: " . 'https://api.lwl12.com/music/netease/song?id=607441');
+                //} else {
+                //    Header("Location: " . "https://api.lwl12.com/music/$site/song?id=" . $music_id);
+                //}
                 exit;
             }
         }
         if($i > 0 && $site === "netease") Header("X-Hermit-Retrys: $i");
 
-        if($site === "netease") $url = str_replace('http://m7', 'https://m8', $url);
+        if($site === "netease") {$url = str_replace('http://m7', 'http://m8', $url); $url = str_replace('http://m8', 'https://m8', $url);}
         if($site === "xiami") $url = str_replace('http://', 'https://', $url);
 
         $this->set_cache($cacheKey, $url, 0.25);
@@ -371,7 +374,7 @@ class HermitJson
             'albumSource' => 0,
             'debug' => 0,
             'advanced_cache' => 0,
-            'within_China' => 1,
+            'netease_cookies'=> '',
         );
 
         $settings = $this->_settings;
