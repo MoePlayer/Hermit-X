@@ -171,7 +171,7 @@
 					<p><input type="text" class="regular-text" name="hermit_setting[netease_cookies]"
 					          value="<?php echo $this->settings('netease_cookies'); ?>"/></p>
 
-					<p class="description">如需播放网易云音乐付费歌曲类特殊曲目，请在网页版网易云音乐登录有权限帐号（如 VIP 帐号），填写 HTTP 头中（可在浏览器开发者工具 Network 选项卡中找到）的 COOKIES。如您不理解该选项有何意义或是如何使用，请忽略。</p>
+					<p class="description">如需播放网易云音乐付费歌曲类特殊曲目，请在网页版网易云音乐登录有权限帐号（如 VIP 帐号），填写 HTTP 头中（可在浏览器开发者工具 Network 选项卡中找到）的 COOKIES。<br>如您不理解该选项有何意义或是如何使用，请忽略。</p>
 				</td>
 			</tr>
 			<!-- <tr valign="top">
