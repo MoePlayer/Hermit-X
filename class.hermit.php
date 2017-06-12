@@ -488,7 +488,7 @@ class hermit
             'debug' => 0,
             'color_customize' => '#5895be',
             'advanced_cache' => 0,
-            'within_China' => true
+            'netease_cookies'=> '',
         );
 
         $settings = $this->_settings;

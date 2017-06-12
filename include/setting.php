@@ -106,7 +106,7 @@
 				</td>
 			</tr>
 			<tr valign="top">
-				<th scope="row"><label>网易云音质</label></th>
+				<th scope="row"><label>音质</label></th>
 				<td>
 					<?php $quality_array = array(
                         '320' =>  '极高 (320kbit/s)',
@@ -166,14 +166,23 @@
 				</td>
 			</tr>
 			<tr valign="top">
+				<th scope="row"><label>网易云音乐 COOKIES</label></th>
+				<td>
+					<p><input type="text" class="regular-text" name="hermit_setting[netease_cookies]"
+					          value="<?php echo $this->settings('netease_cookies'); ?>"/></p>
+
+					<p class="description">如需播放网易云音乐付费歌曲类特殊曲目，请将有权限的网易云音乐帐号（如 VIP 帐号）COOKIES 填入，建议使用手机 APP COOKIES。<br>如您不理解该选项有何意义或是如何使用，请忽略。&nbsp;*请注意，使用网页版 COOKIES 将无法获取 HTTPS 歌曲 URL。</p>
+				</td>
+			</tr>
+			<!-- <tr valign="top">
 				<th scope="row"><label>浏览器缓存时间</label></th>
 				<td>
 					<p><input type="text" class="small-text" name="hermit_setting[remainTime]"
-					          value="<?php echo $this->settings('remainTime'); ?>"/>小时</p>
+					          value="<?php/* echo $this->settings('remainTime'); */?>"/>小时</p>
 
 					<p class="description">默认数量：10小时，最大不宜超过48小时。</p>
 				</td>
-			</tr>
+			</tr> -->
 			<tr valign="top">
 				<th scope="row"><label>播放列表最大高度</label></th>
 				<td>
