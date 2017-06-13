@@ -4,8 +4,6 @@
  *
  * @package Hermit X
  * @since Hermit X 2.5.9
- *
- * 其他人不许乱改！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
  */
 
 /**
@@ -27,6 +25,8 @@ final class Hermit_Update {
 	 * 更新数据
 	 *
 	 * @since Hermit X 2.5.9
+	 * @since Hermit X 2.6.3 储存 API 传送的所有内容，而不仅仅是版本信息。
+	 *
 	 * @var object
 	 */
 	private $update_data;
@@ -45,6 +45,18 @@ final class Hermit_Update {
 		add_action(
 			'admin_notices',
 			array( $this, 'vcs_warning' )
+		);
+
+		add_action(
+			'upgrader_process_complete',
+			array( $this, 'setup_upnotify_email' ),
+			18,
+			2
+		);
+
+		add_action(
+			'hermit_maybe_notify_email',
+			array( $this, 'maybe_notify_email' )
 		);
 
 		add_filter(
@@ -123,14 +135,49 @@ final class Hermit_Update {
 	}
 
 	/**
+	 * 启动更新通知程序
+	 *
+	 * @since Hermit X 2.6.3
+	 */
+	public function setup_upnotify_email( $upgrader, $hook_extra ) {
+		if ( $hook_extra['action'] != 'update' )
+			return;
+
+		if ( $hook_extra['type'] != 'plugin' )
+			return;
+
+		if ( $hook_extra['type'] != 'plugin' )
+			return;
+
+		if ( empty( $hook_extra['bulk'] ) )
+			$hook_extra['plugin'] == $this->get_plugin_file() ? null : return;
+		else
+			in_array( $this->get_plugin_file(), $hook_extra['plugins'] ) ? null : return;
+
+		$version = $this->get_plugin_version();
+		wp_schedule_single_event( time(), 'hermit_maybe_notify_email', compact( 'version' ) );
+	}
+
+	/**
+	 * 检测条件并发送更新通知
+	 *
+	 * @since Hermit X 2.6.3
+	 */
+	public function maybe_notify_email( $version ) {
+		if ( ( $data = $this->get_update_data() ) && !empty( $data->notify_email ) )
+			$this->notify_email( $version );
+	}
+
+	/**
 	 * 插入插件更新信息
 	 *
 	 * @since Hermit X 2.5.9
+	 * @since Hermit X 2.6.3 会从 `self::get_update_data()` 方法的返回值中筛选出版本信息。
 	 */
 	public function insert_update_data( $update ) {
-		if ( $update_data = $this->get_update_data() ) {
+		if ( ( $data = $this->get_update_data() ) && $data->response ) {
 			$file = $this->get_plugin_file();
-			$update->response[$file] = $update_data;
+			$update->response[$file] = $data->response;
 		}
 
 		return $update;
@@ -162,6 +209,7 @@ final class Hermit_Update {
 	 *
 	 * @since Hermit X 2.5.9
 	 * @since Hermit X 2.6.0 新增 TTL 的支持；修复启用插件时 HTTP 请求次数过多的问题。
+	 * @since Hermit X 2.6.3 返回 API 传送的所有内容，而不仅仅是版本信息。
 	 */
 	private function get_update_data() {
 		if ( isset( $this->update_data ) )
@@ -191,14 +239,8 @@ final class Hermit_Update {
 			$body = json_decode( trim( $body ) );
 
 			if ( $body && is_object( $body ) ) {
-				if ( isset( $body->response ) ) {
-					$this->update_data = $body->response;
-
-					if ( !empty( $body->response->autoupdate ) )
-						wp_schedule_single_event( time() + 10, 'wp_version_check' );
-				} else {
-					$this->update_data = false;
-				}
+				if ( !empty( $body->response->autoupdate ) )
+					wp_schedule_single_event( time() + 10, 'wp_version_check' );
 
 				if ( !empty( $body->ttl ) ) {
 					$ttl  = (int) $body->ttl;
@@ -207,10 +249,23 @@ final class Hermit_Update {
 					if ( $ttl < wp_next_scheduled( 'wp_version_check' ) )
 						wp_schedule_single_event( $ttl, 'wp_version_check' );
 				}
+
+				$this->update_data = $body;
+			} else {
+				$this->update_data = false;
 			}
 		}
 
 		return $this->update_data;
+	}
+
+	/**
+	 * 发送更新通知
+	 *
+	 * @since Hermit X 2.6.3
+	 */
+	private function notify_email( $version ) {
+		update_option( 'as_notify_email', $version );
 	}
 
 	/**
