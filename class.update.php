@@ -154,8 +154,8 @@ final class Hermit_Update {
 		else
 			if ( !in_array( $this->get_plugin_file(), $hook_extra['plugins'] ) ) return;
 
-		$version = $this->get_plugin_version();
-		wp_schedule_single_event( time(), 'hermit_maybe_notify_email', compact( 'version' ) );
+		$args = array( $this->get_plugin_version() );
+	    wp_schedule_single_event( time(), 'hermit_maybe_notify_email', $args );
 	}
 
 	/**
