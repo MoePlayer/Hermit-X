@@ -152,6 +152,7 @@ class hermit
         }
         $atts["theme"]       = $color;
         $atts["songs"]       = $content;
+        $atts["_nonce"]      = wp_create_nonce($content);
         $playlist_max_height = $this->settings('playlist_max_height');
         if ($playlist_max_height != 0 && empty($atts["listmaxheight"])) {
             $atts["listmaxheight"] = $playlist_max_height . "px";
@@ -180,6 +181,20 @@ class hermit
         return $context;
     }
 
+    public function nonce_verify()
+    {
+        $result=wp_verify_nonce( $_REQUEST['_nonce'], $_GET['scope'].'#:'.$_GET['id']);
+        if (!$result) {
+            header('HTTP/1.0 401 Unauthorized');
+            header('Content-type: application/json;charset=UTF-8');
+            $result = array(
+                    'status' => 401,
+                    'msg' => $result
+                );
+            die(json_encode($result));
+        }
+        return true;
+    }
     /**
      * JSON 音乐数据
      */
@@ -198,6 +213,7 @@ class hermit
             switch ($scope) {
                     //本地音乐部分
                     case 'remote':
+                        $this->nonce_verify();
                         $result = array(
                             'status' => 200,
                             'msg' => $this->music_remote($id)
@@ -222,6 +238,7 @@ class hermit
                             }
                             if (method_exists($HMTJSON, $scope)) {
                                 if ($scope === 'pic_url') {
+                                    $this->nonce_verify();
                                     $result = array(
                                         'status' => 200,
                                         'msg' => $HMTJSON->$scope($site, $id, $_GET['picid'])
@@ -232,6 +249,7 @@ class hermit
                                         'msg' => $HMTJSON->$scope($site, explode(',', $_GET['src']))
                                     );
                                 } else {
+                                    $this->nonce_verify();
                                     $result = array(
                                         'status' => 200,
                                         'msg' => $HMTJSON->$scope($site, $id)
@@ -252,7 +270,7 @@ class hermit
                 }
         } else {
             $result = array(
-                    'status' => 403,
+                    'status' => 401,
                     'msg' => null
                 );
         }
@@ -810,6 +828,6 @@ class hermit
 
     public function aplayer_init()
     {
-        echo '<script>function cloneObject(src) { if (src == null || typeof src != "object") { return src } if (src instanceof Date) { var clone = new Date(src.getDate()); return clone } if (src instanceof Array) { var clone = []; for (var i = 0, len = src.length; i < len; i++) { clone[i] = src[i] } return clone } if (src instanceof Object) { var clone = {}; for (var key in src) { if (src.hasOwnProperty(key)) { clone[key] = cloneObject(src[key]) } } return clone } } function hermitInit() { var aps = document.getElementsByClassName("aplayer"); var apnum = 0; ap = []; var xhr = []; var option = []; remain_time = ' . $this->settings("remainTime") . '; for (var i = 0; i < aps.length; i++) { if (aps[i].dataset.songs) { option[i] = cloneObject(aps[i].dataset); option[i].element = aps[i]; xhr[i] = new XMLHttpRequest(); xhr[i].onreadystatechange = function() { var index = xhr.indexOf(this); var op = option[index]; if (this.readyState === 4) { if (this.status >= 200 && this.status < 300 || this.status === 304) { var response = JSON.parse(this.responseText); op.music = response.msg.songs; if (op.showlrc === undefined) { if (op.music[0].lrc) { op.showlrc = 3 } else { op.showlrc = 0 } } if (op.music.length === 1) { op.music = op.music[0] } if (op.autoplay) { op.autoplay = (op.autoplay === "true" || op.autoplay === "1") } if (op.loop) { op.loop = (op.loop === "true" || op.loop === "1") } if (op.mutex) { op.mutex = (op.mutex === "true" || op.mutex === "1") } if (op.narrow) { op.narrow = (op.narrow === "true" || op.narrow === "1") } ap[i] = new APlayer(op); ap[i].parseRespons = response; if (window.APlayerCall && window.APlayerCall[i]) window.APlayerCall[i](); if (window.APlayerloadAllCall && aps.length != ap.length) { window.APlayerloadAllCall(); } } else { console.error("Request was unsuccessful: " + this.status) } } }; var scope = option[i].songs.split("#:"); apiurl = "' . admin_url() . 'admin-ajax.php?action=hermit&scope=" + option[i].songs.split("#:")[0] + "&id=" + option[i].songs.split("#:")[1]; xhr[i].open("get", apiurl, true); xhr[i].send(null) } } } function reloadHermit() { for (var i = 0; i < ap.length; i++) { try { ap[i].destroy() } catch(e) {} } hermitInit() } hermitInit();</script>';
+        echo '<script>function cloneObject(src) { if (src == null || typeof src != "object") { return src } if (src instanceof Date) { var clone = new Date(src.getDate()); return clone } if (src instanceof Array) { var clone = []; for (var i = 0, len = src.length; i < len; i++) { clone[i] = src[i] } return clone } if (src instanceof Object) { var clone = {}; for (var key in src) { if (src.hasOwnProperty(key)) { clone[key] = cloneObject(src[key]) } } return clone } } function hermitInit() { var aps = document.getElementsByClassName("aplayer"); var apnum = 0; ap = []; var xhr = []; var option = []; remain_time = ' . $this->settings("remainTime") . '; for (var i = 0; i < aps.length; i++) { if (aps[i].dataset.songs) { option[i] = cloneObject(aps[i].dataset); option[i].element = aps[i]; xhr[i] = new XMLHttpRequest(); xhr[i].onreadystatechange = function() { var index = xhr.indexOf(this); var op = option[index]; if (this.readyState === 4) { if (this.status >= 200 && this.status < 300 || this.status === 304) { var response = JSON.parse(this.responseText); op.music = response.msg.songs; if (op.showlrc === undefined) { if (op.music[0].lrc) { op.showlrc = 3 } else { op.showlrc = 0 } } if (op.music.length === 1) { op.music = op.music[0] } if (op.autoplay) { op.autoplay = (op.autoplay === "true" || op.autoplay === "1") } if (op.loop) { op.loop = (op.loop === "true" || op.loop === "1") } if (op.mutex) { op.mutex = (op.mutex === "true" || op.mutex === "1") } if (op.narrow) { op.narrow = (op.narrow === "true" || op.narrow === "1") } ap[i] = new APlayer(op); ap[i].parseRespons = response; if (window.APlayerCall && window.APlayerCall[i]) window.APlayerCall[i](); if (window.APlayerloadAllCall && aps.length != ap.length) { window.APlayerloadAllCall(); } } else { console.error("Request was unsuccessful: " + this.status) } } }; var scope = option[i].songs.split("#:"); apiurl = "' . admin_url() . 'admin-ajax.php?action=hermit&scope=" + option[i].songs.split("#:")[0] + "&id=" + option[i].songs.split("#:")[1] + "&_nonce=" + option[i]._nonce; xhr[i].open("get", apiurl, true); xhr[i].send(null) } } } function reloadHermit() { for (var i = 0; i < ap.length; i++) { try { ap[i].destroy() } catch(e) {} } hermitInit() } hermitInit();</script>';
     }
 }

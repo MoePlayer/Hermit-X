@@ -25,16 +25,22 @@ jQuery(document).ready(function(b) {
         if ("netease" == c) {
             switch (d.type) {
                 case "netease_songlist":
+                    (a = a.match(/(song\?id=(\d+)|\/song\/(\d+))/gi)) && 0 < a.length && (es = [], b.each(a,
+                        function(a, c) {
+                            -1 === b.inArray(c, e) && es.push(c)
+                        }), d.array = es.join(",").replace(/(song\?id=|\/song\/)/gi, ""));
+                    break;
+                case "netease_songs":
                     (a = a.match(/song\?id=(\d+)/gi)) && 0 < a.length && (e = [], b.each(a,
                         function(a, c) {
-                            -1 === b.inArray(c, e) && e.push(c)
+                            - 1 === b.inArray(c, e) && e.push(c)
                         }), d.array = e.join(",").replace(/song\?id=/g, ""));
-                    break;
+                        break;
                 case "netease_album":
-                    (a = a.match(/album\?id=(\d+)/gi)) && 0 < a.length && (d.array = a[0].replace(/album\?id=/g, ""));
+                    (a = a.match(/(album\?id=(\d+)|\/album\/(\d+))/gi)) && 0 < a.length && (d.array = a[0].replace(/(album\?id=|\/album\/)/gi, ""));
                     break;
                 case "netease_playlist":
-                    (a = a.match(/playlist\?id=(\d+)/gi)) && 0 < a.length && (d.array = a[0].replace(/playlist\?id=/g, ""))
+                    (a = a.match(/(playlist\?id=(\d+)|\/playlist\/(\d+))/gi)) && 0 < a.length && (d.array = a[0].replace(/(playlist\?id=|\/playlist\/)/gi, ""))
             }
         }
 
@@ -53,10 +59,10 @@ jQuery(document).ready(function(b) {
          if ("kugou" == c) {
              switch (d.type) {
                  case "kugou_songlist":
-                     (a = a.match(/[A-Za-z0-9]+/gi)) && 0 < a.length && (e = [], b.each(a,
+                     (a = a.match(/[A-Za-z0-9]+/gi)) && 0 < a.length && (es = [], b.each(a,
                      function(a, c) {
-                         -1 === b.inArray(c, e) && e.push(c)
-                     }), d.array = e.join(","));
+                         -1 === b.inArray(c, e) && es.push(c)
+                     }), d.array = es.join(","));
                      break;
                  case "kugou_album":
                      (a = a.match(/[A-Za-z0-9]+/gi)) && 0 < a.length && (d.array = a[0]);
@@ -68,10 +74,10 @@ jQuery(document).ready(function(b) {
         if ("baidu" == c) {
             switch (d.type) {
                 case "baidu_songlist":
-                    (a = a.match(/music\.baidu\.com\/song\/\d+/gi)) && 0 < a.length && (e = [], b.each(a,
+                    (a = a.match(/music\.baidu\.com\/song\/\d+/gi)) && 0 < a.length && (es = [], b.each(a,
                     function(a, c) {
-                        -1 === b.inArray(c, e) && e.push(c)
-                    }), d.array = e.join(",").replace(/music\.baidu\.com\/song\//gi, ""));
+                        -1 === b.inArray(c, e) && es.push(c)
+                    }), d.array = es.join(",").replace(/music\.baidu\.com\/song\//gi, ""));
                     break;
                 case "baidu_album":
                     (a = a.match(/music\.baidu\.com\/album\/\d+/gi)) && 0 < a.length && (d.array = a[0].replace(/music\.baidu\.com\/album\//gi, ""));
@@ -86,7 +92,7 @@ jQuery(document).ready(function(b) {
     }
 
     function k(c, a) {
-        l = '[hermit auto="' + a.auto + '" loop="' + a.loop + '" unexpand="' + a.unexpand + '" fullheight="' + a.fullheight + '"]' + a.type + "#:" + a.array + "[/hermit]";
+        l = '[hermit autoplay="' + (a.auto ? 'true' : 'false') + '" mode="' + a.mode +'"]' + a.type + "#:" + a.array + "[/hermit]";
         b("#hermit-preview").text(l).addClass("texted")
     }
     void 0 === window.send_to_editor && (window.send_to_editor = function(b) {
@@ -138,6 +144,7 @@ jQuery(document).ready(function(b) {
         };
         l = "";
         e.append(t());
+        d.mode = 'circulation';
         b("body").addClass("hermit-hidden")
     }) : 1 == hermit.roles.length && "contributor" == hermit.roles[0] && (b("#wp-content-editor-tools").prepend('<div id="wp-content-media-buttons" class="wp-media-buttons"><a id="hermit-create" class="button" href="javascript:;" title="\u6dfb\u52a0\u97f3\u4e50"><img src="' + hermit.plugin_url + '/assets/images/logo@2x.png" width="16" height="16"> \u6dfb\u52a0\u97f3\u4e50</a></div>'), b("#wp-content-editor-tools").on("click", "#hermit-create",
         function() {
@@ -241,22 +248,10 @@ jQuery(document).ready(function(b) {
             d.auto = c.prop("checked") ? 1 : 0;
             k(f, d)
         });
-    e.on("click", "#hermit-loop",
+    e.on("change", "#hermit-mode",
         function() {
             var c = b(this);
-            d.loop = c.prop("checked") ? 1 : 0;
-            k(f, d)
-        });
-    e.on("change", "#hermit-unexpand",
-        function() {
-            var c = b(this);
-            d.unexpand = c.prop("checked") ? 1 : 0;
-            k(f, d)
-        });
-    e.on("change", "#hermit-fullheight",
-        function() {
-            var c = b(this);
-            d.fullheight = c.prop("checked") ? 1 : 0;
+            d.mode = c.val();
             k(f, d)
         });
     e.on("change", ".hermit-li.active input",

@@ -79,7 +79,12 @@
 						</ul>
 						<div>
 							<label for="hermit-auto"><input type="checkbox" id="hermit-auto">自动播放</label>
-							<label for="hermit-loop"><input type="checkbox" id="hermit-loop">循环播放</label>
+							<label for="hermit-mode"><select id="hermit-mode">
+  								<option value ="circulation" selected>循环播放</option>
+  								<option value ="random">随机播放</option>
+  								<option value="order">顺序播放</option>
+  								<option value="single">单曲循环</option>
+							</select></label>
 						</div>
 						<div id="hermit-preview">
 						</div>
