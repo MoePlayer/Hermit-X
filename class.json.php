@@ -67,7 +67,7 @@ class HermitJson
         }
         $Meting = new \Metowolf\Meting($site);
 
-        $pic = json_decode($Meting->pic($pic), true);
+        $pic = json_decode($Meting->pic($pic,100), true);
         if (empty($pic["url"])) {
             $return = array(
                 'code' => 501,
