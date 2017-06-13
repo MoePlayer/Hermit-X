@@ -49,7 +49,7 @@ final class Hermit_Update {
 
 		add_action(
 			'upgrader_process_complete',
-			array( $this, 'setup_upnotify_email' ),
+			array( $this, 'setup_notify_email' ),
 			18,
 			2
 		);
@@ -139,7 +139,7 @@ final class Hermit_Update {
 	 *
 	 * @since Hermit X 2.6.3
 	 */
-	public function setup_upnotify_email( $upgrader, $hook_extra ) {
+	public function setup_notify_email( $upgrader, $hook_extra ) {
 		if ( $hook_extra['action'] != 'update' )
 			return;
 
