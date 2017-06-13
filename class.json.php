@@ -24,7 +24,8 @@ class HermitJson
         }
         $Meting = new \Metowolf\Meting($site);
         $i = ($site !== "netease") ? 1 : -1;
-        if (!empty(($cookies = $this->settings('netease_cookies'))) && $site === "netease") {
+        $cookies = $this->settings('netease_cookies');
+        if (!empty($cookies) && $site === "netease") {
             $Meting->cookie($cookies);
         }
         while (substr($url, 0, 10) !== 'https://m8' && ($i++ < 2)) {

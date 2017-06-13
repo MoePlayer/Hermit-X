@@ -183,7 +183,8 @@ class hermit
 
     public function nonce_verify()
     {
-        if (!($result=wp_verify_nonce( $_REQUEST['_nonce'], $_GET['scope'].'#:'.$_GET['id']))) {
+        $result=wp_verify_nonce( $_REQUEST['_nonce'], $_GET['scope'].'#:'.$_GET['id']);
+        if (!$result) {
             header('HTTP/1.0 401 Unauthorized');
             header('Content-type: application/json;charset=UTF-8');
             $result = array(
