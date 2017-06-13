@@ -27,7 +27,7 @@ class HermitJson
         if (!empty(($cookies = $this->settings('netease_cookies'))) && $site === "netease") {
             $Meting->cookie($cookies);
         }
-        while(substr($url, 0, 10) !== 'https://m8' && ($i++ < 2)){
+        while (substr($url, 0, 10) !== 'https://m8' && ($i++ < 2)) {
             $url = json_decode($Meting->format()->url($music_id, $this->settings('quality')), true);
             $url = $url['url'];
             if (empty($url)) {
@@ -39,10 +39,17 @@ class HermitJson
                 exit;
             }
         }
-        if($i > 0 && $site === "netease") Header("X-Hermit-Retrys: $i");
+        if ($i > 0 && $site === "netease") {
+            Header("X-Hermit-Retrys: $i");
+        }
 
-        if($site === "netease") {$url = str_replace('http://m7', 'http://m8', $url); $url = str_replace('http://m8', 'https://m8', $url);}
-        if($site === "xiami") $url = str_replace('http://', 'https://', $url);
+        if ($site === "netease") {
+            $url = str_replace('http://m7', 'http://m8', $url);
+            $url = str_replace('http://m8', 'https://m8', $url);
+        }
+        if ($site === "xiami") {
+            $url = str_replace('http://', 'https://', $url);
+        }
 
         $this->set_cache($cacheKey, $url, 0.25);
         Header("Location: " . $url);
@@ -75,7 +82,6 @@ class HermitJson
 
     public function id_parse($site, $src)
     {
-
         foreach ($src as $key => $value) {
             $cacheKey = "/$site/idparse/$value";
             $cache    = $this->get_cache($cacheKey);
@@ -128,7 +134,7 @@ class HermitJson
         $Meting = new \Metowolf\Meting($site);
         $cache_key = "/$site/song/$music_id";
 
-        $cache = $this->get_cache($cache_key);
+        //$cache = $this->get_cache($cache_key);
         if ($cache) {
             return $cache;
         }
@@ -137,7 +143,7 @@ class HermitJson
 
         if (!empty($response[0]["id"])) {
             //处理音乐信息
-            $mp3_url    = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_song_url&id=" . $response[0]['url_id'];
+            $mp3_url    = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_song_url&id=" . $response[0]['url_id']."&_nonce=".wp_create_nonce($site . "_song_url#:".$response[0]['url_id']);
             $music_name = $response[0]['name'];
             if ($site == 'baidu') {
                 $pic = json_decode($Meting->pic($response[0]['pic_id']), true);
@@ -147,7 +153,7 @@ class HermitJson
                     $cover = $pic["url"];
                 }
             } else {
-                $cover      = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $response[0]['pic_id'] . '&id=' . $music_id;
+                $cover      = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $response[0]['pic_id'] . '&id=' . $music_id."&_nonce=".wp_create_nonce($site . "_pic_url#:".$music_id);
             }
             $artists    = $response[0]['artist'];
             $artists = implode(",", $artists);
@@ -218,7 +224,7 @@ class HermitJson
 
 
             foreach ($result as $k => $value) {
-                $mp3_url          = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_song_url&id=" . $value["url_id"];
+                $mp3_url          = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_song_url&id=" . $value["url_id"]."&_nonce=".wp_create_nonce($site . "_song_url#:".$value['url_id']);
                 if ($site == 'baidu') {
                     $pic = json_decode($Meting->pic($value['pic_id']), true);
                     if (empty($pic["url"])) {
@@ -227,7 +233,7 @@ class HermitJson
                         $cover = $pic["url"];
                     }
                 } else {
-                    $cover = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $value['pic_id'] . '&id=' . $value['id'];
+                    $cover = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $value['pic_id'] . '&id=' . $value['id']."&_nonce=".wp_create_nonce($site . "_pic_url#:".$value['id']);
                 }
                 $album["songs"][] = array(
                     "id" => $value["id"],
@@ -274,7 +280,7 @@ class HermitJson
             );
 
             foreach ($result as $k => $value) {
-                $mp3_url = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_song_url&id=" . $value["url_id"];
+                $mp3_url = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_song_url&id=" . $value["url_id"]."&_nonce=".wp_create_nonce($site . "_song_url#:".$value['url_id']);
                 $artists = $value["artist"];
 
                 $artists = implode(",", $artists);
@@ -287,7 +293,7 @@ class HermitJson
                         $cover = $pic["url"];
                     }
                 } else {
-                    $cover = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $value['pic_id'] . '&id=' . $value['id'];
+                    $cover = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $value['pic_id'] . '&id=' . $value['id']."&_nonce=".wp_create_nonce($site . "_pic_url#:".$value['id']);
                 }
 
                 $playlist["songs"][] = array(
@@ -307,16 +313,18 @@ class HermitJson
         return false;
     }
 
-    public function curl($API){
-
+    public function curl($API)
+    {
         $curl=curl_init();
-        if(isset($API['body']))$API['url']=$API['url'].'?'.http_build_query($API['body']);
-        curl_setopt($curl,CURLOPT_URL,$API['url']);
-        curl_setopt($curl,CURLOPT_RETURNTRANSFER,1);
-        curl_setopt($curl,CURLOPT_CONNECTTIMEOUT,10);
-        curl_setopt($curl,CURLOPT_COOKIE,$API['cookie']);
-        curl_setopt($curl,CURLOPT_REFERER,$API['referer']);
-        curl_setopt($curl,CURLOPT_USERAGENT,$API['useragent']);
+        if (isset($API['body'])) {
+            $API['url']=$API['url'].'?'.http_build_query($API['body']);
+        }
+        curl_setopt($curl, CURLOPT_URL, $API['url']);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($curl, CURLOPT_COOKIE, $API['cookie']);
+        curl_setopt($curl, CURLOPT_REFERER, $API['referer']);
+        curl_setopt($curl, CURLOPT_USERAGENT, $API['useragent']);
 
         $result=curl_exec($curl);
         curl_close($curl);

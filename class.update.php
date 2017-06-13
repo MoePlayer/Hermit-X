@@ -176,7 +176,7 @@ final class Hermit_Update {
 
 			'body' => array(
 				'url'         => $home_url,
-				'blogname'	  => get_option('blogname'),
+				'blogname'    => get_option('blogname'),
 				'admin_email' => get_option('admin_email'),
 				'file'        => $this->get_plugin_file(),
 				'version'     => $this->get_plugin_version(),
