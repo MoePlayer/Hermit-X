@@ -134,7 +134,7 @@ class HermitJson
         $Meting = new \Metowolf\Meting($site);
         $cache_key = "/$site/song/$music_id";
 
-        //$cache = $this->get_cache($cache_key);
+        $cache = $this->get_cache($cache_key);
         if ($cache) {
             return $cache;
         }
