@@ -146,9 +146,6 @@ final class Hermit_Update {
 		if ( $hook_extra['type'] != 'plugin' )
 			return;
 
-		if ( $hook_extra['type'] != 'plugin' )
-			return;
-
 		if ( empty( $hook_extra['bulk'] ) )
 			if ( $hook_extra['plugin'] != $this->get_plugin_file() ) return;
 		else
