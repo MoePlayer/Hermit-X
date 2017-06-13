@@ -67,7 +67,7 @@ class HermitJson
         }
         $Meting = new \Metowolf\Meting($site);
 
-        $pic = json_decode($Meting->pic($pic,100), true);
+        $pic = json_decode($Meting->pic($pic, 100), true);
         if (empty($pic["url"])) {
             $return = array(
                 'code' => 501,
@@ -136,14 +136,14 @@ class HermitJson
 
         $cache = $this->get_cache($cache_key);
         if ($cache) {
-            return $cache;
+            return $this->addNonce($cache, $site, true);
         }
 
         $response = json_decode($Meting->format()->song($music_id), true);
 
         if (!empty($response[0]["id"])) {
             //处理音乐信息
-            $mp3_url    = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_song_url&id=" . $response[0]['url_id']."&_nonce=".wp_create_nonce($site . "_song_url#:".$response[0]['url_id']);
+            $mp3_url    = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_song_url&id=" . $response[0]['url_id'];
             $music_name = $response[0]['name'];
             if ($site == 'baidu') {
                 $pic = json_decode($Meting->pic($response[0]['pic_id']), true);
@@ -153,7 +153,7 @@ class HermitJson
                     $cover = $pic["url"];
                 }
             } else {
-                $cover      = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $response[0]['pic_id'] . '&id=' . $music_id."&_nonce=".wp_create_nonce($site . "_pic_url#:".$music_id);
+                $cover      = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $response[0]['pic_id'] . '&id=' . $music_id;
             }
             $artists    = $response[0]['artist'];
             $artists = implode(",", $artists);
@@ -167,9 +167,9 @@ class HermitJson
                 "lrc" => "https://api.lwl12.com/music/$site/lyric?raw=true&id=" . $music_id
             );
 
-            $this->set_cache($cache_key, $result, 24);
+            $this->set_cache($cache_key, $result, 23);
 
-            return $result;
+            return $this->addNonce($result, $site, true);
         }
 
         return false;
@@ -202,7 +202,7 @@ class HermitJson
 
         $cache = $this->get_cache($cache_key);
         if ($cache) {
-            return $cache;
+            return $this->addNonce($cache, $site);
         }
 
         $response = json_decode($Meting->format()->album($album_id), true);
@@ -224,7 +224,7 @@ class HermitJson
 
 
             foreach ($result as $k => $value) {
-                $mp3_url          = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_song_url&id=" . $value["url_id"]."&_nonce=".wp_create_nonce($site . "_song_url#:".$value['url_id']);
+                $mp3_url          = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_song_url&id=" . $value["url_id"];
                 if ($site == 'baidu') {
                     $pic = json_decode($Meting->pic($value['pic_id']), true);
                     if (empty($pic["url"])) {
@@ -233,7 +233,7 @@ class HermitJson
                         $cover = $pic["url"];
                     }
                 } else {
-                    $cover = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $value['pic_id'] . '&id=' . $value['id']."&_nonce=".wp_create_nonce($site . "_pic_url#:".$value['id']);
+                    $cover = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $value['pic_id'] . '&id=' . $value['id'];
                 }
                 $album["songs"][] = array(
                     "id" => $value["id"],
@@ -246,7 +246,7 @@ class HermitJson
             }
 
             $this->set_cache($key, $album, 24);
-            return $album;
+            return $this->addNonce($album, $site);
         }
 
         return false;
@@ -259,7 +259,7 @@ class HermitJson
 
         $cache = $this->get_cache($cache_key);
         if ($cache) {
-            return $cache;
+            return $this->addNonce($cache, $site);
         }
 
         $response = json_decode($Meting->format()->playlist($playlist_id), true);
@@ -280,7 +280,7 @@ class HermitJson
             );
 
             foreach ($result as $k => $value) {
-                $mp3_url = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_song_url&id=" . $value["url_id"]."&_nonce=".wp_create_nonce($site . "_song_url#:".$value['url_id']);
+                $mp3_url = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_song_url&id=" . $value["url_id"];
                 $artists = $value["artist"];
 
                 $artists = implode(",", $artists);
@@ -293,7 +293,7 @@ class HermitJson
                         $cover = $pic["url"];
                     }
                 } else {
-                    $cover = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $value['pic_id'] . '&id=' . $value['id']."&_nonce=".wp_create_nonce($site . "_pic_url#:".$value['id']);
+                    $cover = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $value['pic_id'] . '&id=' . $value['id'];
                 }
 
                 $playlist["songs"][] = array(
@@ -307,10 +307,24 @@ class HermitJson
             }
 
             $this->set_cache($cache_key, $playlist, 24);
-            return $playlist;
+            return $this->addNonce($playlist, $site);
         }
 
         return false;
+    }
+
+    private function addNonce($data, $site, $single = false)
+    {
+        if ($single) {
+            $data['url'] = $data['url'] . "&_nonce=".wp_create_nonce($site . "_song_url#:".$data['id']);
+            $data['pic'] = $data['pic'] . "&_nonce=".wp_create_nonce($site . "_pic_url#:".$data['id']);
+        } else {
+            foreach ($data["songs"] as $key => $value) {
+                $data["songs"][$key]['url'] = $value['url'] . "&_nonce=".wp_create_nonce($site . "_song_url#:".$value['id']);
+                $data["songs"][$key]['pic'] = $value['pic'] . "&_nonce=".wp_create_nonce($site . "_pic_url#:".$value['id']);
+            }
+        }
+        return $data;
     }
 
     public function curl($API)
