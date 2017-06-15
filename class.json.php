@@ -28,7 +28,7 @@ class HermitJson
         if (!empty($cookies) && $site === "netease") {
             $Meting->cookie($cookies);
         }
-        while (substr($url, 0, 10) === 'http://m7' && ($i++ < 2)) {
+        while (substr($url, 0, 9) !== 'http://m8' && ($i++ < 2)) {
             $url = json_decode($Meting->format()->url($music_id, $this->settings('quality')), true);
             $url = $url['url'];
             if (empty($url)) {
