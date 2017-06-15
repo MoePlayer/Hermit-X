@@ -23,25 +23,29 @@ class HermitJson
             exit;
         }
         $Meting = new \Metowolf\Meting($site);
-        $i = ($site !== "netease") ? 1 : -1;
+
         $cookies = $this->settings('netease_cookies');
         if (!empty($cookies) && $site === "netease") {
             $Meting->cookie($cookies);
         }
-        while (substr($url, 0, 9) === 'http://m7' && ($i++ < 2)) {
-            $url = json_decode($Meting->format()->url($music_id, $this->settings('quality')), true);
-            $url = $url['url'];
-            if (empty($url)) {
-                //if ($this->settings('within_China')) {
-            Header("Location: " . 'https://api.lwl12.com/music/netease/song?id=607441');
-                //} else {
-                //    Header("Location: " . "https://api.lwl12.com/music/$site/song?id=" . $music_id);
-                //}
-                exit;
+
+        $url = json_decode($Meting->format()->url($music_id, $this->settings('quality')), true);
+        $url = $url['url'];
+
+        if ($site === "netease") {
+            $retry = 0;
+            while (substr($url, 0, 9) !== 'http://m8' && ++$retry<3){
+                $url = json_decode($Meting->format()->url($music_id, $this->settings('quality')), true);
+                $url = $url['url'];
+            }
+            if($retry){
+                Header("X-Hermit-Retrys: $retry");
             }
         }
-        if ($i > 0 && $site === "netease") {
-            Header("X-Hermit-Retrys: $i");
+
+        if (empty($url)) {
+            Header("Location: " . 'https://api.lwl12.com/music/netease/song?id=607441');
+            exit;
         }
 
         if ($site === "netease") {
