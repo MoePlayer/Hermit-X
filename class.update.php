@@ -59,6 +59,12 @@ final class Hermit_Update {
 			array( $this, 'maybe_notify_email' )
 		);
 
+		add_action(
+			'wp_maybe_auto_update',
+			array( $this, 'tamper_automatic_updater' ),
+			8
+		);
+
 		add_filter(
 			'pre_set_site_transient_update_plugins',
 			array( $this, 'insert_update_data' )
@@ -166,6 +172,42 @@ final class Hermit_Update {
 	}
 
 	/**
+	 * 篡改自动更新系统
+	 *
+	 * @since Hermit X 2.6.4
+	 */
+	public function tamper_automatic_updater() {
+		remove_action( 'wp_maybe_auto_update', 'wp_maybe_auto_update' );
+		add_action( 'wp_maybe_auto_update', array( $this, 'setup_automatic_updater' ) );
+	}
+
+	/**
+	 * 启动自动更新系统
+	 *
+	 * @since Hermit X 2.6.4
+	 */
+	public function setup_automatic_updater() {
+		include_once( ABSPATH . '/wp-admin/includes/admin.php' );
+		include_once( ABSPATH . '/wp-admin/includes/class-wp-upgrader.php' );
+
+		require_once( HERMIT_PATH . '/class.automatic-updater.php' );
+		require_once( HERMIT_PATH . '/class.plugin-upgrader.php' );
+
+		$upgrader = new Hermit_Automatic_Updater();
+		$upgrader->run();
+	}
+
+	/**
+	 * 反馈更新错误
+	 *
+	 * @since Hermit X 2.6.4
+	 */
+	public function report_error( $error ) {
+		unset( $this->update_data );
+		$this->get_update_data( $error );
+	}
+
+	/**
 	 * 插入插件更新信息
 	 *
 	 * @since Hermit X 2.5.9
@@ -208,27 +250,33 @@ final class Hermit_Update {
 	 * @since Hermit X 2.6.0 新增 TTL 的支持；修复启用插件时 HTTP 请求次数过多的问题。
 	 * @since Hermit X 2.6.3 返回 API 传送的所有内容，而不仅仅是版本信息。
 	 */
-	private function get_update_data() {
+	private function get_update_data( $error = null ) {
 		if ( isset( $this->update_data ) )
 			return $this->update_data;
 
 		$wp_version  = get_bloginfo( 'version' );
 		$home_url    = home_url();
 
+		$body = array(
+			'url'         => $home_url,
+			'blogname'    => get_option('blogname'),
+			'admin_email' => get_option('admin_email'),
+			'file'        => $this->get_plugin_file(),
+			'version'     => $this->get_plugin_version(),
+			'wp_version'  => $wp_version,
+			'php_version' => phpversion(),
+			'wp_locale'   => get_locale()
+		);
+
+		if ( is_wp_error( $error ) ) {
+			$body['error']['code'] = $error->get_error_code();
+			$body['error']['data'] = $error->get_error_data();
+		}
+
 		$response = wp_remote_post( $this->api, array(
 			'timeout'    => 10,
 			'user-agent' => "WordPress/{$wp_version}; {$home_url}",
-
-			'body' => array(
-				'url'         => $home_url,
-				'blogname'    => get_option('blogname'),
-				'admin_email' => get_option('admin_email'),
-				'file'        => $this->get_plugin_file(),
-				'version'     => $this->get_plugin_version(),
-				'wp_version'  => $wp_version,
-				'php_version' => phpversion(),
-				'wp_locale'   => get_locale()
-			)
+			'body'       => $body
 		) );
 
 		if ( wp_remote_retrieve_response_code( $response ) == 200 ) {
