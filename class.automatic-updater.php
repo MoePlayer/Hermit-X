@@ -25,6 +25,9 @@ final class Hermit_Automatic_Updater extends WP_Automatic_Updater {
 		if ( $item->plugin != plugin_basename( HERMIT_FILE ) )
 			return parent::update( $type, $item );
 
+		if ( !class_exists( 'Hermit_Plugin_Upgrader' ) )
+			require( HERMIT_PATH . '/class.plugin-upgrader.php' );
+
 		$skin     = new Automatic_Upgrader_Skin();
 		$upgrader = new Hermit_Plugin_Upgrader( $skin );
 

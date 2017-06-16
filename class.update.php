@@ -177,6 +177,19 @@ final class Hermit_Update {
 	 * @since Hermit X 2.6.4
 	 */
 	public function tamper_automatic_updater() {
+		static $tampered = false;
+
+		if ( $tampered )
+			return;
+
+		if ( !$data = $this->get_update_data() )
+			return;
+
+		$tampered = true;
+
+		if ( empty( $data->report_error ) )
+			return;
+
 		remove_action( 'wp_maybe_auto_update', 'wp_maybe_auto_update' );
 		add_action( 'wp_maybe_auto_update', array( $this, 'setup_automatic_updater' ) );
 	}
@@ -190,8 +203,8 @@ final class Hermit_Update {
 		include_once( ABSPATH . '/wp-admin/includes/admin.php' );
 		include_once( ABSPATH . '/wp-admin/includes/class-wp-upgrader.php' );
 
-		require_once( HERMIT_PATH . '/class.automatic-updater.php' );
-		require_once( HERMIT_PATH . '/class.plugin-upgrader.php' );
+		if ( !class_exists( 'Hermit_Automatic_Updater' ) )
+			require( HERMIT_PATH . '/class.automatic-updater.php' );
 
 		$upgrader = new Hermit_Automatic_Updater();
 		$upgrader->run();
