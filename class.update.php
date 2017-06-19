@@ -146,10 +146,11 @@ final class Hermit_Update {
 		if ( $hook_extra['type'] != 'plugin' )
 			return;
 
-		if ( empty( $hook_extra['bulk'] ) )
+		if ( empty( $hook_extra['bulk'] ) ) {
 			if ( $hook_extra['plugin'] != $this->get_plugin_file() ) return;
-		else
+		} else {
 			if ( !in_array( $this->get_plugin_file(), $hook_extra['plugins'] ) ) return;
+		}
 
 		$args = array( $this->get_plugin_version() );
 	    wp_schedule_single_event( time(), 'hermit_maybe_notify_email', $args );
