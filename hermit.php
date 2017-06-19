@@ -3,7 +3,7 @@
 Plugin Name: Hermit X
 Plugin URI: https://blog.lwl12.com/read/hermit-x.html
 Description: 音乐播放器 Hermit music player build for wordpress with APlayer
-Version: 2.6.4.1200-beta
+Version: 2.6.4.1201-beta
 Author: Hermit X Developer Team
 Author URI: https://blog.lwl12.com/read/hermit-x.html#developer
 */
