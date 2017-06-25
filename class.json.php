@@ -32,25 +32,13 @@ class HermitJson
         $url = json_decode($Meting->format()->url($music_id, $this->settings('quality')), true);
         $url = $url['url'];
 
-        if ($site === "netease") {
-            $retry = 0;
-            while (substr($url, 0, 9) !== 'http://m8' && ++$retry<3){
-                $url = json_decode($Meting->format()->url($music_id, $this->settings('quality')), true);
-                $url = $url['url'];
-            }
-            if($retry){
-                Header("X-Hermit-Retrys: $retry");
-            }
-        }
-
         if (empty($url)) {
             Header("Location: " . 'https://api.lwl12.com/music/netease/song?id=607441');
             exit;
         }
 
         if ($site === "netease") {
-            $url = str_replace('http://m7', 'http://m8', $url);
-            $url = str_replace('http://m8', 'https://m8', $url);
+            $url = str_replace('https://m7', 'https://m8', $url);
         }
         if ($site === "xiami" || $site === 'tencent' || $site === 'baidu') {
             $url = str_replace('http://', 'https://', $url);
