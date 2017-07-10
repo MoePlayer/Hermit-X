@@ -32,17 +32,6 @@ class HermitJson
         $url = json_decode($Meting->format()->url($music_id, $this->settings('quality')), true);
         $url = $url['url'];
 
-        if ($site === "netease") {
-            $retry = 0;
-            while (substr($url, 0, 9) !== 'http://m8' && ++$retry<3){
-                $url = json_decode($Meting->format()->url($music_id, $this->settings('quality')), true);
-                $url = $url['url'];
-            }
-            if($retry){
-                Header("X-Hermit-Retrys: $retry");
-            }
-        }
-
         if (empty($url)) {
             Header("Location: " . 'https://api.lwl12.com/music/netease/song?id=607441');
             exit;
@@ -52,7 +41,7 @@ class HermitJson
             $url = str_replace('http://m7', 'http://m8', $url);
             $url = str_replace('http://m8', 'https://m8', $url);
         }
-        if ($site === "xiami") {
+        if ($site === "xiami" || $site === 'tencent' || $site === 'baidu') {
             $url = str_replace('http://', 'https://', $url);
         }
 
@@ -79,6 +68,9 @@ class HermitJson
                 'msg' => 'Invalid song or Music site server error'
             );
             exit(json_encode($return));
+        }
+        if ($site === 'netease' || $site === "xiami" || $site === 'tencent') {
+            $pic['url'] = str_replace('http://', 'https://', $pic['url']);
         }
         $this->set_cache($cacheKey, $pic["url"], 168);
         Header("Location: " . $pic["url"]);
@@ -155,7 +147,7 @@ class HermitJson
                 if (empty($pic["url"])) {
                     $cover = null;
                 } else {
-                    $cover = $pic["url"];
+                     $cover = $pic["url"];
                 }
             } else {
                 $cover      = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $response[0]['pic_id'] . '&id=' . $music_id;
