@@ -85,6 +85,11 @@
   								<option value="order">顺序播放</option>
   								<option value="single">单曲循环</option>
 							</select></label>
+							<label for="hermit-preload"><select id="hermit-preload">
+								<option value="auto" selected>自动预加载</option>
+  								<option value ="metadata">元数据</option>
+  								<option value ="none">无</option>
+							</select></label>
 						</div>
 						<div id="hermit-preview">
 						</div>

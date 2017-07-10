@@ -92,7 +92,7 @@ jQuery(document).ready(function(b) {
     }
 
     function k(c, a) {
-        l = '[hermit autoplay="' + (a.auto ? 'true' : 'false') + '" mode="' + a.mode +'"]' + a.type + "#:" + a.array + "[/hermit]";
+        l = '[hermit autoplay="' + (a.auto ? 'true' : 'false') + '" mode="' + a.mode + '" preload="' + a.preload +'"]' + a.type + "#:" + a.array + "[/hermit]";
         b("#hermit-preview").text(l).addClass("texted")
     }
     void 0 === window.send_to_editor && (window.send_to_editor = function(b) {
@@ -145,6 +145,7 @@ jQuery(document).ready(function(b) {
         l = "";
         e.append(t());
         d.mode = 'circulation';
+        d.preload = 'auto';
         b("body").addClass("hermit-hidden")
     }) : 1 == hermit.roles.length && "contributor" == hermit.roles[0] && (b("#wp-content-editor-tools").prepend('<div id="wp-content-media-buttons" class="wp-media-buttons"><a id="hermit-create" class="button" href="javascript:;" title="\u6dfb\u52a0\u97f3\u4e50"><img src="' + hermit.plugin_url + '/assets/images/logo@2x.png" width="16" height="16"> \u6dfb\u52a0\u97f3\u4e50</a></div>'), b("#wp-content-editor-tools").on("click", "#hermit-create",
         function() {
@@ -252,6 +253,12 @@ jQuery(document).ready(function(b) {
         function() {
             var c = b(this);
             d.mode = c.val();
+            k(f, d)
+        });
+    e.on("change", "#hermit-preload",
+        function() {
+            var c = b(this);
+            d.preload = c.val();
             k(f, d)
         });
     e.on("change", ".hermit-li.active input",
