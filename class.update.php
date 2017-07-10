@@ -173,7 +173,7 @@ final class Hermit_Update {
 	 * @since Hermit X 2.6.3 会从 `self::get_update_data()` 方法的返回值中筛选出版本信息。
 	 */
 	public function insert_update_data( $update ) {
-		if ( !empty(($data = $this->get_update_data())) && !empty($data->response) ) {
+		if (($data = $this->get_update_data()) && !empty($data->response) ) {
 			$file = $this->get_plugin_file();
 			$update->response[$file] = $data->response;
 		}
