@@ -40,6 +40,7 @@ class HermitJson
         if ($site === "netease") {
             $url = str_replace('http://m7', 'http://m8', $url);
             $url = str_replace('http://m8', 'https://m8', $url);
+            $url = str_replace('http://m10', 'https://m10', $url);
         }
         if ($site === "xiami" || $site === 'tencent' || $site === 'baidu') {
             $url = str_replace('http://', 'https://', $url);
@@ -77,6 +78,61 @@ class HermitJson
         exit;
     }
 
+    public function lyric($site, $id)
+    {
+        $cacheKey = "/$site/lyric/$id";
+        $value = $this->get_cache($cacheKey);
+        if ($value) {
+            Header("X-Hermit-Cached: From Cache");
+            return $value;
+        }
+        $Meting = new \Metowolf\Meting($site);
+        $value = json_decode($Meting->format(true)->lyric($id), true);
+        $value = $this->lrctran($value['lyric'],$value['tlyric']);
+        $this->set_cache($cacheKey, $value, 24);
+        return $value;
+    }
+
+    private function lrctrim($lyrics)
+    {
+        $result="";
+        $lyrics=explode("\n",$lyrics);
+        $data=array();
+        foreach($lyrics as $lyric){
+            preg_match('/\[(\d{2}):(\d{2}\.?\d*)]/',$lyric,$lrcTimes);
+            $lrcText=preg_replace('/\[(\d{2}):(\d{2}\.?\d*)]/','',$lyric);
+            if(empty($lrcTimes))continue;
+            $lrcTimes=intval($lrcTimes[1])*60000+intval(floatval($lrcTimes[2])*1000);
+            $lrcText=preg_replace('/\s\s+/', ' ',$lrcText);
+            $lrcText=trim($lrcText);
+            $data[]=array($lrcTimes,$lrcText);
+        }
+        sort($data);
+        return $data;
+    }
+
+    private function lrctran($lyric,$tlyric)
+    {
+        $lyric=$this->lrctrim($lyric);
+        $tlyric=$this->lrctrim($tlyric);
+        $len1=count($lyric);
+        $len2=count($tlyric);
+        $result="";
+        for($i=0,$j=0;$i<$len1&&$j<$len2;$i++){
+            while($lyric[$i][0]>$tlyric[$j][0]&&$j+1<$len2)$j++;
+            if($lyric[$i][0]==$tlyric[$j][0]){
+                $tlyric[$j][1]=str_replace('/','',$tlyric[$j][1]);
+                if(!empty($tlyric[$j][1]))$lyric[$i][1].=" ({$tlyric[$j][1]})";
+                $j++;
+            }
+        }
+        for($i=0;$i<$len1;$i++){
+            $t=$lyric[$i][0];
+            $result.=sprintf("[%02d:%02d.%03d]%s\n",$t/60000,$t%60000/1000,$t%1000,$lyric[$i][1]);
+        }
+        return $result;
+    }
+
     public function id_parse($site, $src)
     {
         foreach ($src as $key => $value) {
@@ -91,9 +147,9 @@ class HermitJson
                 case 'tencent':
                 $request = array(
                     'url'    => $value,
-                    'referer'   => 'http://y.qq.com/portal/player.html',
-                    'cookie'    => 'qqmusic_uin=12345678; qqmusic_key=12345678; qqmusic_fromtag=30; ts_last=y.qq.com/portal/player.html;',
-                    'useragent' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.30 Safari/537.36',
+                    'referer'   => 'https://y.qq.com/portal/player.html',
+                    'cookie'    => 'pgv_pvi=3832878080; pgv_si=s4066364416; pgv_pvid=3938077488; yplayer_open=1; qqmusic_fromtag=66; ts_last=y.qq.com/portal/player.html; ts_uid=5141451452; player_exist=1; yq_index=1',
+                    'useragent' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
                 );
                     break;
 
@@ -142,16 +198,8 @@ class HermitJson
             //处理音乐信息
             $mp3_url    = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_song_url&id=" . $response[0]['url_id'];
             $music_name = $response[0]['name'];
-            if ($site == 'baidu') {
-                $pic = json_decode($Meting->pic($response[0]['pic_id']), true);
-                if (empty($pic["url"])) {
-                    $cover = null;
-                } else {
-                     $cover = $pic["url"];
-                }
-            } else {
-                $cover      = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $response[0]['pic_id'] . '&id=' . $music_id;
-            }
+            $cover      = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $response[0]['pic_id'] . '&id=' . $music_id;
+            $lyric      = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_lyric&id=" . $response[0]['lyric_id'];
             $artists    = $response[0]['artist'];
             $artists = implode(",", $artists);
 
@@ -161,7 +209,7 @@ class HermitJson
                 "author" => $artists,
                 "url" => $mp3_url,
                 "pic" => $cover,
-                "lrc" => "https://api.lwl12.com/music/$site/lyric?raw=true&id=" . $music_id
+                "lrc" => $lyric
             );
 
             $this->set_cache($cache_key, $result, 23);
@@ -221,24 +269,16 @@ class HermitJson
 
 
             foreach ($result as $k => $value) {
-                $mp3_url          = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_song_url&id=" . $value["url_id"];
-                if ($site == 'baidu') {
-                    $pic = json_decode($Meting->pic($value['pic_id']), true);
-                    if (empty($pic["url"])) {
-                        $cover = null;
-                    } else {
-                        $cover = $pic["url"];
-                    }
-                } else {
-                    $cover = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $value['pic_id'] . '&id=' . $value['id'];
-                }
+                $mp3_url = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_song_url&id=" . $value["url_id"];
+                $cover   = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $value['pic_id'] . '&id=' . $value['id'];
+                $lyric   = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_lyric&id=" . $value['lyric_id'];
                 $album["songs"][] = array(
                     "id" => $value["id"],
                     "title" => $value["name"],
                     "url" => $mp3_url,
                     "author" => $album_author = implode(",", $value['artist']),
                     "pic" => $cover,
-                    "lrc" => "https://api.lwl12.com/music/$site/lyric?raw=true&id=" . $value["id"]
+                    "lrc" => $lyric
                 );
             }
 
@@ -279,27 +319,16 @@ class HermitJson
             foreach ($result as $k => $value) {
                 $mp3_url = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_song_url&id=" . $value["url_id"];
                 $artists = $value["artist"];
-
                 $artists = implode(",", $artists);
-
-                if ($site == 'baidu') {
-                    $pic = json_decode($Meting->pic($value['pic_id']), true);
-                    if (empty($pic["url"])) {
-                        $cover = null;
-                    } else {
-                        $cover = $pic["url"];
-                    }
-                } else {
-                    $cover = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $value['pic_id'] . '&id=' . $value['id'];
-                }
-
+                $cover   = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $value['pic_id'] . '&id=' . $value['id'];
+                $lyric   = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_lyric&id=" . $value['lyric_id'];
                 $playlist["songs"][] = array(
                     "id" => $value["id"],
                     "title" => $value["name"],
                     "url" => $mp3_url,
                     "author" => $artists,
                     "pic" => $cover,
-                    "lrc" => "https://api.lwl12.com/music/$site/lyric?raw=true&id=" . $value["id"]
+                    "lrc" => $lyric
                 );
             }
 
@@ -315,10 +344,12 @@ class HermitJson
         if ($single) {
             $data['url'] = $data['url'] . "&_nonce=".wp_create_nonce($site . "_song_url#:".$data['id']);
             $data['pic'] = $data['pic'] . "&_nonce=".wp_create_nonce($site . "_pic_url#:".$data['id']);
+            $data['lrc'] = $data['lrc'] . "&_nonce=".wp_create_nonce($site . "_lyric#:".$data['id']);
         } else {
             foreach ($data["songs"] as $key => $value) {
                 $data["songs"][$key]['url'] = $value['url'] . "&_nonce=".wp_create_nonce($site . "_song_url#:".$value['id']);
                 $data["songs"][$key]['pic'] = $value['pic'] . "&_nonce=".wp_create_nonce($site . "_pic_url#:".$value['id']);
+                $data["songs"][$key]['lrc'] = $value['lrc'] . "&_nonce=".wp_create_nonce($site . "_lyric#:".$value['id']);
             }
         }
         return $data;
