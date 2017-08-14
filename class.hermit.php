@@ -222,7 +222,7 @@ class hermit
 
                     //默认路由
                     default:
-                    $re = '/^(?<site>(netease|xiami|tencent|kugou|baidu)?)_?(?<scope>songs|songlist|album|playlist|collect|artist|song_url|pic_url|lrc_url|id_parse)$/i';
+                    $re = '/^(?<site>(netease|xiami|tencent|kugou|baidu)?)_?(?<scope>songs|songlist|album|playlist|collect|artist|song_url|pic_url|lyric|id_parse)$/i';
                     preg_match($re, $scope, $matches);
                         if (!empty($matches['scope'])) {
                             $scope = $matches['scope'];
@@ -248,7 +248,7 @@ class hermit
                                         'status' => 200,
                                         'msg' => $HMTJSON->$scope($site, explode(',', $_GET['src']))
                                     );
-                                } elseif ($scope === 'lrc_url') {
+                                } elseif ($scope === 'lyric') {
                                     $this->nonce_verify();
                                     echo $HMTJSON->$scope($site, $_GET['id']);
                                     exit;

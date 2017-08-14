@@ -78,9 +78,9 @@ class HermitJson
         exit;
     }
 
-    public function lrc_url($site, $id)
+    public function lyric($site, $id)
     {
-        $cacheKey = "/$site/lrc_url/$id";
+        $cacheKey = "/$site/lyric/$id";
         $value = $this->get_cache($cacheKey);
         if ($value) {
             Header("X-Hermit-Cached: From Cache");
@@ -199,7 +199,7 @@ class HermitJson
             $mp3_url    = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_song_url&id=" . $response[0]['url_id'];
             $music_name = $response[0]['name'];
             $cover      = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $response[0]['pic_id'] . '&id=' . $music_id;
-            $lyric      = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_lrc_url&id=" . $response[0]['lyric_id'];
+            $lyric      = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_lyric&id=" . $response[0]['lyric_id'];
             $artists    = $response[0]['artist'];
             $artists = implode(",", $artists);
 
@@ -271,7 +271,7 @@ class HermitJson
             foreach ($result as $k => $value) {
                 $mp3_url = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_song_url&id=" . $value["url_id"];
                 $cover   = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $value['pic_id'] . '&id=' . $value['id'];
-                $lyric   = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_lrc_url&id=" . $value['lyric_id'];
+                $lyric   = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_lyric&id=" . $value['lyric_id'];
                 $album["songs"][] = array(
                     "id" => $value["id"],
                     "title" => $value["name"],
@@ -321,7 +321,7 @@ class HermitJson
                 $artists = $value["artist"];
                 $artists = implode(",", $artists);
                 $cover   = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $value['pic_id'] . '&id=' . $value['id'];
-                $lyric   = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_lrc_url&id=" . $value['lyric_id'];
+                $lyric   = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_lyric&id=" . $value['lyric_id'];
                 $playlist["songs"][] = array(
                     "id" => $value["id"],
                     "title" => $value["name"],
@@ -344,12 +344,12 @@ class HermitJson
         if ($single) {
             $data['url'] = $data['url'] . "&_nonce=".wp_create_nonce($site . "_song_url#:".$data['id']);
             $data['pic'] = $data['pic'] . "&_nonce=".wp_create_nonce($site . "_pic_url#:".$data['id']);
-            $data['lrc'] = $data['lrc'] . "&_nonce=".wp_create_nonce($site . "_lrc_url#:".$data['id']);
+            $data['lrc'] = $data['lrc'] . "&_nonce=".wp_create_nonce($site . "_lyric#:".$data['id']);
         } else {
             foreach ($data["songs"] as $key => $value) {
                 $data["songs"][$key]['url'] = $value['url'] . "&_nonce=".wp_create_nonce($site . "_song_url#:".$value['id']);
                 $data["songs"][$key]['pic'] = $value['pic'] . "&_nonce=".wp_create_nonce($site . "_pic_url#:".$value['id']);
-                $data["songs"][$key]['lrc'] = $value['lrc'] . "&_nonce=".wp_create_nonce($site . "_lrc_url#:".$value['id']);
+                $data["songs"][$key]['lrc'] = $value['lrc'] . "&_nonce=".wp_create_nonce($site . "_lyric#:".$value['id']);
             }
         }
         return $data;
