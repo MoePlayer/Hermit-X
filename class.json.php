@@ -39,6 +39,7 @@ class HermitJson
 
         if ($site === "netease") {
             $url = str_replace('http://m7', 'http://m8', $url);
+            $url = str_replace('http://m8c', 'http://m8', $url);
             $url = str_replace('http://m8', 'https://m8', $url);
             $url = str_replace('http://m10', 'https://m10', $url);
         }
