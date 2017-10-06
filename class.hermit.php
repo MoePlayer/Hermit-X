@@ -152,7 +152,7 @@ class hermit
         }
         $atts["theme"]       = $color;
         $atts["songs"]       = $content;
-        $atts["_nonce"]      = wp_create_nonce($content);
+        $atts["_nonce"]      = $this->settings('low_security') ? md5($content.NONCE_KEY) : wp_create_nonce($content);
         $playlist_max_height = $this->settings('playlist_max_height');
         if ($playlist_max_height != 0 && empty($atts["listmaxheight"])) {
             $atts["listmaxheight"] = $playlist_max_height . "px";
@@ -183,18 +183,18 @@ class hermit
 
     public function nonce_verify()
     {
-        if ($this->settings('nonce_verify')) {
+        if (!$this->settings('low_security')) {
             $result = wp_verify_nonce( $_GET['_nonce'], $_GET['scope'].'#:'.$_GET['id']);
         } else {
-            $result= crc32($_GET['scope'].'#:'.$_GET['id']) === $_GET['_nonce'];
+            $result = md5($_GET['scope'].'#:'.$_GET['id'].NONCE_KEY) === $_GET['_nonce'];
         }
-    
+
         if (!$result) {
             header('HTTP/1.0 401 Unauthorized');
             header('Content-type: application/json;charset=UTF-8');
             $result = array(
                     'status' => 401,
-                    'msg' => $result
+                    'msg' => $result,
                 );
             die(json_encode($result));
         }
@@ -517,7 +517,7 @@ class hermit
             'color_customize' => '#5895be',
             'advanced_cache' => 0,
             'netease_cookies'=> '',
-            'nonce_verify' => 1,
+            'low_security' => 0,
         );
 
         $settings = $this->_settings;

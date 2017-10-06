@@ -166,15 +166,15 @@
 				</td>
 			</tr>
 			<tr valign="top">
-				<th scope="row"><label>Nonce 验证</label></th>
+				<th scope="row"><label>低安全性验证</label></th>
 				<td>
-					<p><label><input type="checkbox" name="hermit_setting[nonce_verify]"
-					          value="1" <?php if ($this->settings('nonce_verify') == 1) {
+					<p><label><input type="checkbox" name="hermit_setting[low_security]"
+					          value="1" <?php if ($this->settings('low_security') == 1) {
                         echo 'checked="checked"';
                     } ?>/>
-						<span>开启 Nonce 验证</span></label></p>
+						<span>使用低安全性验证</span></label></p>
 
-					<p class="description">使用 Nonce 验证保证 Hermit X 音乐信息接口不被恶意利用。<br> 仅在您需要使用全页面缓存等无法兼容 nonce 验证的情况下需要关闭。<b>关闭该选项会显著降低接口安全性，不建议填写了 COOKIES 的用户关闭！</b></p>
+					<p class="description">默认使用 Nonce 验证保证 Hermit X 音乐信息接口不被恶意利用。<br> 仅在您需要使用全页面缓存等无法兼容 nonce 验证的情况下需要启用该选项。<b>开启该选项会显著降低接口安全性</b></p>
 				</td>
 			</tr>
 			<tr valign="top">
