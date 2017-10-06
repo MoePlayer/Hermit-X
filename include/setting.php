@@ -166,6 +166,18 @@
 				</td>
 			</tr>
 			<tr valign="top">
+				<th scope="row"><label>低安全性验证</label></th>
+				<td>
+					<p><label><input type="checkbox" name="hermit_setting[low_security]"
+					          value="1" <?php if ($this->settings('low_security') == 1) {
+                        echo 'checked="checked"';
+                    } ?>/>
+						<span>使用低安全性验证</span></label></p>
+
+					<p class="description">默认使用 Nonce 验证保证 Hermit X 音乐信息接口不被恶意利用。<br> 仅在您需要使用全页面缓存等无法兼容 nonce 验证的情况下需要启用该选项。<b>开启该选项会显著降低接口安全性</b></p>
+				</td>
+			</tr>
+			<tr valign="top">
 				<th scope="row"><label>网易云音乐 COOKIES</label></th>
 				<td>
 					<p><input type="text" class="regular-text" name="hermit_setting[netease_cookies]"
