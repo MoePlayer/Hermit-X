@@ -343,14 +343,14 @@ class HermitJson
     private function addNonce($data, $site, $single = false)
     {
         if ($single) {
-            $data['url'] = $data['url'] . "&_nonce=".wp_create_nonce($site . "_song_url#:".$data['id']);
-            $data['pic'] = $data['pic'] . "&_nonce=".wp_create_nonce($site . "_pic_url#:".$data['id']);
-            $data['lrc'] = $data['lrc'] . "&_nonce=".wp_create_nonce($site . "_lyric#:".$data['id']);
+            $data['url'] = $data['url'] . "&_nonce=". $this->settings('nonce_verify') ? wp_create_nonce($site . "_song_url#:".$data['id']) : crc32($site . "_song_url#:".$data['id'].NONCE_KEY);
+            $data['pic'] = $data['pic'] . "&_nonce=".$this->settings('nonce_verify') ? wp_create_nonce($site . "_pic_url#:".$data['id']) : crc32($site . "_pic_url#:".$data['id'].NONCE_KEY);
+            $data['lrc'] = $data['lrc'] . "&_nonce=".$this->settings('nonce_verify') ? wp_create_nonce($site . "_lyric#:".$data['id']) : crc32($site . "_lyric#:".$data['id'].NONCE_KEY);
         } else {
             foreach ($data["songs"] as $key => $value) {
-                $data["songs"][$key]['url'] = $value['url'] . "&_nonce=".wp_create_nonce($site . "_song_url#:".$value['id']);
-                $data["songs"][$key]['pic'] = $value['pic'] . "&_nonce=".wp_create_nonce($site . "_pic_url#:".$value['id']);
-                $data["songs"][$key]['lrc'] = $value['lrc'] . "&_nonce=".wp_create_nonce($site . "_lyric#:".$value['id']);
+                $data["songs"][$key]['url'] = $value['url'] . $this->settings('nonce_verify') ? wp_create_nonce($site . "_song_url#:".$value['id']) : crc32($site . "_song_url#:".$value['id'].NONCE_KEY);
+                $data["songs"][$key]['pic'] = $value['pic'] . $this->settings('nonce_verify') ? wp_create_nonce($site . "_pic_url#:".$value['id']) : crc32($site . "_pic_url#:".$value['id'].NONCE_KEY);
+                $data["songs"][$key]['lrc'] = $value['lrc'] . $this->settings('nonce_verify') ? wp_create_nonce($site . "_pic_url#:".$value['id']) : crc32($site . "_pic_url#:".$value['id'].NONCE_KEY);
             }
         }
         return $data;
@@ -426,6 +426,7 @@ class HermitJson
             'debug' => 0,
             'advanced_cache' => 0,
             'netease_cookies'=> '',
+            'nonce_verify' => 1,
         );
 
         $settings = $this->_settings;

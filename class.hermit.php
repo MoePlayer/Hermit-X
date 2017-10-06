@@ -183,7 +183,12 @@ class hermit
 
     public function nonce_verify()
     {
-        $result=wp_verify_nonce( $_REQUEST['_nonce'], $_GET['scope'].'#:'.$_GET['id']);
+        if ($this->settings('nonce_verify')) {
+            $result = wp_verify_nonce( $_GET['_nonce'], $_GET['scope'].'#:'.$_GET['id']);
+        } else {
+            $result= crc32($_GET['scope'].'#:'.$_GET['id']) === $_GET['_nonce'];
+        }
+    
         if (!$result) {
             header('HTTP/1.0 401 Unauthorized');
             header('Content-type: application/json;charset=UTF-8');
@@ -512,6 +517,7 @@ class hermit
             'color_customize' => '#5895be',
             'advanced_cache' => 0,
             'netease_cookies'=> '',
+            'nonce_verify' => 1,
         );
 
         $settings = $this->_settings;
