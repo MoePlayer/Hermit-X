@@ -356,14 +356,14 @@ class HermitJson
             }
         } else {
             if ($single) {
-                $data['url'] = $data['url'] . "&_nonce=".md5($site . "_song_url#:".$data['id'].NONCE_KEY);
-                $data['pic'] = $data['pic'] . "&_nonce=".md5($site . "_pic_url#:".$data['id'].NONCE_KEY);
-                $data['lrc'] = $data['lrc'] . "&_nonce=".md5($site . "_lyric#:".$data['id'].NONCE_KEY);
+                $data['url'] = $data['url'] . "&_nonce=".md5(NONCE_KEY.$site . "_song_url#:".$data['id'].NONCE_KEY);
+                $data['pic'] = $data['pic'] . "&_nonce=".md5(NONCE_KEY.$site . "_pic_url#:".$data['id'].NONCE_KEY);
+                $data['lrc'] = $data['lrc'] . "&_nonce=".md5(NONCE_KEY.$site . "_lyric#:".$data['id'].NONCE_KEY);
             } else {
                 foreach ($data["songs"] as $key => $value) {
-                    $data["songs"][$key]['url'] = $value['url'] . "&_nonce=".md5($site . "_song_url#:".$value['id'].NONCE_KEY);
-                    $data["songs"][$key]['pic'] = $value['pic'] . "&_nonce=".md5($site . "_pic_url#:".$value['id'].NONCE_KEY);
-                    $data["songs"][$key]['lrc'] = $value['lrc'] . "&_nonce=".md5($site . "_lyric#:".$value['id'].NONCE_KEY);
+                    $data["songs"][$key]['url'] = $value['url'] . "&_nonce=".md5(NONCE_KEY.$site . "_song_url#:".$value['id'].NONCE_KEY);
+                    $data["songs"][$key]['pic'] = $value['pic'] . "&_nonce=".md5(NONCE_KEY.$site . "_pic_url#:".$value['id'].NONCE_KEY);
+                    $data["songs"][$key]['lrc'] = $value['lrc'] . "&_nonce=".md5(NONCE_KEY.$site . "_lyric#:".$value['id'].NONCE_KEY);
                 }
             }
         }
