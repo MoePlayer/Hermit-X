@@ -152,7 +152,7 @@ class hermit
         }
         $atts["theme"]       = $color;
         $atts["songs"]       = $content;
-        $atts["_nonce"]      = $this->settings('low_security') ? md5($content.NONCE_KEY) : wp_create_nonce($content);
+        $atts["_nonce"]      = $this->settings('low_security') ? md5(NONCE_KEY.$content.NONCE_KEY) : wp_create_nonce($content);
         $playlist_max_height = $this->settings('playlist_max_height');
         if ($playlist_max_height != 0 && empty($atts["listmaxheight"])) {
             $atts["listmaxheight"] = $playlist_max_height . "px";
@@ -186,7 +186,7 @@ class hermit
         if (!$this->settings('low_security')) {
             $result = wp_verify_nonce( $_GET['_nonce'], $_GET['scope'].'#:'.$_GET['id']);
         } else {
-            $result = md5($_GET['scope'].'#:'.$_GET['id'].NONCE_KEY) === $_GET['_nonce'];
+            $result = md5(NONCE_KEY.$_GET['scope'].'#:'.$_GET['id'].NONCE_KEY) === $_GET['_nonce'];
         }
 
         if (!$result) {
