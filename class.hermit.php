@@ -104,15 +104,6 @@ class hermit
     }
 
     /**
-     * 获取一个唯一的id以区分各个播放器实例
-     * @return number
-     */
-    public static function getUniqueId()
-    {
-        return ++self::$playerID;
-    }
-
-    /**
      * 添加文章短代码
      */
     public function shortcode($atts, $content = null)
@@ -168,7 +159,7 @@ class hermit
             $apatts = $apatts . 'data-' . $value . '="' . $atts[$value] . '" ';
         }
 
-        return '<!-Hermit X v' . HERMIT_VERSION . ' start--><div id="aplayer' . self::getUniqueId() . '" class="aplayer" ' . $apatts . '></div><!--Hermit X v' . HERMIT_VERSION . ' end-->';
+        return '<!-Hermit X v' . HERMIT_VERSION . ' start--><div id="aplayer' . ++self::$playerID . '" class="aplayer" ' . $apatts . '></div><!--Hermit X end-->';
     }
 
     /**
