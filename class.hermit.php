@@ -218,7 +218,7 @@ class hermit
 
                     //默认路由
                     default:
-                    $re = '/^(?<site>(netease|xiami|tencent|kugou|baidu)?)_?(?<scope>songs|songlist|album|playlist|collect|artist|song_url|pic_url|lyric|id_parse)$/i';
+                    $re = '/^(?<site>(netease|xiami|tencent|kugou|baidu)?)_?(?<scope>songs|songlist|album|playlist|collect|artist|song_url|lyric|id_parse)$/i';
                     preg_match($re, $scope, $matches);
                         if (!empty($matches['scope'])) {
                             $scope = $matches['scope'];
@@ -233,13 +233,14 @@ class hermit
                                 $scope = 'playlist';
                             }
                             if (method_exists($HMTJSON, $scope)) {
-                                if ($scope === 'pic_url') {
-                                    $this->nonce_verify();
-                                    $result = array(
-                                        'status' => 200,
-                                        'msg' => $HMTJSON->$scope($site, $id, $_GET['picid'])
-                                    );
-                                } elseif ($scope === 'id_parse') {
+                                // if ($scope === 'pic_url') {
+                                //     $this->nonce_verify();
+                                //     $result = array(
+                                //         'status' => 200,
+                                //         'msg' => $HMTJSON->$scope($site, $id, $_GET['picid'])
+                                //     );
+                                //}
+                                if ($scope === 'id_parse') {
                                     $result = array(
                                         'status' => 200,
                                         'msg' => $HMTJSON->$scope($site, explode(',', $_GET['src']))

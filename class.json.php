@@ -52,31 +52,22 @@ class HermitJson
         exit;
     }
 
-    public function pic_url($site, $id, $pic)
+    private function pic_url($site, $id, $pic)
     {
         $cacheKey = "/$site/pic_url/$pic";
         $url = $this->get_cache($cacheKey);
-        if ($url) {
-            Header("X-Hermit-Cached: From Cache");
-            Header("Location: " . $url);
-            return 0;
-        }
+        if (!empty($url)) return $url;
         $Meting = new \Metowolf\Meting($site);
 
         $pic = json_decode($Meting->pic($pic, 100), true);
         if (empty($pic["url"])) {
-            $return = array(
-                'code' => 501,
-                'msg' => 'Invalid song or Music site server error'
-            );
-            exit(json_encode($return));
+            return false;
         }
         if ($site === 'netease' || $site === "xiami" || $site === 'tencent') {
             $pic['url'] = str_replace('http://', 'https://', $pic['url']);
         }
         $this->set_cache($cacheKey, $pic["url"], 168);
-        Header("Location: " . $pic["url"]);
-        exit;
+        return $pic["url"];
     }
 
     public function lyric($site, $id)
@@ -199,7 +190,7 @@ class HermitJson
             //处理音乐信息
             $mp3_url    = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_song_url&id=" . $response[0]['url_id'];
             $music_name = $response[0]['name'];
-            $cover      = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $response[0]['pic_id'] . '&id=' . $music_id;
+            $cover      = $this->pic_url($site, $music_id, $response[0]['pic_id']);
             $lyric      = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_lyric&id=" . $response[0]['lyric_id'];
             $artists    = $response[0]['artist'];
             $artists = implode(",", $artists);
@@ -271,7 +262,7 @@ class HermitJson
 
             foreach ($result as $k => $value) {
                 $mp3_url = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_song_url&id=" . $value["url_id"];
-                $cover   = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $value['pic_id'] . '&id=' . $value['id'];
+                $cover   = $this->pic_url($site, $value['id'], $value['pic_id']);
                 $lyric   = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_lyric&id=" . $value['lyric_id'];
                 $album["songs"][] = array(
                     "id" => $value["id"],
@@ -321,7 +312,7 @@ class HermitJson
                 $mp3_url = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_song_url&id=" . $value["url_id"];
                 $artists = $value["artist"];
                 $artists = implode(",", $artists);
-                $cover   = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_pic_url&picid=" . $value['pic_id'] . '&id=' . $value['id'];
+                $cover   = $this->pic_url($site, $value['id'], $value['pic_id']);
                 $lyric   = admin_url() . "admin-ajax.php" . "?action=hermit&scope=" . $site . "_lyric&id=" . $value['lyric_id'];
                 $playlist["songs"][] = array(
                     "id" => $value["id"],
@@ -345,24 +336,24 @@ class HermitJson
         if(!$this->settings('low_security')){
             if ($single) {
                 $data['url'] = $data['url'] . "&_nonce=".wp_create_nonce($site . "_song_url#:".$data['id']);
-                $data['pic'] = $data['pic'] . "&_nonce=".wp_create_nonce($site . "_pic_url#:".$data['id']);
+                //$data['pic'] = $data['pic'] . "&_nonce=".wp_create_nonce($site . "_pic_url#:".$data['id']);
                 $data['lrc'] = $data['lrc'] . "&_nonce=".wp_create_nonce($site . "_lyric#:".$data['id']);
             } else {
                 foreach ($data["songs"] as $key => $value) {
                     $data["songs"][$key]['url'] = $value['url'] . "&_nonce=".wp_create_nonce($site . "_song_url#:".$value['id']);
-                    $data["songs"][$key]['pic'] = $value['pic'] . "&_nonce=".wp_create_nonce($site . "_pic_url#:".$value['id']);
+                    //$data["songs"][$key]['pic'] = $value['pic'] . "&_nonce=".wp_create_nonce($site . "_pic_url#:".$value['id']);
                     $data["songs"][$key]['lrc'] = $value['lrc'] . "&_nonce=".wp_create_nonce($site . "_lyric#:".$value['id']);
                 }
             }
         } else {
             if ($single) {
                 $data['url'] = $data['url'] . "&_nonce=".md5(NONCE_KEY.$site . "_song_url#:".$data['id'].NONCE_KEY);
-                $data['pic'] = $data['pic'] . "&_nonce=".md5(NONCE_KEY.$site . "_pic_url#:".$data['id'].NONCE_KEY);
+                //$data['pic'] = $data['pic'] . "&_nonce=".md5(NONCE_KEY.$site . "_pic_url#:".$data['id'].NONCE_KEY);
                 $data['lrc'] = $data['lrc'] . "&_nonce=".md5(NONCE_KEY.$site . "_lyric#:".$data['id'].NONCE_KEY);
             } else {
                 foreach ($data["songs"] as $key => $value) {
                     $data["songs"][$key]['url'] = $value['url'] . "&_nonce=".md5(NONCE_KEY.$site . "_song_url#:".$value['id'].NONCE_KEY);
-                    $data["songs"][$key]['pic'] = $value['pic'] . "&_nonce=".md5(NONCE_KEY.$site . "_pic_url#:".$value['id'].NONCE_KEY);
+                    //$data["songs"][$key]['pic'] = $value['pic'] . "&_nonce=".md5(NONCE_KEY.$site . "_pic_url#:".$value['id'].NONCE_KEY);
                     $data["songs"][$key]['lrc'] = $value['lrc'] . "&_nonce=".md5(NONCE_KEY.$site . "_lyric#:".$value['id'].NONCE_KEY);
                 }
             }
