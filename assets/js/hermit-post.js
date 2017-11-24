@@ -37,10 +37,10 @@ jQuery(document).ready(function(b) {
                         }), d.array = e.join(",").replace(/song\?id=/g, ""));
                         break;
                 case "netease_album":
-                    (a = a.match(/(album\?id=(\d+)|\/album\/(\d+))/gi)) && 0 < a.length && (d.array = a[0].replace(/(album\?id=|\/album\/)/gi, ""));
+                    (a = a.match(/(album\?id=(\d+)|\/album\/(\d+))/i)) && 0 < a.length && (d.array = a[0].replace(/(album\?id=|\/album\/)/gi, ""));
                     break;
                 case "netease_playlist":
-                    (a = a.match(/(playlist\?id=(\d+)|\/playlist\/(\d+))/gi)) && 0 < a.length && (d.array = a[0].replace(/(playlist\?id=|\/playlist\/)/gi, ""))
+                    (a = a.match(/(playlist\?id=(\d+)|\/playlist\/(\d+))/i)) && 0 < a.length && (d.array = a[0].replace(/(playlist\?id=|\/playlist\/)/gi, ""))
             }
         }
 
@@ -53,10 +53,10 @@ jQuery(document).ready(function(b) {
                     }), d.array = e.join(",").replace(/y\.qq\.com\/n\/yqq\/song\//gi, ""));
                     break;
                 case "tencent_album":
-                    (a = a.match(/y\.qq\.com\/n\/yqq\/album\/([A-Za-z0-9]+)/gi)) && 0 < a.length && (d.array = a[0].replace(/y\.qq\.com\/n\/yqq\/album\//gi, ""));
+                    (a = a.match(/y\.qq\.com\/n\/yqq\/album\/([A-Za-z0-9]+)/i)) && 0 < a.length && (d.array = a[0].replace(/y\.qq\.com\/n\/yqq\/album\//gi, ""));
                     break;
                 case "tencent_playlist":
-                    (a = a.match(/y\.qq\.com\/n\/yqq\/playlist\/(\d+)/gi)) && 0 < a.length && (d.array = a[0].replace(/y\.qq\.com\/n\/yqq\/playlist\//gi, ""))
+                    (a = a.match(/y\.qq\.com\/n\/yqq\/playlist\/(\d+)/i)) && 0 < a.length && (d.array = a[0].replace(/y\.qq\.com\/n\/yqq\/playlist\//gi, ""))
             }
         }
          if ("kugou" == c) {
@@ -68,10 +68,10 @@ jQuery(document).ready(function(b) {
                      }), d.array = es.join(","));
                      break;
                  case "kugou_album":
-                     (a = a.match(/[A-Za-z0-9]+/gi)) && 0 < a.length && (d.array = a[0]);
+                     (a = a.match(/[A-Za-z0-9]+/i)) && 0 < a.length && (d.array = a[0]);
                      break;
                  case "kugou_playlist":
-                     (a = a.match(/[A-Za-z0-9]+/gi)) && 0 < a.length && (d.array = a[0]);
+                     (a = a.match(/[A-Za-z0-9]+/i)) && 0 < a.length && (d.array = a[0]);
              }
         }
         if ("baidu" == c) {
@@ -83,10 +83,10 @@ jQuery(document).ready(function(b) {
                     }), d.array = es.join(",").replace(/music\.baidu\.com\/song\//gi, ""));
                     break;
                 case "baidu_album":
-                    (a = a.match(/music\.baidu\.com\/album\/\d+/gi)) && 0 < a.length && (d.array = a[0].replace(/music\.baidu\.com\/album\//gi, ""));
+                    (a = a.match(/music\.baidu\.com\/album\/\d+/i)) && 0 < a.length && (d.array = a[0].replace(/music\.baidu\.com\/album\//gi, ""));
                     break;
                 case "baidu_playlist":
-                    (a = a.match(/music\.baidu\.com\/songlist\/\d+/gi)) && 0 < a.length && (d.array = a[0].replace(/music\.baidu\.com\/songlist\//gi, ""))
+                    (a = a.match(/music\.baidu\.com\/songlist\/\d+/i)) && 0 < a.length && (d.array = a[0].replace(/music\.baidu\.com\/songlist\//gi, ""))
             }
         }
         "remote" == c && (d.type = "remote", d.array = a);
