@@ -47,13 +47,16 @@ jQuery(document).ready(function(b) {
         if ("tencent" == c) {
             switch (d.type) {
                 case "tencent_songlist":
-                    (a = a.match(/(http|https):\/\/y\.qq\.com\/portal\/song\//gi)) && 0 < a.length && (d.array = "Wating Parse...");
+                    (a = a.match(/y\.qq\.com\/n\/yqq\/song\/([A-Za-z0-9]+)/gi)) && 0 < a.length && (e = [], b.each(a,
+                    function(a, c) {
+                        - 1 === b.inArray(c, e) && e.push(c)
+                    }), d.array = e.join(",").replace(/y\.qq\.com\/n\/yqq\/song\//gi, ""));
                     break;
                 case "tencent_album":
-                    (a = a.match(/y\.qq\.com\/portal\/album\/([A-Za-z0-9]+)/gi)) && 0 < a.length && (d.array = a[0].replace(/y\.qq\.com\/portal\/album\//gi, ""));
+                    (a = a.match(/y\.qq\.com\/n\/yqq\/album\/([A-Za-z0-9]+)/gi)) && 0 < a.length && (d.array = a[0].replace(/y\.qq\.com\/n\/yqq\/album\//gi, ""));
                     break;
                 case "tencent_playlist":
-                    (a = a.match(/y\.qq\.com\/portal\/playlist\/(\d+)/gi)) && 0 < a.length && (d.array = a[0].replace(/y\.qq\.com\/portal\/playlist\//gi, ""))
+                    (a = a.match(/y\.qq\.com\/n\/yqq\/playlist\/(\d+)/gi)) && 0 < a.length && (d.array = a[0].replace(/y\.qq\.com\/n\/yqq\/playlist\//gi, ""))
             }
         }
          if ("kugou" == c) {
@@ -171,9 +174,9 @@ jQuery(document).ready(function(b) {
         function() {
             if (f == "xiami") {
                 id_parse('xiami');
-            } else if (d.type == "tencent_songlist") {
-                id_parse('tencent');
-            } else {
+            // } else if (d.type == "tencent_songlist") {
+            //     id_parse('tencent');
+             } else {
                 "disabled" != b(this).attr("disabled") && (send_to_editor(l.replace(/,+$/g, "")), b("#hermit-shell").remove());
                 b("body").removeClass("hermit-hidden")
             }
@@ -183,8 +186,8 @@ jQuery(document).ready(function(b) {
             case 'xiami':
                 b("#hermit-shell-insert").text( "Xiami Music ID Parsing...");
                 break;
-            case 'tencent':
-                b("#hermit-shell-insert").text("Tencent Music ID Parsing...");
+            // case 'tencent':
+            //     b("#hermit-shell-insert").text("Tencent Music ID Parsing...");
         }
         b.ajax({
             url: hermit.ajax_url,

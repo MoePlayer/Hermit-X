@@ -136,14 +136,14 @@ class HermitJson
             }
 
             switch ($site) {
-                case 'tencent':
-                $request = array(
-                    'url'    => $value,
-                    'referer'   => 'https://y.qq.com/portal/player.html',
-                    'cookie'    => 'pgv_pvi=3832878080; pgv_si=s4066364416; pgv_pvid=3938077488; yplayer_open=1; qqmusic_fromtag=66; ts_last=y.qq.com/portal/player.html; ts_uid=5141451452; player_exist=1; yq_index=1',
-                    'useragent' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
-                );
-                    break;
+                // case 'tencent':
+                // $request = array(
+                //     'url'    => $value,
+                //     'referer'   => 'https://y.qq.com/portal/player.html',
+                //     'cookie'    => 'pgv_pvi=3832878080; pgv_si=s4066364416; pgv_pvid=3938077488; yplayer_open=1; qqmusic_fromtag=66; ts_last=y.qq.com/portal/player.html; ts_uid=5141451452; player_exist=1; yq_index=1',
+                //     'useragent' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
+                // );
+                //     break;
 
                 case 'xiami':
                 $request = array(
@@ -159,9 +159,9 @@ class HermitJson
                 case 'xiami':
                     $re       = '/<link rel="canonical" href="http:\/\/www\.xiami\.com\/(collect|album|song)\/(?<id>\d+)" \/>/';
                     break;
-                case 'tencent':
-                    $re = '/g_SongData.*"songmid":"(?<id>[A-Za-z0-9]+)".*"songtype"/';
-                    break;
+                // case 'tencent':
+                //     $re = '/g_SongData.*"songmid":"(?<id>[A-Za-z0-9]+)".*"songtype"/';
+                //     break;
                 default:
                     return false;
                     break;
