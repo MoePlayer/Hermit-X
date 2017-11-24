@@ -59,9 +59,9 @@ class HermitJson
         if (!empty($url)) return $url;
         $Meting = new \Metowolf\Meting($site);
 
-        $pic = json_decode($Meting->pic($pic, 100), true);
+        $pic = json_decode($Meting->pic($pic, ($site === 'tencent') ? 90 : 100), true);
         if (empty($pic["url"])) {
-            return false;
+            return null;
         }
         if ($site === 'netease' || $site === "xiami" || $site === 'tencent') {
             $pic['url'] = str_replace('http://', 'https://', $pic['url']);
