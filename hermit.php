@@ -9,7 +9,7 @@ Author URI: https://blog.lwl12.com/read/hermit-x.html#developer
 */
 
 define('HERMIT_FILE', __FILE__);
-define('HERMIT_VERSION', '2.6.6.1024-RC');
+define('HERMIT_VERSION', '2.6.6.1025-RC');
 define('HERMIT_URL', plugins_url('', __FILE__));
 define('HERMIT_PATH', dirname(__FILE__));
 define('HERMIT_ADMIN_URL', admin_url());
