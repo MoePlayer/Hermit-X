@@ -55,10 +55,6 @@ class hermit
             $this,
             'aplayer_init'
         ));
-        add_filter('clean_url', array(
-            $this,
-            'add_async_forscript'
-        ), 11, 1);
 
         /**
          ** 封面来源
@@ -780,18 +776,6 @@ class hermit
             wp_enqueue_script($val, $js_path, false, HERMIT_VERSION, $js_place);
         }
     }
-
-    public function add_async_forscript($url)
-    {
-        if (strpos($url, 'APlayer.min.js')===false) {
-            return $url;
-        } elseif (is_admin()) {
-            return $url;
-        } else {
-            return $url."' async='async";
-        }
-    }
-
 
     private function post($key)
     {
