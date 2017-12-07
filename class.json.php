@@ -40,8 +40,8 @@ class HermitJson
         if ($site === "netease") {
             $url = str_replace('http://m7.', 'http://m9.', $url);
             $url = str_replace('http://m8c.', 'http://m9.', $url);
-            $url = str_replace('http://m8.', 'http://m9', $url);
-            $url = str_replace('http://m9.', 'https://m9', $url);
+            $url = str_replace('http://m8.', 'http://m9.', $url);
+            $url = str_replace('http://m9.', 'https://m9.', $url);
             $url = str_replace('http://m10', 'https://m10', $url);
         }
         if ($site === "xiami" || $site === 'tencent' || $site === 'baidu') {
