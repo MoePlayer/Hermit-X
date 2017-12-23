@@ -6,6 +6,7 @@ Description: 音乐播放器 Hermit music player build for wordpress with APlaye
 Version: 2.6.6.1027-RC
 Author: Hermit X Developer Team
 Author URI: https://blog.lwl12.com/read/hermit-x.html#developer
+GitHub Plugin URI: https://github.com/MoePlayer/Hermit-X
 */
 
 define('HERMIT_FILE', __FILE__);
