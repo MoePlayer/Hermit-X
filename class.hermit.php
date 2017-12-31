@@ -519,7 +519,7 @@ class hermit
         global $wpdb, $hermit_table_name;
 
         $result = array();
-        $data   = $wpdb->get_results("SELECT id,song_name,song_author,song_url FROM {$hermit_table_name} WHERE id in ({$ids})");
+        $data   = $wpdb->get_results("SELECT id,song_name,song_author,song_url FROM {$hermit_table_name} WHERE id in ({$ids}) order by field(id, {$ids})");
 
         foreach ($data as $key => $value) {
             $result['songs'][] = array(
