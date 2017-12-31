@@ -534,6 +534,10 @@ class hermit
         return $result;
     }
 
+    private function localMusicImage( ){
+        //咕咕咕
+    }
+
     /**
      * 新增本地音乐
      */
