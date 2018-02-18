@@ -548,7 +548,7 @@ class hermit
     }
 
     public function ignore_cookies_pointer() {
-        check_ajax_referer( 'hermit_ignore_cookies_pointer' );
+        check_ajax_referer( 'hermit-ignore-cookies-pointer' );
         $dismissed = $this->get_current_dismissed();
 
         if ( in_array( 'hermit-cookies-setting', $dismissed ) )
@@ -560,7 +560,7 @@ class hermit
         $user_id     = get_current_user_id();
         $dismissed[] = 'hermit-cookies-setting';
 
-        if ( update_user_meta( $user_id, 'dismissed_wp_pointers', $dismissed ) )
+        if ( update_user_meta( $user_id, 'dismissed_wp_pointers', implode( ',', $dismissed ) ) )
             wp_die( 1 );
     }
 
