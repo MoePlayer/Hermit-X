@@ -532,7 +532,7 @@ class hermit
         wp_enqueue_style( 'wp-pointer' );
         wp_enqueue_script( 'wp-pointer' );
 
-        $filename = HERMIT_PATH . '/cookies-pointer.php';
+        $filename = HERMIT_PATH . '/include/cookies-pointer.php';
         $callback = require( $filename );
 
         $ignore = add_query_arg( array(
