@@ -55,6 +55,14 @@ class hermit
             $this,
             'aplayer_init'
         ));
+        add_action( 'admin_enqueue_scripts', array(
+            $this,
+            'cookies_pointer'
+        ) );
+        add_action( 'wp_ajax_hermit_ignore_cookies_pointer', array(
+            $this,
+            'ignore_cookies_pointer'
+        ) );
 
         /**
          ** 封面来源
@@ -512,6 +520,53 @@ class hermit
         $settings = wp_parse_args($settings, $defaults);
 
         return $settings[$key];
+    }
+
+    public function cookies_pointer() {
+        if ( in_array( 'hermit-cookies-setting', $this->get_current_dismissed() ) )
+            return;
+
+        if ( !current_user_can( 'manage_options' ) )
+            return;
+
+        wp_enqueue_style( 'wp-pointer' );
+        wp_enqueue_script( 'wp-pointer' );
+
+        $filename = HERMIT_PATH . '/include/cookies-pointer.php';
+        $callback = require( $filename );
+
+        $ignore = add_query_arg( array(
+            'action'   => 'hermit_ignore_cookies_pointer',
+            '_wpnonce' => wp_create_nonce( 'hermit-ignore-cookies-pointer' )
+        ), admin_url( 'admin-ajax.php' ) );
+
+        ob_start();
+        call_user_func( $callback,  $ignore );
+
+        $code = ob_get_clean();
+        wp_add_inline_script( 'wp-pointer', $code );
+    }
+
+    public function ignore_cookies_pointer() {
+        check_ajax_referer( 'hermit-ignore-cookies-pointer' );
+        $dismissed = $this->get_current_dismissed();
+
+        if ( in_array( 'hermit-cookies-setting', $dismissed ) )
+            return;
+
+        if ( !current_user_can( 'manage_options' ) )
+            return;
+
+        $user_id     = get_current_user_id();
+        $dismissed[] = 'hermit-cookies-setting';
+
+        if ( update_user_meta( $user_id, 'dismissed_wp_pointers', implode( ',', $dismissed ) ) )
+            wp_die( 1 );
+    }
+
+    private function get_current_dismissed() {
+        $dismissed = get_user_meta( get_current_user_id(), 'dismissed_wp_pointers', true );
+        return array_filter( explode( ',', (string) $dismissed ) );
     }
 
     private function music_remote($ids)
