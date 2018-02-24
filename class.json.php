@@ -25,9 +25,7 @@ class HermitJson
         $Meting = new \Metowolf\Meting($site);
 
         $cookies = $this->settings('netease_cookies');
-        if (!empty($cookies) && $site === "netease") {
-            $Meting->cookie($cookies);
-        }
+        if (!empty($cookies) && $site === "netease") $Meting->cookie($cookies);
 
         $url = json_decode($Meting->format()->url($music_id, $this->settings('quality')), true);
         $url = $url['url'];
@@ -59,7 +57,10 @@ class HermitJson
         $cacheKey = "/$site/pic_url/$pic";
         $url = $this->get_cache($cacheKey);
         if (!empty($url)) return $url;
+
         $Meting = new \Metowolf\Meting($site);
+        $cookies = $this->settings('netease_cookies');
+        if (!empty($cookies) && $site === "netease") $Meting->cookie($cookies);
 
         $pic = json_decode($Meting->pic($pic, ($site === 'tencent') ? 90 : 100), true);
         if (empty($pic["url"])) {
@@ -81,6 +82,9 @@ class HermitJson
             return $value;
         }
         $Meting = new \Metowolf\Meting($site);
+        $cookies = $this->settings('netease_cookies');
+        if (!empty($cookies) && $site === "netease") $Meting->cookie($cookies);
+
         $value = json_decode($Meting->format(true)->lyric($id), true);
         $value = $this->lrctran($value['lyric'],$value['tlyric']);
         $this->set_cache($cacheKey, $value, 24);
@@ -186,6 +190,9 @@ class HermitJson
             return $this->addNonce($cache, $site, true);
         }
 
+        $cookies = $this->settings('netease_cookies');
+        if (!empty($cookies) && $site === "netease") $Meting->cookie($cookies);
+
         $response = json_decode($Meting->format()->song($music_id), true);
 
         if (!empty($response[0]["id"])) {
@@ -244,6 +251,9 @@ class HermitJson
             return $this->addNonce($cache, $site);
         }
 
+        $cookies = $this->settings('netease_cookies');
+        if (!empty($cookies) && $site === "netease") $Meting->cookie($cookies);
+
         $response = json_decode($Meting->format()->album($album_id), true);
 
         if (!empty($response[0])) {
@@ -292,6 +302,9 @@ class HermitJson
         if ($cache) {
             return $this->addNonce($cache, $site);
         }
+
+        $cookies = $this->settings('netease_cookies');
+        if (!empty($cookies) && $site === "netease") $Meting->cookie($cookies);
 
         $response = json_decode($Meting->format()->playlist($playlist_id), true);
 
