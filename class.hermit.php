@@ -87,7 +87,7 @@ class hermit
         $strategy = $this->settings('strategy');
         $globalPlayer = $this->settings('globalPlayer');
 
-        if ($strategy == 1 && !$globalPlayer) {
+        if ($strategy == 1 && $globalPlayer == 0) {
             global $post, $posts;
             foreach ($posts as $post) {
                 if (has_shortcode($post->post_content, 'hermit')) {
@@ -149,6 +149,30 @@ class hermit
         }
         $atts["theme"]       = $color;
         $atts["songs"]       = $content;
+
+        $atts["mode"] = strtolower($atts["mode"]);
+
+        switch ($atts["mode"]) {
+            case 'random':
+                $atts["loop"] = 'all';
+                $atts["order"] = 'random';
+                break;
+            case 'order':
+                $atts["loop"] = 'none';
+                $atts["order"] = 'list';
+                break;
+            case 'single':
+                $atts["loop"] = 'one';
+                $atts["order"] = 'list';
+                break;
+            default:
+                $atts["loop"] = 'all';
+                $atts["order"] = 'list';
+                break;
+        }
+
+        unset($atts["mode"]);
+
         $atts["_nonce"]      = $this->settings('low_security') ? md5(NONCE_KEY.$content.NONCE_KEY) : wp_create_nonce($content);
         $playlist_max_height = $this->settings('playlist_max_height');
         if ($playlist_max_height != 0 && empty($atts["listmaxheight"])) {
@@ -516,6 +540,7 @@ class hermit
             'advanced_cache' => 0,
             'netease_cookies'=> '',
             'low_security' => 0,
+            'globalPlayer' => 0
         );
 
         $settings = $this->_settings;

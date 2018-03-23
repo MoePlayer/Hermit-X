@@ -457,6 +457,7 @@ class HermitJson
             'advanced_cache' => 0,
             'netease_cookies'=> '',
             'low_security' => 0,
+            'globalPlayer' => 0
         );
 
         $settings = $this->_settings;
