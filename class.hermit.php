@@ -85,8 +85,9 @@ class hermit
     public function hermit_scripts()
     {
         $strategy = $this->settings('strategy');
+        $globalPlayer = $this->settings('globalPlayer');
 
-        if ($strategy == 1) {
+        if ($strategy == 1 && !$globalPlayer) {
             global $post, $posts;
             foreach ($posts as $post) {
                 if (has_shortcode($post->post_content, 'hermit')) {
@@ -104,6 +105,7 @@ class hermit
      */
     private function _load_scripts()
     {
+        $this->_css('APlayer.min');
         $this->_js('APlayer.min', $this->settings('jsplace'));
     }
 
