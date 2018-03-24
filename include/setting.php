@@ -3,10 +3,6 @@
 	<?php if (isset($_REQUEST['settings-updated'])) {
     echo '<div id="setting-error-settings_updated" class="updated settings-error"><p><strong>设置已保存。</strong></p></div>';
 } ?>
-	<?php if (isset($_POST['hermit_empty_cache'])) {
-    $this->empty_cache();
-    echo '<div id="setting-error-settings_updated" class="updated settings-error"><p><strong>缓存已清空。</strong></p></div><script>window.localStorage.clear();</script>';
-} ?>
 	<form method="post" action="options.php">
 		<?php settings_fields('hermit_setting_group'); ?>
 		<table class="form-table">
@@ -75,6 +71,7 @@
                         'pink'    => '少女粉',
                         'purple'  => '基情紫',
                         'black'   => '暗色灰',
+						'selfAdapting' => '自适应',
                         'customize'   => '自定义'
                     );
                     foreach ($color_array as $key => $title) {
@@ -94,6 +91,7 @@
 
                     }
                     ?>
+					<p class="description">选择「自适应」将根据音乐封面自适应主题色，需要额外加载 7KB 大小的 JS 文件。</p>
 				</td>
 			</tr>
 			<tr valign="top">
@@ -127,18 +125,6 @@
                     }
                     ?>
 					<p class="description">实际音质<b>小于等于</b>所选音质。默认极高</p>
-				</td>
-			</tr>
-			<tr valign="top">
-				<th scope="row"><label>高级缓存</label></th>
-				<td>
-					<p><label><input type="checkbox" name="hermit_setting[advanced_cache]"
-					          value="1" <?php if ($this->settings('advanced_cache') == 1) {
-                        echo 'checked="checked"';
-                    } ?>/>
-						<span>开启高级缓存</span></label></p>
-
-					<p class="description">开启高级缓存需要支持 Memcached 或 Redis 相关支持</p>
 				</td>
 			</tr>
 			<tr valign="top">
@@ -203,11 +189,6 @@
 			</tbody>
 		</table>
 	</form>
-	<h2>清空所有数据库缓存</h2>
 
-	<form method="post">
-		<input type="submit" class="button-primary" value="清空缓存"/>
-		<input name="hermit_empty_cache" type="hidden" value="1"/>
-	</form>
 	<style>label{margin-right:8px}input[type=checkbox],input[type=radio]{margin-right:0!important}.hermit-radio-default input[type=radio]{border-color:#5895be}.hermit-radio-default{color:#5895be}.hermit-radio-default input[type=radio]:checked:before{background-color:#5895be}.hermit-radio-red{color:#dd4b39}.hermit-radio-red input[type=radio]{border-color:#dd4b39}.hermit-radio-red input[type=radio]:checked:before{background-color:#dd4b39}.hermit-radio-blue{color:#5cb85c}.hermit-radio-blue input[type=radio]{border-color:#5cb85c}.hermit-radio-blue input[type=radio]:checked:before{background-color:#5cb85c}.hermit-radio-yellow{color:#f0ad4e}.hermit-radio-yellow input[type=radio]{border-color:#f0ad4e}.hermit-radio-yellow input[type=radio]:checked:before{background-color:#f0ad4e}.hermit-radio-pink{color:#f489ad}.hermit-radio-pink input[type=radio]{border-color:#f489ad}.hermit-radio-pink input[type=radio]:checked:before{background-color:#f489ad}.hermit-radio-purple{color:orchid}.hermit-radio-purple input[type=radio]{border-color:orchid}.hermit-radio-purple input[type=radio]:checked:before{background-color:orchid}.hermit-radio-black{color:#aaa}.hermit-radio-black input[type=radio]:checked:before{background-color:#aaa}</style>
 </div>

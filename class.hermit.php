@@ -55,14 +55,14 @@ class hermit
             $this,
             'aplayer_init'
         ));
-        add_action( 'admin_enqueue_scripts', array(
+        add_action('admin_enqueue_scripts', array(
             $this,
             'cookies_pointer'
-        ) );
-        add_action( 'wp_ajax_hermit_ignore_cookies_pointer', array(
+        ));
+        add_action('wp_ajax_hermit_ignore_cookies_pointer', array(
             $this,
             'ignore_cookies_pointer'
-        ) );
+        ));
 
         /**
          ** 封面来源
@@ -107,6 +107,8 @@ class hermit
     {
         $this->_css('APlayer.min');
         $this->_js('APlayer.min', $this->settings('jsplace'));
+        if($this->settings('color') === 'selfAdapting') $this->_libjs('color-thief', 1);
+        $this->_js('hermit-load', 1);
     }
 
     /**
@@ -149,7 +151,9 @@ class hermit
         }
         $atts["theme"]       = $color;
         $atts["songs"]       = $content;
-        if($this->settings('listFolded') == 1) $atts["listfolded"]  = 'true';
+        if ($this->settings('listFolded') == 1) {
+            $atts["listfolded"]  = 'true';
+        }
 
         $atts["mode"] = strtolower($atts["mode"]);
 
@@ -208,7 +212,7 @@ class hermit
     public function nonce_verify()
     {
         if (!$this->settings('low_security')) {
-            $result = wp_verify_nonce( $_GET['_nonce'], $_GET['scope'].'#:'.$_GET['id']);
+            $result = wp_verify_nonce($_GET['_nonce'], $_GET['scope'].'#:'.$_GET['id']);
         } else {
             $result = md5(NONCE_KEY.$_GET['scope'].'#:'.$_GET['id'].NONCE_KEY) === $_GET['_nonce'];
         }
@@ -282,11 +286,11 @@ class hermit
                                     $this->nonce_verify();
                                     echo $HMTJSON->$scope($site, $_GET['id']);
                                     exit;
-                                }
-                                else {
+                                } else {
                                     $this->nonce_verify();
                                     $result = array(
                                         'status' => 200,
+                                        'order' => $_GET['i'],
                                         'msg' => $HMTJSON->$scope($site, $id)
                                     );
                                 }
@@ -539,7 +543,6 @@ class hermit
             'albumSource' => 0,
             'debug' => 0,
             'color_customize' => '#5895be',
-            'advanced_cache' => 0,
             'netease_cookies'=> '',
             'low_security' => 0,
             'globalPlayer' => 0,
@@ -552,51 +555,59 @@ class hermit
         return $settings[$key];
     }
 
-    public function cookies_pointer() {
-        if ( in_array( 'hermit-cookies-setting', $this->get_current_dismissed() ) )
+    public function cookies_pointer()
+    {
+        if (in_array('hermit-cookies-setting', $this->get_current_dismissed())) {
             return;
+        }
 
-        if ( !current_user_can( 'manage_options' ) )
+        if (!current_user_can('manage_options')) {
             return;
+        }
 
-        wp_enqueue_style( 'wp-pointer' );
-        wp_enqueue_script( 'wp-pointer' );
+        wp_enqueue_style('wp-pointer');
+        wp_enqueue_script('wp-pointer');
 
         $filename = HERMIT_PATH . '/include/cookies-pointer.php';
-        $callback = require( $filename );
+        $callback = require($filename);
 
-        $ignore = add_query_arg( array(
+        $ignore = add_query_arg(array(
             'action'   => 'hermit_ignore_cookies_pointer',
-            '_wpnonce' => wp_create_nonce( 'hermit-ignore-cookies-pointer' )
-        ), admin_url( 'admin-ajax.php' ) );
+            '_wpnonce' => wp_create_nonce('hermit-ignore-cookies-pointer')
+        ), admin_url('admin-ajax.php'));
 
         ob_start();
-        call_user_func( $callback,  $ignore );
+        call_user_func($callback, $ignore);
 
         $code = ob_get_clean();
-        wp_add_inline_script( 'wp-pointer', $code );
+        wp_add_inline_script('wp-pointer', $code);
     }
 
-    public function ignore_cookies_pointer() {
-        check_ajax_referer( 'hermit-ignore-cookies-pointer' );
+    public function ignore_cookies_pointer()
+    {
+        check_ajax_referer('hermit-ignore-cookies-pointer');
         $dismissed = $this->get_current_dismissed();
 
-        if ( in_array( 'hermit-cookies-setting', $dismissed ) )
+        if (in_array('hermit-cookies-setting', $dismissed)) {
             return;
+        }
 
-        if ( !current_user_can( 'manage_options' ) )
+        if (!current_user_can('manage_options')) {
             return;
+        }
 
         $user_id     = get_current_user_id();
         $dismissed[] = 'hermit-cookies-setting';
 
-        if ( update_user_meta( $user_id, 'dismissed_wp_pointers', implode( ',', $dismissed ) ) )
-            wp_die( 1 );
+        if (update_user_meta($user_id, 'dismissed_wp_pointers', implode(',', $dismissed))) {
+            wp_die(1);
+        }
     }
 
-    private function get_current_dismissed() {
-        $dismissed = get_user_meta( get_current_user_id(), 'dismissed_wp_pointers', true );
-        return array_filter( explode( ',', (string) $dismissed ) );
+    private function get_current_dismissed()
+    {
+        $dismissed = get_user_meta(get_current_user_id(), 'dismissed_wp_pointers', true);
+        return array_filter(explode(',', (string) $dismissed));
     }
 
     private function music_remote($ids)
@@ -619,7 +630,8 @@ class hermit
         return $result;
     }
 
-    private function localMusicImage( ){
+    private function localMusicImage()
+    {
         //咕咕咕
     }
 
@@ -828,14 +840,6 @@ class hermit
         return $music_count;
     }
 
-    public function empty_cache()
-    {
-        global $wpdb;
-
-        $query_string = "DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_/netease%' OR option_name LIKE '_transient_timeout_/netease%' OR option_name LIKE '_transient_/xiami%' OR option_name LIKE '_transient_timeout_/xiami%'";
-        $wpdb->query($query_string);
-    }
-
     private function _css($css_str)
     {
         $css_arr = explode(',', $css_str);
@@ -904,6 +908,10 @@ class hermit
 
     public function aplayer_init()
     {
-        echo '<script>function cloneObject(src) { if (src == null || typeof src != "object") { return src } if (src instanceof Date) { var clone = new Date(src.getDate()); return clone } if (src instanceof Array) { var clone = []; for (var i = 0, len = src.length; i < len; i++) { clone[i] = src[i] } return clone } if (src instanceof Object) { var clone = {}; for (var key in src) { if (src.hasOwnProperty(key)) { clone[key] = cloneObject(src[key]) } } return clone } } function hermitInit() { var aps = document.getElementsByClassName("aplayer"); var apnum = 0; ap = []; var xhr = []; var option = []; for (var i = 0; i < aps.length; i++) { if (aps[i].dataset.songs) { option[i] = cloneObject(aps[i].dataset); option[i].element = aps[i]; xhr[i] = new XMLHttpRequest(); xhr[i].onreadystatechange = function() { var index = xhr.indexOf(this); var op = option[index]; op.storageName = "HxAP-Setting"; if (this.readyState === 4) { if (this.status >= 200 && this.status < 300 || this.status === 304) { var response = JSON.parse(this.responseText); op.music = response.msg.songs; if (op.showlrc === undefined) { if (op.music[0].lrc) { op.showlrc = 3 } else { op.showlrc = 0 } } if (op.music.length === 1) { op.music = op.music[0] } if (op.autoplay) { op.autoplay = (op.autoplay === "true" || op.autoplay === "1") } if (op.listfolded) { op.listFolded = (op.listfolded === "true") } if (op.mutex) { op.mutex = (op.mutex === "true" || op.mutex === "1") } if (op.narrow) { op.narrow = (op.narrow === "true" || op.narrow === "1") } ap[i] = new APlayer(op); ap[i].parseRespons = response; if (window.APlayerCall && window.APlayerCall[i]) window.APlayerCall[i](); if (window.APlayerloadAllCall && aps.length != ap.length) { window.APlayerloadAllCall(); } } else { console.error("Request was unsuccessful: " + this.status) } } }; var scope = option[i].songs.split("#:"); apiurl = "' . admin_url() . 'admin-ajax.php?action=hermit&scope=" + option[i].songs.split("#:")[0] + "&id=" + option[i].songs.split("#:")[1] + "&_nonce=" + option[i]._nonce; xhr[i].open("get", apiurl, true); xhr[i].send(null) } } } function reloadHermit() { for (var i = 0; i < ap.length; i++) { try { ap[i].destroy() } catch(e) {} } hermitInit() } hermitInit();</script>';
+        wp_localize_script('hermit-load', 'HermitX', array(
+            'ajaxurl' => admin_url('admin-ajax.php'),
+            'version' => HERMIT_VERSION,
+            'sat' => ($this->settings('color') === 'selfAdapting') ? true : false,
+        ));
     }
 }

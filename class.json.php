@@ -406,24 +406,14 @@ class HermitJson
 
     public function get_cache($key)
     {
-        if ($this->settings('advanced_cache')) {
-            $cache = wp_cache_get($key, 'hermit');
-        } else {
-            $cache = get_transient($key);
-        }
-
+        $cache = get_transient($key);
         return $cache === false ? false : json_decode($cache, true);
     }
 
     public function set_cache($key, $value, $hour = 0.1)
     {
         $value = json_encode($value);
-
-        if ($this->settings('advanced_cache')) {
-            wp_cache_set($key, $value, 'hermit', 60 * 60 * $hour);
-        } else {
-            set_transient($key, $value, 60 * 60 * $hour);
-        }
+        set_transient($key, $value, 60 * 60 * $hour);
     }
 
     public function clear_cache($key)
@@ -440,29 +430,7 @@ class HermitJson
      */
     public function settings($key)
     {
-        $defaults = array(
-            'strategy' => 1,
-            'color' => 'default',
-            'playlist_max_height' => '349',
-            'quality' => '320',
-            'jsplace' => 0,
-            'prePage' => 20,
-            'remainTime' => 10,
-            'roles' => array(
-                'administrator'
-            ),
-            'albumSource' => 0,
-            'debug' => 0,
-            'advanced_cache' => 0,
-            'netease_cookies'=> '',
-            'low_security' => 0,
-            'globalPlayer' => 0,
-            'listFolded' => 0,
-        );
-
-        $settings = $this->_settings;
-        $settings = wp_parse_args($settings, $defaults);
-
-        return $settings[$key];
+        global $HMT;
+        return $HMT->settings($key);
     }
 }
