@@ -43,10 +43,16 @@ function hermitInit() {
                     if (this.status >= 200 && this.status < 300 || this.status === 304) {
                         var response = JSON.parse(this.responseText);
                         op.music = response.msg.songs;
-                        const i = response.order;
                         if (op.music === undefined) {
                             console.warn("Hermit-X failed to load " + option[index].songs);
                             return false;
+                        }
+                        if (op.showlrc === undefined) {
+                            if (op.music[0].lrc) {
+                                op.lrcType = 3
+                            } else {
+                                op.lrcType = 0
+                            }
                         }
                         if (op.music.length === 1) {
                             op.music = op.music[0];
@@ -64,7 +70,6 @@ function hermitInit() {
                             op.narrow = (op.narrow === "true");
                         }
                         ap[i] = new APlayer(op);
-                        console.log(i);
                         ap[i].parseRespons = response;
                         if (window.APlayerCall && window.APlayerCall[i]) window.APlayerCall[i]();
                         if (window.APlayerloadAllCall && aps.length != ap.length) {
@@ -76,7 +81,7 @@ function hermitInit() {
                 }
             };
             var scope = option[i].songs.split("#:");
-            apiurl = HermitX.ajaxurl + "?action=hermit&i=" + i + "&scope=" + option[i].songs.split("#:")[0] + "&id=" + option[i].songs.split("#:")[1] + "&_nonce=" + option[i]._nonce;
+            apiurl = HermitX.ajaxurl + "?action=hermit&scope=" + option[i].songs.split("#:")[0] + "&id=" + option[i].songs.split("#:")[1] + "&_nonce=" + option[i]._nonce;
             xhr[i].open("get", apiurl, true);
             xhr[i].send(null);
         }
