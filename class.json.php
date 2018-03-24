@@ -441,7 +441,6 @@ class HermitJson
     public function settings($key)
     {
         $defaults = array(
-            'tips' => '点击播放或暂停',
             'strategy' => 1,
             'color' => 'default',
             'playlist_max_height' => '349',
@@ -457,7 +456,8 @@ class HermitJson
             'advanced_cache' => 0,
             'netease_cookies'=> '',
             'low_security' => 0,
-            'globalPlayer' => 0
+            'globalPlayer' => 0,
+            'playlist_status' => 0,
         );
 
         $settings = $this->_settings;

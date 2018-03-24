@@ -149,6 +149,7 @@ class hermit
         }
         $atts["theme"]       = $color;
         $atts["songs"]       = $content;
+        if($this->settings('listFolded') == 1) $atts["listfolded"]  = 'true';
 
         $atts["mode"] = strtolower($atts["mode"]);
 
@@ -174,10 +175,12 @@ class hermit
         unset($atts["mode"]);
 
         $atts["_nonce"]      = $this->settings('low_security') ? md5(NONCE_KEY.$content.NONCE_KEY) : wp_create_nonce($content);
+
         $playlist_max_height = $this->settings('playlist_max_height');
         if ($playlist_max_height != 0 && empty($atts["listmaxheight"])) {
             $atts["listmaxheight"] = $playlist_max_height . "px";
         }
+
         $keys   = array_keys($atts);
         $apatts = "";
         foreach ($keys as $value) {
@@ -523,7 +526,6 @@ class hermit
     public function settings($key)
     {
         $defaults = array(
-            'tips' => '点击播放或暂停',
             'strategy' => 1,
             'color' => 'default',
             'playlist_max_height' => '349',
@@ -540,7 +542,8 @@ class hermit
             'advanced_cache' => 0,
             'netease_cookies'=> '',
             'low_security' => 0,
-            'globalPlayer' => 0
+            'globalPlayer' => 0,
+            'listFolded' => 0,
         );
 
         $settings = $this->_settings;
@@ -901,6 +904,6 @@ class hermit
 
     public function aplayer_init()
     {
-        echo '<script>function cloneObject(src) { if (src == null || typeof src != "object") { return src } if (src instanceof Date) { var clone = new Date(src.getDate()); return clone } if (src instanceof Array) { var clone = []; for (var i = 0, len = src.length; i < len; i++) { clone[i] = src[i] } return clone } if (src instanceof Object) { var clone = {}; for (var key in src) { if (src.hasOwnProperty(key)) { clone[key] = cloneObject(src[key]) } } return clone } } function hermitInit() { var aps = document.getElementsByClassName("aplayer"); var apnum = 0; ap = []; var xhr = []; var option = []; for (var i = 0; i < aps.length; i++) { if (aps[i].dataset.songs) { option[i] = cloneObject(aps[i].dataset); option[i].element = aps[i]; xhr[i] = new XMLHttpRequest(); xhr[i].onreadystatechange = function() { var index = xhr.indexOf(this); var op = option[index]; if (this.readyState === 4) { if (this.status >= 200 && this.status < 300 || this.status === 304) { var response = JSON.parse(this.responseText); op.music = response.msg.songs; if (op.showlrc === undefined) { if (op.music[0].lrc) { op.showlrc = 3 } else { op.showlrc = 0 } } if (op.music.length === 1) { op.music = op.music[0] } if (op.autoplay) { op.autoplay = (op.autoplay === "true" || op.autoplay === "1") } if (op.mutex) { op.mutex = (op.mutex === "true" || op.mutex === "1") } if (op.narrow) { op.narrow = (op.narrow === "true" || op.narrow === "1") } ap[i] = new APlayer(op); ap[i].parseRespons = response; if (window.APlayerCall && window.APlayerCall[i]) window.APlayerCall[i](); if (window.APlayerloadAllCall && aps.length != ap.length) { window.APlayerloadAllCall(); } } else { console.error("Request was unsuccessful: " + this.status) } } }; var scope = option[i].songs.split("#:"); apiurl = "' . admin_url() . 'admin-ajax.php?action=hermit&scope=" + option[i].songs.split("#:")[0] + "&id=" + option[i].songs.split("#:")[1] + "&_nonce=" + option[i]._nonce; xhr[i].open("get", apiurl, true); xhr[i].send(null) } } } function reloadHermit() { for (var i = 0; i < ap.length; i++) { try { ap[i].destroy() } catch(e) {} } hermitInit() } hermitInit();</script>';
+        echo '<script>function cloneObject(src) { if (src == null || typeof src != "object") { return src } if (src instanceof Date) { var clone = new Date(src.getDate()); return clone } if (src instanceof Array) { var clone = []; for (var i = 0, len = src.length; i < len; i++) { clone[i] = src[i] } return clone } if (src instanceof Object) { var clone = {}; for (var key in src) { if (src.hasOwnProperty(key)) { clone[key] = cloneObject(src[key]) } } return clone } } function hermitInit() { var aps = document.getElementsByClassName("aplayer"); var apnum = 0; ap = []; var xhr = []; var option = []; for (var i = 0; i < aps.length; i++) { if (aps[i].dataset.songs) { option[i] = cloneObject(aps[i].dataset); option[i].element = aps[i]; xhr[i] = new XMLHttpRequest(); xhr[i].onreadystatechange = function() { var index = xhr.indexOf(this); var op = option[index]; op.storageName = "HxAP-Setting"; if (this.readyState === 4) { if (this.status >= 200 && this.status < 300 || this.status === 304) { var response = JSON.parse(this.responseText); op.music = response.msg.songs; if (op.showlrc === undefined) { if (op.music[0].lrc) { op.showlrc = 3 } else { op.showlrc = 0 } } if (op.music.length === 1) { op.music = op.music[0] } if (op.autoplay) { op.autoplay = (op.autoplay === "true" || op.autoplay === "1") } if (op.listfolded) { op.listFolded = (op.listfolded === "true") } if (op.mutex) { op.mutex = (op.mutex === "true" || op.mutex === "1") } if (op.narrow) { op.narrow = (op.narrow === "true" || op.narrow === "1") } ap[i] = new APlayer(op); ap[i].parseRespons = response; if (window.APlayerCall && window.APlayerCall[i]) window.APlayerCall[i](); if (window.APlayerloadAllCall && aps.length != ap.length) { window.APlayerloadAllCall(); } } else { console.error("Request was unsuccessful: " + this.status) } } }; var scope = option[i].songs.split("#:"); apiurl = "' . admin_url() . 'admin-ajax.php?action=hermit&scope=" + option[i].songs.split("#:")[0] + "&id=" + option[i].songs.split("#:")[1] + "&_nonce=" + option[i]._nonce; xhr[i].open("get", apiurl, true); xhr[i].send(null) } } } function reloadHermit() { for (var i = 0; i < ap.length; i++) { try { ap[i].destroy() } catch(e) {} } hermitInit() } hermitInit();</script>';
     }
 }
