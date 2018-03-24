@@ -28,10 +28,6 @@ function hermitInit() {
     var aps = document.getElementsByClassName("aplayer");
     var apnum = 0;
     ap = [];
-    if (HermitX.sat == "1"){
-        var colorThief = new ColorThief();
-        var setTheme = [];
-    }
     var xhr = [];
     var option = [];
     for (let i = 0; i < aps.length; i++) {
@@ -73,19 +69,6 @@ function hermitInit() {
                         if (window.APlayerCall && window.APlayerCall[i]) window.APlayerCall[i]();
                         if (window.APlayerloadAllCall && aps.length != ap.length) {
                             window.APlayerloadAllCall();
-                        }
-                        if (HermitX.sat == "1") {
-                            setTheme[i] = (index) => {
-                                if (!ap[i].list.audios[index].theme) {
-                                    colorThief.getColorAsync(ap[i].list.audios[index].cover, function (color) {
-                                        ap[i].theme(`rgb(${color[0]}, ${color[1]}, ${color[2]})`, index);
-                                    });
-                                }
-                            };
-                            setTheme[i](ap[i].list.index);
-                            ap[i].on('listswitch', (data) => {
-                                setTheme[i](data.index);
-                            });
                         }
                     } else {
                         console.error("Request was unsuccessful: " + this.status);

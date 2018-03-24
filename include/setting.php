@@ -71,7 +71,6 @@
                         'pink'    => '少女粉',
                         'purple'  => '基情紫',
                         'black'   => '暗色灰',
-						'selfAdapting' => '自适应',
                         'customize'   => '自定义'
                     );
                     foreach ($color_array as $key => $title) {
@@ -91,7 +90,6 @@
 
                     }
                     ?>
-					<p class="description">选择「自适应」将根据音乐封面自适应主题色，需要额外加载 7KB 大小的 JS 文件。</p>
 				</td>
 			</tr>
 			<tr valign="top">

@@ -107,7 +107,6 @@ class hermit
     {
         $this->_css('APlayer.min');
         $this->_js('APlayer.min', $this->settings('jsplace'));
-        if($this->settings('color') === 'selfAdapting') $this->_libjs('color-thief', 1);
         $this->_js('hermit-load', 1);
     }
 
@@ -911,7 +910,6 @@ class hermit
         wp_localize_script('hermit-load', 'HermitX', array(
             'ajaxurl' => admin_url('admin-ajax.php'),
             'version' => HERMIT_VERSION,
-            'sat' => ($this->settings('color') === 'selfAdapting') ? true : false,
         ));
     }
 }
