@@ -457,7 +457,7 @@ class HermitJson
             'netease_cookies'=> '',
             'low_security' => 0,
             'globalPlayer' => 0,
-            'playlist_status' => 0,
+            'listFolded' => 0,
         );
 
         $settings = $this->_settings;
