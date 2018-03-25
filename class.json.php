@@ -30,10 +30,10 @@ class HermitJson
         $url = json_decode($Meting->format()->url($music_id, $this->settings('quality')), true);
         $url = $url['url'];
 
-        if (empty($url)) {
-            Header("Location: " . 'https://api.lwl12.com/music/netease/song?id=607441');
-            exit;
-        }
+        // if (empty($url)) {
+        //     Header("Location: " . 'https://api.lwl12.com/music/netease/song?id=607441');
+        //     exit;
+        // }
 
         if ($site === "netease") {
             $url = str_replace('http://m7.', 'http://m9.', $url);
@@ -90,6 +90,9 @@ class HermitJson
 
         $value = json_decode($Meting->format(true)->lyric($id), true);
         $value = $this->lrctran($value['lyric'],$value['tlyric']);
+        if (empty($value)) {
+            $value = "[00:00.000]此歌曲暂无歌词，请您欣赏";
+        }
         $this->set_cache($cacheKey, $value, 24);
         return $value;
     }
