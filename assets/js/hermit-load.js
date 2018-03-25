@@ -1,26 +1,26 @@
 function cloneObject(src) {
     if (src == null || typeof src != "object") {
-        return src
+        return src;
     }
     if (src instanceof Date) {
         var clone = new Date(src.getDate());
-        return clone
+        return clone;
     }
     if (src instanceof Array) {
         var clone = [];
         for (var i = 0, len = src.length; i < len; i++) {
-            clone[i] = src[i]
+            clone[i] = src[i];
         }
-        return clone
+        return clone;
     }
     if (src instanceof Object) {
         var clone = {};
         for (var key in src) {
             if (src.hasOwnProperty(key)) {
-                clone[key] = cloneObject(src[key])
+                clone[key] = cloneObject(src[key]);
             }
         }
-        return clone
+        return clone;
     }
 }
 
@@ -49,9 +49,9 @@ function hermitInit() {
                         }
                         if (op.showlrc === undefined) {
                             if (op.music[0].lrc) {
-                                op.lrcType = 3
+                                op.lrcType = 3;
                             } else {
-                                op.lrcType = 0
+                                op.lrcType = 0;
                             }
                         }
                         if (op.music.length === 1) {
@@ -91,10 +91,10 @@ function hermitInit() {
 function reloadHermit() {
     for (var i = 0; i < ap.length; i++) {
         try {
-            ap[i].destroy()
+            ap[i].destroy();
         } catch (e) {}
     }
-    hermitInit()
+    hermitInit();
 }
 hermitInit();
-console.log(`\n %c Hermit X Music Helper v` + HermitX.version + ` %c https://lwl.moe/HermitX \n`, `color: #fff; background: #4285f4; padding:5px 0;`, `background: #66CCFF; padding:5px 0;`);
+console.log("\n %c Hermit X Music Helper v" + HermitX.version + " %c https://lwl.moe/HermitX \n", "color: #fff; background: #4285f4; padding:5px 0;", "background: #66CCFF; padding:5px 0;");
