@@ -63,6 +63,14 @@ class hermit
             $this,
             'ignore_cookies_pointer'
         ));
+        add_action('plugins_loaded', array(
+            $this,
+            'maybe_upgrade_database'
+        ));
+        add_action('hermit_upgrade_database', array(
+            $this,
+            'upgrade_all'
+        ));
 
         /**
          ** 封面来源
@@ -911,5 +919,50 @@ class hermit
             'ajaxurl' => admin_url('admin-ajax.php'),
             'version' => HERMIT_VERSION,
         ));
+    }
+
+    public function maybe_upgrade_database() {
+        if ( ( $version = $this->get_db_version() ) == HERMIT_DB_VERSION )
+            return;
+
+        do_action( 'hermit_upgrade_database', $version );
+        update_option( 'hermit_db_version', HERMIT_DB_VERSION );
+    }
+
+    public function upgrade_all( $from ) {
+        if ( $from < 2 )
+            $this->suppress_database_error_area( function( $wpdb ) {
+                global $hermit_table_name;
+                $wpdb->query( "ALTER TABLE `{$hermit_table_name}` ADD `song_cover` TEXT NOT NULL DEFAULT '' AFTER `song_url`" );
+                $wpdb->query( "ALTER TABLE `{$hermit_table_name}` ADD `song_lyric` LONGTEXT NOT NULL DEFAULT '' AFTER `song_cover`" );
+            } );
+    }
+
+    /**
+     * @return integer
+     */
+    private function get_db_version() {
+        if ( $version = get_option( 'hermit_db_version' ) )
+            return intval( $version );
+
+        global $wpdb, $hermit_table_name;
+
+        if ( $wpdb->query( "SHOW COLUMNS FROM `{$hermit_table_name}` LIKE 'song_cover'" ) )
+            $version = HERMIT_DB_VERSION; // 后「版本号」时代。
+        else
+            $version = 1; // 安装于数据库版本号系统诞生之前。
+
+        add_site_option( 'hermit_initial_db_version', $version );
+        update_option( 'hermit_db_version', $version );
+
+        return $version;
+    }
+
+    private function suppress_database_error_area( $callback ) {
+        global $wpdb;
+        $wpdb->hide_errors();
+
+        call_user_func( $callback, $wpdb );
+        $wpdb->show_errors();
     }
 }

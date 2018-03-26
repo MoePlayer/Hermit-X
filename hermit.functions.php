@@ -12,6 +12,8 @@ function hermit_install()
 				song_name   VARCHAR(255) NOT NULL,
 				song_author VARCHAR(255) NOT NULL,
 				song_url    TEXT NOT NULL,
+				song_cover  TEXT NOT NULL DEFAULT '',
+				song_lyric  LONGTEXT NOT NULL DEFAULT '',
 				created     DATETIME NOT NULL,
 				UNIQUE KEY id (id)
 			) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1");
@@ -35,4 +37,7 @@ function hermit_uninstall()
 
 	$wpdb->query("DROP TABLE IF EXISTS {$hermit_table_name}");
 	$wpdb->query("DROP TABLE IF EXISTS {$hermit_cat_name}");
+
+	delete_site_option( 'hermit_initial_db_version' );
+	delete_option( 'hermit_db_version' );
 }
