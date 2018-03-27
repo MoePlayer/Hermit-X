@@ -195,7 +195,7 @@ class hermit
             $apatts = $apatts . 'data-' . $value . '="' . $atts[$value] . '" ';
         }
 
-        return '<!-Hermit X v' . HERMIT_VERSION . ' start--><div id="aplayer' . ++self::$playerID . '" class="aplayer" ' . $apatts . '></div><!--Hermit X end-->';
+        return '<!--Hermit X v' . HERMIT_VERSION . ' start--><div id="aplayer' . ++self::$playerID . '" class="aplayer" ' . $apatts . '></div><!--Hermit X end-->';
     }
 
     /**
