@@ -81,7 +81,7 @@ function hermitInit() {
                 }
             };
             var scope = option[i].songs.split("#:");
-            apiurl = HermitX.ajaxurl + "?action=hermit&scope=" + option[i].songs.split("#:")[0] + "&id=" + option[i].songs.split("#:")[1] + "&_nonce=" + option[i]._nonce;
+            var apiurl = HermitX.ajaxurl + "?action=hermit&scope=" + option[i].songs.split("#:")[0] + "&id=" + option[i].songs.split("#:")[1] + "&_nonce=" + option[i]._nonce;
             xhr[i].open("get", apiurl, true);
             xhr[i].send(null);
         }
@@ -96,5 +96,6 @@ function reloadHermit() {
     }
     hermitInit();
 }
+var ap = [];
 hermitInit();
 console.log("\n %c Hermit X Music Helper v" + HermitX.version + " %c https://lwl.moe/HermitX \n", "color: #fff; background: #4285f4; padding:5px 0;", "background: #66CCFF; padding:5px 0;");

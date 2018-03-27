@@ -107,7 +107,7 @@ class hermit
     {
         $this->_css('APlayer.min');
         $this->_js('APlayer.min', $this->settings('jsplace'));
-        $this->_js('hermit-load', 1);
+        $this->_js('hermit-load.min', 1);
     }
 
     /**
@@ -907,7 +907,7 @@ class hermit
 
     public function aplayer_init()
     {
-        wp_localize_script('hermit-load', 'HermitX', array(
+        wp_localize_script('hermit-load.min', 'HermitX', array(
             'ajaxurl' => admin_url('admin-ajax.php'),
             'version' => HERMIT_VERSION,
         ));
