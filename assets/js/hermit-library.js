@@ -63,8 +63,272 @@ jQuery(document).ready(function ($) {
         return html;
     });
 
+    /*CYP的代码*/
+    $('body').on('click', '.netease-confirm-button', function () {
+        $.getJSON("http://" + window.location.host + "/wp-content/plugins/Hermit-X-master/include/netease.php", {
+                id: $('#hermit-form-netease_id').val(),
+                site: "netease"
+            },
+            function (data, status) {
+
+                $('#hermit-form-song_name').val(function (n, c) {
+                    if (c == '') {
+                        return data.name;
+                    } else {
+                        return c;
+                    }
+                });
+                $('#hermit-form-song_author').val(function (n, c) {
+                    if (c == '') {
+                        return data.artists[0].name;
+                    } else {
+                        return c;
+                    }
+                });
+                $('#hermit-form-song_lrc').val(function (n, c) {
+                    if (c == '') {
+                        return 'http://www.godmusik.com/wp-json/hermit/v1/hermitlist/neteaseid/lrc/' + $('#hermit-form-netease_id').val();
+                    } else {
+                        return c;
+                    }
+                });
+                $('#hermit-form-cover_url').val(function (n, c) {
+                    if (c == '') {
+                        return data.album.picUrl;
+                    } else {
+                        return c;
+                    }
+                });
+                $('#hermit-form-song_url').val(function (n, c) {
+                    if (c == '') {
+                        return data.mp3Url.replace("http://m", "http://p");
+                    } else {
+                        return c;
+                    }
+                });
+                $('#hermit-form-song_album').val(function (n, c) {
+                    if (c == '') {
+                        return data.album.name;
+                    } else {
+                        return c;
+                    }
+                });
+                $('.song_name_search').val(function (n, c) {
+                    if (c == '') {
+                        return data.name + ' ' + data.artists[0].name;
+                    } else {
+                        return c;
+                    }
+                });
+            });
+    });
+    var downcode = '';
+
+    function browserRedirect() {
+
+        $.get("http://" + window.location.host + "/wp-admin/upload.php?page=add-from-server").done(function (data) {
+            downcode = $(data).find('#_wpnonce').val();
+        });
+    }
+
+    browserRedirect();
+
+
+
+    $('body').on('click', '#get-cover-url', function () {
+
+        $('#get-cover-url').next('.loadingimg').fadeIn();
+        //获取网易云音乐歌曲数据
+        $.getJSON("http://" + window.location.host + "/wp-content/plugins/Hermit-X-master/include/netease.php", {
+                id: $('#hermit-form-netease_id').val(),
+                site: "netease"
+            },
+            function (data, status) {
+                var filename = $('#hermit-form-song_album').val().replace(/\//g, "|");
+                //下载的文件是否成功返回值
+                $.getJSON("http://" + window.location.host + "/wp-content/plugins/add-from-server/down1.php", {
+                        url: $('#hermit-form-cover_url').val(),
+                        password: "28365411cypcpycy",
+                        filename: filename + '.jpg',
+                        submit: '确认下载'
+                    },
+                    function (data1, status) {
+                        console.log(data1);
+                        if (data1.status == 'seccessful') {
+                            console.log(downcode);
+                            //把下载以后的文件加入媒体库并得到文件地址
+                            $.post("http://" + window.location.host + "/wp-admin/upload.php?page=add-from-server", {
+                                    'files[]': [filename + '.jpg'],
+                                    'import-date': "current",
+                                    '_wpnonce': downcode,
+                                    '_wp_http_referer': '/wp-admin/upload.php?page=add-from-server',
+                                    'cwd': '/var/wwwroot/' + window.location.host + '/wp-content/plugins/add-from-server/temp',
+                                    'import': 'Import'
+                                },
+                                function (data2) {
+
+                                    if (data2.indexOf('has been added to Media library') > 0) {
+                                        console.log('has been added to Media library');
+                                        //获取文件地址
+                                        $.getJSON("http://" + window.location.host + "/wp-json/wp/v2/media?orderby=id", function (data3) {
+                                            console.log(data3[0].source_url);
+                                            $('#hermit-form-cover_url').val(data3[0].source_url);
+                                            $('#get-cover-url').next('.loadingimg').fadeOut();
+                                        });
+                                    }
+                                });
+                        }
+                    });
+
+            });
+
+
+    });
+
+    function getsongurl() {
+        console.log($songurl);
+        $('#get-songs-url1').next().fadeIn();
+        $.getJSON("http://" + window.location.host + "/wp-content/plugins/add-from-server/down1.php", {
+                url: $songurl,
+                password: "28365411cypcpycy",
+                filename: $('#hermit-form-song_name').val() + '.mp3',
+                submit: '确认下载'
+            },
+            function (data, status) {
+                console.log(data.status);
+                if (data.status == 'seccessful') {
+                    console.log(downcode);
+                    //把下载以后的文件加入媒体库并得到文件地址
+                    $.post("http://" + window.location.host + "/wp-admin/upload.php?page=add-from-server", {
+                            'files[]': [$('#hermit-form-song_name').val() + '.mp3'],
+                            'import-date': "current",
+                            '_wpnonce': downcode,
+                            '_wp_http_referer': '/wp-admin/upload.php?page=add-from-server',
+                            'cwd': '/var/wwwroot/' + window.location.host + '/wp-content/plugins/add-from-server/temp',
+                            'import': 'Import'
+                        },
+                        function (data2) {
+                            if (data2.indexOf('has been added to Media library') > 0) {
+                                console.log('has been added to Media library');
+                                //获取文件地址
+                                $.getJSON("http://" + window.location.host + "/wp-json/wp/v2/media?orderby=id", function (data3) {
+                                    console.log(data3[0].source_url);
+                                    $('#hermit-form-song_url').val(data3[0].source_url);
+                                    $('#get-songs-url1').next().fadeOut();
+                                });
+
+                            }
+                        });
+                }
+            });
+    }
+
+
+    //获取歌词
+    $('body').on('click', '#get-song_lrc_detail', function () {
+        $('#get-song_lrc_detail').next().fadeIn();
+
+        var url = 'http://' + window.location.host + '/wp-content/plugins/Hermit-X-master/get_data.php?callback=?';
+        $.get(url, {
+            url: "http://music.163.com/api/song/lyric?id=" + $('#hermit-form-netease_id').val() + "&os=pc&lv=-1&kv=-1&tv=-1"
+        }, function (data, stute) {
+            data = eval("(" + data + ")");
+            var lrca = data.lrc.lyric.indexOf('\\') < 0 ? data.lrc.lyric : data.lrc.lyric.replace(/\\/g, '');
+
+            if (data.tlyric.lyric != null) {
+
+
+                //data = data.replace(/\\/g,'');
+                var tlrca = data.tlyric.lyric.indexOf('\\') < 0 ? data.tlyric.lyric.split('[') : data.tlyric.lyric.replace(/\\/g, '').split('[');
+
+
+                $.each(tlrca, function (index, value) {
+                    //var panduan = (value.search(/^(\d{2})\:(\d{2})/) > 0 || value.search(/^(\d{2})\:(\d{2})/) == 0);
+
+
+                    //console.log(value);
+                    if (value.indexOf(']') > 0 && (value.search(/^(\d{2})\:(\d{2})/) > 0 || value.search(/^(\d{2})\:(\d{2})/) == 0)) {
+
+
+                        var thstrr = lrca.split(value.split(']')[0] + ']')[1].split('[')[0];
+                        var thstrr1 = JSON.stringify(thstrr);
+                        var valstr = JSON.stringify(value.split(']')[1]);
+                        var value1 = JSON.parse(thstrr1.indexOf('\\n') < 0 ? thstrr1 : thstrr1.replace(/\\n/g, ''));
+                        var value2 = valstr.indexOf('\\n') == 1 || valstr.indexOf('\\n') == '-1' ? value.split(']')[1] : "(" + JSON.parse(valstr.replace(/\\n/g, ')\\n'));
+                        lrca = lrca.replace(thstrr, value1 + value2);
+                    } else if (value != '' && value != ' ') {
+                        console.log(value);
+                        lrca = lrca + '[' + value;
+                    }
+                    if (index === tlrca.length - 1) {
+                        //console.log(index);
+                        $('#hermit-form-song_lrc_detail').val(lrca);
+                    }
+
+                });
+
+            } else if (data.tlyric.lyric == null) {
+
+                $('#hermit-form-song_lrc_detail').val(lrca);
+            }
+            if (stute == 'success') {
+                $('#get-song_lrc_detail').next().fadeOut();
+            }
+        });
+        /*$.getJSON($('#hermit-form-song_lrc').val(), function (data, stute) {
+            
+            $('#hermit-form-song_lrc_detail').val(data.lrc.lyric);
+            if (stute == 'success') {
+                $('#get-song_lrc_detail').next().fadeOut();
+            }
+        });*/
+        $('#hermit-form-song_lrc').val('http://' + window.location.host + '/wp-json/hermit/v1/hermitlist/neteaseid/lrc/' + $('#hermit-form-netease_id').val());
+    });
+
+    //获取歌曲地址
+    $('body').on('click', '#get-songs-url1', function () {
+        $songurl = 'https://api.lwl12.com/music/netease/song?id=' + $('#hermit-form-netease_id').val();
+        getsongurl();
+
+    });
+
+    $('body').on('click', '#get-songs-url', function () {
+
+        if ($('#hermit-form-song_url').val() != 'http://p2.music.126.net/hmZoNQaqzZALvVp0rE7faA==/0.mp3') {
+            $songurl = $('#hermit-form-song_url').val();
+        } else {
+            $songurl = 'https://api.lwl12.com/music/netease/song?id=' + $('#hermit-form-netease_id').val();
+        }
+
+        getsongurl();
+
+    });
+    //搜索音乐
+    $('body').on('click', '.song_search', function () {
+        $.get('http://www.godmusik.com/wp-content/plugins/Hermit-X-master/get_data.php?url=http://musicmini.baidu.com/app/search/searchList.php?qword=' + $('.song_name_search').val(), function (data, stute) {
+            $('.list_music').html($(data).find('#sc-table'));
+        });
+    });
+    //获取音乐
+    $('body').on('click', '.get_search_song_url', function () {
+
+        $('input[class="sCheckBox"]:checked').each(function () {
+            $.getJSON('http://music.baidu.com/data/music/fmlink?callback=?', {
+                songIds: $(this).attr('id')
+            }, function (data, stute) {
+                $('#hermit-form-song_url').val(data.data.songList[0].songLink);
+                //console.log(data.data.songList[0].songLink);
+            })
+        });
+        $('.list_music').empty();
+    });
+
+
+
+    /*CYP的代码*/
+
     //上传mp3
-    $('body').on('click', '#hermit-form-song_url-upload', function(){
+    $('body').on('click', '#hermit-form-song_url-upload', function () {
         /**
          * 采用 3.5之后的新上传图片方法
          * 不再支持3.5以下 Wordpress 版本
@@ -73,11 +337,11 @@ jQuery(document).ready(function ($) {
         // Create the media frame.
         var file_frame = wp.media.frames.file_frame = wp.media({
             title: '上传本地音乐（推荐 mp3 格式，尽量用英文名称）',
-            multiple: false  // Set to true to allow multiple files to be selected
+            multiple: false // Set to true to allow multiple files to be selected
         });
 
         // When an image is selected, run a callback.
-        file_frame.on( 'select', function() {
+        file_frame.on('select', function () {
             var attachment = file_frame.state().get('selection').first().toJSON();
             $('#hermit-form-song_url').val(attachment.url);
         });
@@ -85,7 +349,30 @@ jQuery(document).ready(function ($) {
         // Finally, open the modal
         file_frame.open();
     });
+    /*CYP的代码*/
+    //上传jpg
+    $('body').on('click', '#hermit-form-cover_url-upload', function () {
+        /**
+         * 采用 3.5之后的新上传图片方法
+         * 不再支持3.5以下 Wordpress 版本
+         */
 
+        // Create the media frame.
+        var file_frame = wp.media.frames.file_frame = wp.media({
+            title: '上传本地图片（推荐 jpg 格式，尽量用英文名称）',
+            multiple: false // Set to true to allow multiple files to be selected
+        });
+
+        // When an image is selected, run a callback.
+        file_frame.on('select', function () {
+            var attachment = file_frame.state().get('selection').first().toJSON();
+            $('#hermit-form-cover_url').val(attachment.url);
+        });
+
+        // Finally, open the modal
+        file_frame.open();
+    });
+    /*CYP的代码*/
     //新建音乐
     $('.add-new-h2').click(function () {
         var sobj = {
@@ -116,7 +403,7 @@ jQuery(document).ready(function ($) {
     });
 
     //选中删除
-    $('.hermit-delete-all').click(function() {
+    $('.hermit-delete-all').click(function () {
         if ($(this).prev('.hermit-action-selector') == 'trash') {
             var arr = [];
 
@@ -135,9 +422,9 @@ jQuery(document).ready(function ($) {
 
     //新建分类
     $('.hermit-list-table').on('click', '.hermit-new-nav', function () {
-        var title = window.prompt("新建分类","");
+        var title = window.prompt("新建分类", "");
 
-        if( title ){
+        if (title) {
             $bodyLoader.showProgress('新建分类中');
 
             $.ajax({
@@ -187,8 +474,14 @@ jQuery(document).ready(function ($) {
         initCatNav();
     });
 
-    window.showTableByCat = function(catid){
-        hermit.currentCatId = catid;
+    window.showTableByCat = function (catid) {
+
+
+        /*CYP的代码*/
+        //hermit.currentCatId = catid;
+        window.location.href = location.pathname + '?page=hermit&catid=' + catid;
+
+        /*CYP的代码*/
     };
 
     function initView() {
@@ -203,21 +496,21 @@ jQuery(document).ready(function ($) {
 
     function initNavigation() {
         $('.tablenav-pages').html(navigationTmpl(hermit))
-                            //分页
-                            .mxpage({
-                                perPage: 5,
-                                currentPage: 1, //当前页数
-                                maxPage: hermit.maxPage, //最大页数
-                                previousText: '‹', //上一页标题
-                                nextText: '›', //下一页标题
-                                frontPageText: '«', //最前页标题
-                                lastPageText: '»', //最后页标题
-                                click: function (index) {
-                                    list({
-                                        page: index
-                                    })
-                                }
-                            });
+            //分页
+            .mxpage({
+                perPage: 5,
+                currentPage: 1, //当前页数
+                maxPage: hermit.maxPage, //最大页数
+                previousText: '‹', //上一页标题
+                nextText: '›', //下一页标题
+                frontPageText: '«', //最前页标题
+                lastPageText: '»', //最后页标题
+                click: function (index) {
+                    list({
+                        page: index
+                    })
+                }
+            });
     }
 
     function initTable() {
@@ -244,11 +537,12 @@ jQuery(document).ready(function ($) {
             button: msg.title,
             width: 720,
             height: 540,
-            cancel: function () {
-            },
+            cancel: function () {},
             confirm: function (that) {
-                var formKey = ['song_name', 'song_author', 'song_url', 'song_cat'],
+                /*CYP的代码*/
+                var formKey = ['netease_id', 'song_name', 'song_author', 'song_album', 'song_url', 'song_cat', 'song_lrc', 'song_lrc_detail', 'cover_url'],
                     formObj = {};
+                /*CYP的代码*/
 
                 $bodyLoader.showProgress('数据上传中');
 
@@ -257,10 +551,13 @@ jQuery(document).ready(function ($) {
                         $elem = $('#hermit-form-' + _id),
                         val = $elem.val();
 
-                    if (isEmpty(val)) {
+                    /*CYP的代码*/
+                    if (isEmpty(val) && i != 4 && i != 5) {
+
                         $bodyLoader.showError('请输入正确的信息。');
                         return false;
                     }
+                    /*CYP的代码*/
 
                     formObj[_id] = val
                 }
