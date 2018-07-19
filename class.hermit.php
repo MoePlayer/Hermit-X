@@ -215,8 +215,9 @@ class hermit
         } else {
             $result = md5(NONCE_KEY.$_GET['scope'].'#:'.$_GET['id'].NONCE_KEY) === $_GET['_nonce'];
         }
-
-        if (!$result) {
+        /*CYP的代码start*/
+        if (!$result && $_GET['scope']!='netease_album') {
+            /*CYP的代码end*/
             header('HTTP/1.0 401 Unauthorized');
             header('Content-type: application/json;charset=UTF-8');
             $result = array(
@@ -225,6 +226,7 @@ class hermit
                 );
             die(json_encode($result));
         }
+        
         return true;
     }
     /**
@@ -614,15 +616,22 @@ class hermit
         global $wpdb, $hermit_table_name;
 
         $result = array();
-        $data   = $wpdb->get_results("SELECT id,song_name,song_author,song_url FROM {$hermit_table_name} WHERE id in ({$ids}) order by field(id, {$ids})");
+        /*CYP的代码*/
+        $data   = $wpdb->get_results("SELECT id,netease_id,song_name,song_author,song_album,cover_url,song_lrc,song_url FROM {$hermit_table_name} WHERE id in ({$ids}) order by field(id, {$ids})");
+        /*CYP的代码*/
+        //$data   = $wpdb->get_results("SELECT id,song_name,song_author,song_url FROM {$hermit_table_name} WHERE id in ({$ids}) order by field(id, {$ids})");
 
         foreach ($data as $key => $value) {
             $result['songs'][] = array(
+                /*CYP的代码*/
+                "netease_id" => $value->netease_id,
                 "title" => $value->song_name,
                 "author" => $value->song_author,
+                "album" => $value->song_album,
                 "url" => $value->song_url,
-                "pic" => "",
-                "lrc" => ""
+                "pic" => $value->cover_url,
+                "lrc" => $value->song_lrc
+                /*CYP的代码*/
             );
         }
 
@@ -641,24 +650,40 @@ class hermit
     {
         global $wpdb, $hermit_table_name;
 
+        /*CYP的代码*/
+        $netease_id = stripslashes($this->post('netease_id'));
         $song_name   = stripslashes($this->post('song_name'));
         $song_author = stripslashes($this->post('song_author'));
+        $song_album = stripslashes($this->post('song_album'));
+        $song_lrc = stripslashes($this->post('song_lrc'));
+        $song_lrc_detail = stripslashes($this->post('song_lrc_detail'));
+        $cover_url = esc_attr(esc_html($this->post('cover_url')));
+        /*CYP的代码*/
         $song_url    = esc_attr(esc_html($this->post('song_url')));
         $song_cat    = $this->post('song_cat');
         $created     = date('Y-m-d H:i:s');
 
-        $wpdb->insert($hermit_table_name, compact('song_name', 'song_author', 'song_url', 'song_cat', 'created'), array(
+        /*CYP的代码*/
+        $wpdb->insert($hermit_table_name, compact('netease_id','song_name','song_author','song_album', 'song_lrc','song_lrc_detail', 'cover_url', 'song_url', 'song_cat', 'created'), array(
+            '%s',
+            '%s',
+            '%s',
+            '%s',
+            '%s',
             '%s',
             '%s',
             '%s',
             '%d',
             '%s'
         ));
+        /*CYP的代码*/
         $id = $wpdb->insert_id;
 
         $song_cat_name = $this->music_cat($song_cat);
 
-        return compact('id', 'song_name', 'song_author', 'song_cat', 'song_cat_name', 'song_url');
+        /*CYP的代码*/
+        return compact('id','netease_id', 'song_name', 'song_author','song_album', 'song_cat', 'song_cat_name','song_lrc','song_lrc_detail', 'cover_url', 'song_url');
+        /*CYP的代码*/
     }
 
     /**
@@ -667,16 +692,28 @@ class hermit
     private function music_update()
     {
         global $wpdb, $hermit_table_name;
-
+        /*CYP的代码*/
         $id          = $this->post('id');
+        $netease_id = stripslashes($this->post('netease_id'));
         $song_name   = stripslashes($this->post('song_name'));
         $song_author = stripslashes($this->post('song_author'));
+        $song_album = stripslashes($this->post('song_album'));
+        $song_lrc = stripslashes($this->post('song_lrc'));
+        $song_lrc_detail = stripslashes($this->post('song_lrc_detail'));
+        $cover_url = esc_attr(esc_html($this->post('cover_url')));
+        /*CYP的代码*/
         $song_url    = esc_attr(esc_html($this->post('song_url')));
         $song_cat    = $this->post('song_cat');
 
-        $wpdb->update($hermit_table_name, compact('song_name', 'song_author', 'song_cat', 'song_url'), array(
+        /*CYP的代码*/  
+        $wpdb->update($hermit_table_name, compact('netease_id','song_name', 'song_author','song_album', 'song_lrc','song_lrc_detail','cover_url', 'song_cat','song_url'), array(
             'id' => $id
         ), array(
+            '%s',
+            '%s',
+            '%s',
+            '%s',
+            '%s',
             '%s',
             '%s',
             '%d',
@@ -684,10 +721,13 @@ class hermit
         ), array(
             '%d'
         ));
+        /*CYP的代码*/
 
         $song_cat_name = $this->music_cat($song_cat);
 
-        return compact('id', 'song_name', 'song_author', 'song_cat', 'song_cat_name', 'song_url');
+        /*CYP的代码*/
+        return compact('id','netease_id','song_name', 'song_author','song_album', 'song_cat', 'song_cat_name', 'song_lrc','song_lrc_detail','cover_url', 'song_url');
+        /*CYP的代码*/
     }
 
     /**
@@ -730,17 +770,54 @@ class hermit
         $limit  = $this->settings('prePage');
         $offset = ($paged - 1) * $limit;
 
+        /*CYP的代码*/
         if ($catid) {
-            $query_str = "SELECT id,song_name,song_author,song_cat,song_url,created FROM {$hermit_table_name} WHERE `song_cat` = '{$catid}' ORDER BY `created` DESC LIMIT {$limit} OFFSET {$offset}";
+            $query_str = "SELECT id,netease_id,song_name,song_author,song_album,song_cat,song_lrc,song_lrc_detail,cover_url,song_url,created FROM {$hermit_table_name} WHERE `song_cat` = '{$catid}' ORDER BY `created` DESC LIMIT {$limit} OFFSET {$offset}";
         } else {
-            $query_str = "SELECT id,song_name,song_author,song_cat,song_url,created FROM {$hermit_table_name} ORDER BY `created` DESC LIMIT {$limit} OFFSET {$offset}";
+            $query_str = "SELECT id,netease_id,song_name,song_author,song_album,song_cat,song_lrc,song_lrc_detail,cover_url,song_url,created FROM {$hermit_table_name} ORDER BY `created` DESC LIMIT {$limit} OFFSET {$offset}";
         }
+        /*CYP的代码*/
 
         $result = $wpdb->get_results($query_str);
 
         return $result;
     }
 
+    
+    /*CYP的代码*/
+    /**
+     * 本地音乐列表
+     *
+     * @param      $paged
+     * @param null $catid
+     *
+     * @return mixed
+     */
+    private function music_search_list($keyword,$paged, $catid = null)
+    {
+        global $wpdb, $hermit_table_name;
+
+        $limit  = $this->settings('prePage');
+        $offset = ($paged - 1) * $limit;
+
+        /*CYP的代码*/
+        if ($catid) {
+            $query_str = "SELECT id,netease_id,song_name,song_author,song_album,song_cat,song_lrc,song_lrc_detail,cover_url,song_url,created FROM {$hermit_table_name} WHERE `song_cat` = '{$catid}' and concat(`song_name`,`song_author`,`netease_id` ) like '%$keyword%' ORDER BY `created` DESC LIMIT {$limit} OFFSET {$offset}";
+        } else {
+            $query_str = "SELECT id,netease_id,song_name,song_author,song_album,song_cat,song_lrc,song_lrc_detail,cover_url,song_url,created FROM {$hermit_table_name} WHERE concat(`song_name`,`song_author`,`netease_id` ) like '%$keyword%' ORDER BY `created` DESC LIMIT {$limit} OFFSET {$offset}";
+        }
+        /*CYP的代码*/
+
+        $result = $wpdb->get_results($query_str);
+
+        return $result;
+    }
+    /*CYP的代码*/
+    
+    
+    
+    
+    
     /**
      * 本地音乐分类列表
      *
@@ -824,13 +901,16 @@ class hermit
      *
      * @return mixed
      */
-    private function music_count($catid = null)
+    /*CYP的代码*/
+    private function music_count($catid = null,$keyword = null)
     {
         global $wpdb, $hermit_table_name;
-
+        
         if ($catid) {
             $query_str = "SELECT COUNT(id) AS count FROM {$hermit_table_name} WHERE song_cat = '{$catid}'";
-        } else {
+        } else if($keyword){
+            $query_str = "SELECT COUNT(id) AS count FROM {$hermit_table_name} WHERE concat(`song_name`,`song_author`,`netease_id` ) like '%{$keyword}%'";
+        }else{
             $query_str = "SELECT COUNT(id) AS count FROM {$hermit_table_name}";
         }
 
@@ -838,6 +918,7 @@ class hermit
 
         return $music_count;
     }
+    /*CYP的代码*/
 
     private function _css($css_str)
     {
