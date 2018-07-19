@@ -36,11 +36,11 @@ class HermitJson
         // }
 
         if ($site === "netease") {
-            $url = str_replace('http://m7.', 'http://m9.', $url);
-            $url = str_replace('http://m7c.', 'http://m9.', $url);
-            $url = str_replace('http://m8c.', 'http://m9.', $url);
-            $url = str_replace('http://m8.', 'http://m9.', $url);
-            $url = str_replace('http://m9.', 'https://m9.', $url);
+            $url = str_replace('http://m9.', 'http://m7.', $url);
+            $url = str_replace('http://m7c.', 'http://m7.', $url);
+            $url = str_replace('http://m8c.', 'http://m7.', $url);
+            $url = str_replace('http://m8.', 'http://m7.', $url);
+            $url = str_replace('http://m7.', 'https://m7.', $url);
             $url = str_replace('http://m10', 'https://m10', $url);
         }
         if ($site === "xiami" || $site === 'tencent') {
@@ -93,6 +93,11 @@ class HermitJson
         if (empty($value)) {
             $value = "[00:00.000]此歌曲暂无歌词，请您欣赏";
         }
+
+        if ($site === 'tencent') {
+          $value = html_entity_decode($value, ENT_QUOTES | ENT_HTML5);
+        }
+        
         $this->set_cache($cacheKey, $value, 24);
         return $value;
     }
