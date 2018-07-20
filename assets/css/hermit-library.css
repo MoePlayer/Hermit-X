@@ -368,3 +368,23 @@
         transform: rotate(0deg)
     }
 }
+
+/*CYP的代码*/
+
+@media screen and (max-width: 720px) {
+    .mxlayer-content {
+        width: 80%!important;
+        height:90%!important;
+        top: 5%!important;
+        left: 10%!important;
+        margin: 0px!important;
+    }
+}
+.loadingimg{
+    display:none;
+}
+
+/* 设置了浏览器宽度不大于1200px时 abc 显示900px宽度 */
+
+
+/*CYP的代码*/
