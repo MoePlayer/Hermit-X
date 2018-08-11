@@ -65,6 +65,8 @@ class HermitJson
         if (!empty($url)) return $url;
 
         $Meting = new \Metowolf\Meting($site);
+        $proxy = $this->settings('proxy');
+        if (!empty($proxy)) $Meting->proxy($proxy);
         $cookies = $this->settings('netease_cookies');
         if (!empty($cookies) && $site === "netease") $Meting->cookie($cookies);
 
@@ -88,6 +90,8 @@ class HermitJson
             return $value;
         }
         $Meting = new \Metowolf\Meting($site);
+        $proxy = $this->settings('proxy');
+        if (!empty($proxy)) $Meting->proxy($proxy);
         $cookies = $this->settings('netease_cookies');
         if (!empty($cookies) && $site === "netease") $Meting->cookie($cookies);
 
@@ -274,6 +278,9 @@ class HermitJson
             return $this->addNonce($cache, $site);
         }
 
+        $proxy = $this->settings('proxy');
+        if (!empty($proxy)) $Meting->proxy($proxy);
+
         $cookies = $this->settings('netease_cookies');
         if (!empty($cookies) && $site === "netease") $Meting->cookie($cookies);
 
@@ -326,6 +333,9 @@ class HermitJson
             return $this->addNonce($cache, $site);
         }
 
+        $proxy = $this->settings('proxy');
+        if (!empty($proxy)) $Meting->proxy($proxy);
+        
         $cookies = $this->settings('netease_cookies');
         if (!empty($cookies) && $site === "netease") $Meting->cookie($cookies);
 
