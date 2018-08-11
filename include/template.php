@@ -15,7 +15,7 @@
 							<a href="javascript:;" class="media-menu-item">虾米音乐</a>
 							<a href="javascript:;" class="media-menu-item">腾讯音乐</a>
 							<a href="javascript:;" class="media-menu-item">酷狗音乐</a>
-							<a href="javascript:;" class="media-menu-item">百度音乐</a>
+							<a href="javascript:;" class="media-menu-item">千千音乐</a>
 							<a href="javascript:;" class="media-menu-item">本地音乐</a>
 						</div>
 					</div>
@@ -66,7 +66,7 @@
 									<label><input type="radio" name="baidu_type" value="baidu_playlist">歌单</label>
 								</div>
 								<textarea class="hermit-textarea large-text code" cols="30" rows="9"
-										  placeholder="输入百度音乐地址……"></textarea>
+										  placeholder="输入千千音乐地址……"></textarea>
 							</li>
 							<li class="hermit-li" data-type="remote">
 								<div id="hermit-remote-content">

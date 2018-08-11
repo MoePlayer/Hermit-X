@@ -138,6 +138,15 @@
 				</td>
 			</tr>
 			<tr valign="top">
+				<th scope="row"><label>全局代理</label></th>
+				<td>
+					<p><input type="text" class="regular-text" name="hermit_setting[proxy]"
+					          value="<?php echo $this->settings('proxy'); ?>"/></p>
+
+					<p class="description">Hermit X 将使用此代理服务器请求各曲源服务器。</p>
+				</td>
+			</tr>
+			<tr valign="top">
 				<th scope="row"><label>网易云音乐 COOKIES</label></th>
 				<td>
 					<p><input type="text" class="regular-text" name="hermit_setting[netease_cookies]"

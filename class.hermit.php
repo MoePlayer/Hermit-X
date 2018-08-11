@@ -546,6 +546,7 @@ class hermit
             'low_security' => 0,
             'globalPlayer' => 0,
             'listFolded' => 0,
+            'proxy' => '',
         );
 
         $settings = $this->_settings;

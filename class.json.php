@@ -27,6 +27,9 @@ class HermitJson
         $cookies = $this->settings('netease_cookies');
         if (!empty($cookies) && $site === "netease") $Meting->cookie($cookies);
 
+        $proxy = $this->settings('proxy');
+        if (!empty($proxy)) $Meting->proxy($proxy);
+
         $url = json_decode($Meting->format()->url($music_id, $this->settings('quality')), true);
         $url = $url['url'];
 
@@ -172,8 +175,8 @@ class HermitJson
                 $request = array(
                     'url'    => $value,
                     'referer'   => 'http://h.xiami.com/',
-                    'cookie'    => 'user_from=2;XMPLAYER_addSongsToggler=0;XMPLAYER_isOpen=0;_xiamitoken=123456789;',
-                    'useragent' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.30 Safari/537.36',
+                    'cookie'    => 'user_from=2;XMPLAYER_addSongsToggler=0;XMPLAYER_isOpen=0;_xiamitoken=c7c00f36f7f1acc679c3ad4ee5aabebd;',
+                    'useragent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36',
                 );
                     break;
             }
@@ -209,6 +212,9 @@ class HermitJson
 
         $cookies = $this->settings('netease_cookies');
         if (!empty($cookies) && $site === "netease") $Meting->cookie($cookies);
+
+        $proxy = $this->settings('proxy');
+        if (!empty($proxy)) $Meting->proxy($proxy);
 
         $response = json_decode($Meting->format()->song($music_id), true);
 
@@ -406,6 +412,9 @@ class HermitJson
         curl_setopt($curl, CURLOPT_COOKIE, $API['cookie']);
         curl_setopt($curl, CURLOPT_REFERER, $API['referer']);
         curl_setopt($curl, CURLOPT_USERAGENT, $API['useragent']);
+        if ($this->settings('proxy')) {
+            curl_setopt($curl, CURLOPT_PROXY, $this->settings('proxy'));
+        }
 
         $result=curl_exec($curl);
         curl_close($curl);

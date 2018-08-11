@@ -77,16 +77,16 @@ jQuery(document).ready(function(b) {
         if ("baidu" == c) {
             switch (d.type) {
                 case "baidu_songlist":
-                    (a = a.match(/music\.baidu\.com\/song\/\d+/gi)) && 0 < a.length && (es = [], b.each(a,
+                    (a = a.match(/music\.taihe\.com\/song\/\d+/gi)) && 0 < a.length && (es = [], b.each(a,
                     function(a, c) {
                         -1 === b.inArray(c, e) && es.push(c)
-                    }), d.array = es.join(",").replace(/music\.baidu\.com\/song\//gi, ""));
+                    }), d.array = es.join(",").replace(/music\.taihe\.com\/song\//gi, ""));
                     break;
                 case "baidu_album":
-                    (a = a.match(/music\.baidu\.com\/album\/\d+/i)) && 0 < a.length && (d.array = a[0].replace(/music\.baidu\.com\/album\//gi, ""));
+                    (a = a.match(/music\.taihe\.com\/album\/\d+/i)) && 0 < a.length && (d.array = a[0].replace(/music\.taihe\.com\/album\//gi, ""));
                     break;
                 case "baidu_playlist":
-                    (a = a.match(/music\.baidu\.com\/songlist\/\d+/i)) && 0 < a.length && (d.array = a[0].replace(/music\.baidu\.com\/songlist\//gi, ""))
+                    (a = a.match(/music\.taihe\.com\/songlist\/\d+/i)) && 0 < a.length && (d.array = a[0].replace(/music\.taihe\.com\/songlist\//gi, ""))
             }
         }
         "remote" == c && (d.type = "remote", d.array = a);
