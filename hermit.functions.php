@@ -43,10 +43,10 @@ function hermit_uninstall()
 function field_check()
 {
     global $wpdb, $hermit_table_name;
-    if (count($wpdb->get_results("DESCRIBE {$hermit_table_name} song_cover")) <= 0) {
+    if (!$wpdb->get_results("SHOW COLUMNS FROM `{$hermit_table_name}` LIKE 'song_cover'")) {
         $wpdb->query("ALTER TABLE `{$hermit_table_name}` ADD `song_cover` TEXT AFTER `song_url`");
     }
-    if (count($wpdb->get_results("DESCRIBE {$hermit_table_name} song_lrc")) <= 0) {
+    if (!$wpdb->get_results("SHOW COLUMNS FROM `{$hermit_table_name}` LIKE 'song_lrc'")) {
         $wpdb->query("ALTER TABLE `{$hermit_table_name}` ADD `song_lrc` LONGTEXT AFTER `song_cover`");
     }
 }
