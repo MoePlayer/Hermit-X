@@ -13,7 +13,7 @@ function hermit_install()
 				song_author VARCHAR(255) NOT NULL,
 				song_url    TEXT NOT NULL,
 				song_cover  TEXT,
-				song_lrc    TEXT,
+				song_lrc    LONGTEXT,
 				created     DATETIME NOT NULL,
 				UNIQUE KEY id (id)
 			) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1");
@@ -47,6 +47,6 @@ function field_check()
         $wpdb->query("ALTER TABLE `{$hermit_table_name}` ADD `song_cover` TEXT AFTER `song_url`");
     }
     if (count($wpdb->get_results("DESCRIBE {$hermit_table_name} song_lrc")) <= 0) {
-        $wpdb->query("ALTER TABLE `{$hermit_table_name}` ADD `song_lrc` TEXT AFTER `song_cover`");
+        $wpdb->query("ALTER TABLE `{$hermit_table_name}` ADD `song_lrc` LONGTEXT AFTER `song_cover`");
     }
 }
