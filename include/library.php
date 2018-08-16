@@ -97,6 +97,19 @@ $catid = isset($_GET['catid']) && $_GET['catid'] ? $_GET['catid'] : null;
 					<a href="javascript:;" id="hermit-form-song_url-upload" >上传或添加音乐</a> （本地音乐需要注意盗链）
 				</td>
 			</tr>
+            <tr>
+                <td valign="top"><strong>封面地址</strong></td>
+                <td valign="top">
+                    <textarea name="song_url" rows="3" id="hermit-form-song_cover" class="large-text code">{{song_cover}}</textarea><br />
+                    <a href="javascript:;" id="hermit-form-song_cover-upload" >上传或添加封面图片</a> （本地图片需要注意盗链）
+                </td>
+            </tr>
+            <tr>
+                <td valign="top"><strong>歌词</strong></td>
+                <td valign="top">
+                    <textarea name="song_url" rows="10" id="hermit-form-song_lrc" class="large-text code">{{song_lrc}}</textarea><br />
+                </td>
+            </tr>
 			<tr>
 				<td valign="top"><strong>分类</strong></td>
 				<td valign="top">

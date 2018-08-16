@@ -86,6 +86,29 @@ jQuery(document).ready(function ($) {
         file_frame.open();
     });
 
+    //上传封面图片
+    $('body').on('click', '#hermit-form-song_cover-upload', function(){
+        /**
+         * 采用 3.5之后的新上传图片方法
+         * 不再支持3.5以下 Wordpress 版本
+         */
+
+            // Create the media frame.
+        var file_frame = wp.media.frames.file_frame = wp.media({
+                title: '上传本地图片（尽量用英文名称）',
+                multiple: false  // Set to true to allow multiple files to be selected
+            });
+
+        // When an image is selected, run a callback.
+        file_frame.on( 'select', function() {
+            var attachment = file_frame.state().get('selection').first().toJSON();
+            $('#hermit-form-song_cover').val(attachment.url);
+        });
+
+        // Finally, open the modal
+        file_frame.open();
+    });
+
     //新建音乐
     $('.add-new-h2').click(function () {
         var sobj = {
@@ -247,7 +270,7 @@ jQuery(document).ready(function ($) {
             cancel: function () {
             },
             confirm: function (that) {
-                var formKey = ['song_name', 'song_author', 'song_url', 'song_cat'],
+                var formKey = ['song_name', 'song_author', 'song_url', 'song_cat', 'song_cover', 'song_lrc'],
                     formObj = {};
 
                 $bodyLoader.showProgress('数据上传中');
