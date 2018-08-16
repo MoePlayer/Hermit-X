@@ -643,11 +643,10 @@ class hermit
     {
         global $wpdb, $hermit_table_name;
 
-        $data   = $wpdb->get_results("SELECT song_lrc FROM {$hermit_table_name} WHERE id = {$id}");
+        $data   = $wpdb->get_results($wpdb->prepare("SELECT song_lrc FROM `$hermit_table_name` WHERE id = %d", $id));
         if (count($data) <= 0 || $data[0]->song_lrc == null) $result = "[00:00.000]此歌曲暂无歌词，请您欣赏";
         else {
-            $lrc = $data[0]->song_lrc;
-            $result = $lrc;
+            $result = $data[0]->song_lrc;
         }
 
         return $result;
