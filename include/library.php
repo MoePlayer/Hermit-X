@@ -162,7 +162,7 @@ $catid = isset($_GET['catid']) && $_GET['catid'] ? $_GET['catid'] : null;
     <script id="hermit-lrc-template" type="text/x-handlebars-template">
         <div>
             <!-- 不对html转码 -->
-            {{{ song_lrc }}}
+            {{{ song_lrc_html }}}
         </div>
     </script>
 

@@ -69,7 +69,8 @@ jQuery(document).ready(function ($) {
     Handlebars.registerHelper('catCover', function (cover_url, name) {
         var html;
 
-        html = '<img class="cover" src="' + cover_url +'" alt="' + name +'">';
+        if (cover_url != "")html = '<img class="cover" src="' + cover_url +'" title="' + name +'" alt="图片加载失败">';
+        else html = '<p>没有封面图</p>'
 
         return html;
     });
@@ -319,8 +320,12 @@ jQuery(document).ready(function ($) {
                         val = $elem.val();
 
                     if (isEmpty(val)) {
-                        $bodyLoader.showError('请输入正确的信息。');
-                        return false;
+                        if (i < 4) {
+                            $bodyLoader.showError('请输入正确的信息。');
+                            return false;
+                        } else {
+                            val = '';
+                        }
                     }
 
                     formObj[_id] = val

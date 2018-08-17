@@ -628,7 +628,7 @@ class hermit
                 "title" => $value->song_name,
                 "author" => $value->song_author,
                 "url" => $value->song_url,
-                "pic" => $value->song_cover == null ? "" : $value->song_cover,
+                "pic" => $value->song_cover,
                 "lrc" => admin_url() . "admin-ajax.php" . "?action=hermit&scope=remote_lyric&id=" . $value->id
             );
         }
@@ -644,10 +644,8 @@ class hermit
         global $wpdb, $hermit_table_name;
 
         $data   = $wpdb->get_results($wpdb->prepare("SELECT song_lrc FROM `$hermit_table_name` WHERE id = %d", $id));
-        if (count($data) <= 0 || $data[0]->song_lrc == null) $result = "[00:00.000]此歌曲暂无歌词，请您欣赏";
-        else {
-            $result = $data[0]->song_lrc;
-        }
+        if (count($data) < 0) $result = "";
+        else $result = $data[0]->song_lrc;
 
         return $result;
     }
@@ -771,7 +769,8 @@ class hermit
 
         // 将lrc转成html格式
         for ($i = 0; $i < count($result); $i++) {
-            $result[$i]->song_lrc = str_replace("\n", "<br />", $result[$i]->song_lrc);
+            if ($result[$i]->song_lrc == "") $result[$i]->song_lrc_html = "没有歌词<br />";
+            else $result[$i]->song_lrc_html = str_replace("\n", "<br />", $result[$i]->song_lrc);
         }
 
         return $result;
