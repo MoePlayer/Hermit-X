@@ -769,6 +769,11 @@ class hermit
 
         $result = $wpdb->get_results($query_str);
 
+        // 将lrc转成html格式
+        for ($i = 0; $i < count($result); $i++) {
+            $result[$i]->song_lrc = str_replace("\n", "<br />", $result[$i]->song_lrc);
+        }
+
         return $result;
     }
 

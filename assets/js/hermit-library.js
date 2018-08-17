@@ -21,6 +21,9 @@ jQuery(document).ready(function ($) {
         tableSrc = $("#hermit-table-template").html(),
         tableTmpl = Handlebars.compile(tableSrc),
 
+        lrcSrc = $("#hermit-lrc-template").html(),
+        lrcTmpl = Handlebars.compile(lrcSrc),
+
         $bodyLoader = $.mxloader('#wpwrap', true);
 
     Handlebars.registerHelper('catName', function (catid) {
@@ -59,6 +62,22 @@ jQuery(document).ready(function ($) {
             var _checked = val.id == song_cat ? ' selected="selected"' : '';
             html += '<option value="' + val.id + '"' + _checked + '>' + val.title + '</option>';
         });
+
+        return html;
+    });
+
+    Handlebars.registerHelper('catCover', function (cover_url, name) {
+        var html;
+
+        html = '<img class="cover" src="' + cover_url +'" alt="' + name +'">';
+
+        return html;
+    });
+
+    Handlebars.registerHelper('catLrc', function (index) {
+        var html;
+
+        html = '<a href="javascript:" class="hermit-show-lrc" data-index="' + index +'">显示歌词</a>';
 
         return html;
     });
@@ -117,6 +136,25 @@ jQuery(document).ready(function ($) {
         };
 
         form(sobj)
+    });
+
+    //显示歌词
+    $('.hermit-list-table').on('click', '.hermit-show-lrc', function () {
+        var $this = $(this),
+            index = $this.attr('data-index'),
+            sobj = hermit.data[index],
+            main_html = lrcTmpl(sobj);
+
+        $.mxlayer({
+            title: sobj["song_name"],
+            main: main_html,
+            button: "关闭",
+            width: 720,
+            height: 540,
+            confirm: function (that) {
+                that.fireEvent();
+            }
+        })
     });
 
     //编辑

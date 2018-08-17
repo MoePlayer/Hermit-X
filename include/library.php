@@ -25,10 +25,12 @@ $catid = isset($_GET['catid']) && $_GET['catid'] ? $_GET['catid'] : null;
 		<table class="wp-list-table widefat fixed striped posts">
 			<colgroup>
 				<col width="35"/>
-				<col width="10%" />
+                <col width="120"/>
 				<col width="120"/>
 				<col width="120"/>
-				<col width="60%"/>
+				<col width="120"/>
+				<col width="40%"/>
+                <col width="120"/>
 				<col width="120"/>
 			</colgroup>
 			<thead>
@@ -37,10 +39,12 @@ $catid = isset($_GET['catid']) && $_GET['catid'] ? $_GET['catid'] : null;
 						<label class="screen-reader-text" for="cb-select-all">全选</label>
 						<input id="cb-select-all" type="checkbox">
 					</td>
+                    <th scope="col" class="manage-column column-cover">封面</th>
 					<th scope="col" class="manage-column column-title">歌曲名称</th>
 					<th scope="col" class="manage-column column-author">作者</th>
 					<th scope="col" class="manage-column column-categories">分类</th>
 					<th scope="col" class="manage-column column-url">地址</th>
+                    <th scope="col" class="manage-column column-lrc">歌词</th>
 					<th scope="col" class="manage-column column-action">操作</th>
 				</tr>
 			</thead>
@@ -52,10 +56,12 @@ $catid = isset($_GET['catid']) && $_GET['catid'] ? $_GET['catid'] : null;
 						<label class="screen-reader-text" for="cb-select-all-1">全选</label>
 						<input id="cb-select-all" type="checkbox">
 					</td>
-					<th scope="col" class="manage-column column-title">名称</th>
+                    <th scope="col" class="manage-column column-cover">封面</th>
+					<th scope="col" class="manage-column column-title">歌曲名称</th>
 					<th scope="col" class="manage-column column-author">作者</th>
 					<th scope="col" class="manage-column column-categories">分类</th>
 					<th scope="col" class="manage-column column-url">地址</th>
+                    <th scope="col" class="manage-column column-lrc">歌词</th>
 					<th scope="col" class="manage-column column-action">操作</th>
 				</tr>
 			</tfoot>
@@ -141,14 +147,24 @@ $catid = isset($_GET['catid']) && $_GET['catid'] ? $_GET['catid'] : null;
 					<label class="screen-reader-text" for="cb-select-th">选择</label>
 					<input class="cb-select-th" type="checkbox" value="{{id}}">
 				</th>
+                <td>{{#catCover song_cover song_name}}{{/catCover}}</td>
 				<td>{{song_name}}</td>
 				<td>{{song_author}}</td>
 				<td>{{#catName song_cat}}{{/catName}}</td>
 				<td>{{song_url}}</td>
+                <td>{{#catLrc @index}}{{/catLrc}}</td>
 				<td><a href="javascript:;" class="hermit-edit" data-index="{{@index}}">编辑</a> | <a href="javascript:;" class="hermit-delete" data-id="{{id}}">删除</a></td>
 			</tr>
 		{{/data}}
 	</script>
+
+    <!-- 歌词模板 -->
+    <script id="hermit-lrc-template" type="text/x-handlebars-template">
+        <div>
+            <!-- 不对html转码 -->
+            {{{ song_lrc }}}
+        </div>
+    </script>
 
 	<script>
 		var hermit = {

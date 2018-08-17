@@ -351,6 +351,13 @@
     margin-top: 10px;
 }
 
+.cover {
+    height: auto;
+    width: 100px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 @-webkit-keyframes mxloader {
     0% {
         -webkit-transform: rotate(360deg)
