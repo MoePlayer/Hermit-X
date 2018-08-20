@@ -21,6 +21,9 @@ jQuery(document).ready(function ($) {
         tableSrc = $("#hermit-table-template").html(),
         tableTmpl = Handlebars.compile(tableSrc),
 
+        catmovSrc = $("#hermit-move-cat-template").html(),
+        catmovTmpl = Handlebars.compile(catmovSrc),
+
         $bodyLoader = $.mxloader('#wpwrap', true);
 
     Handlebars.registerHelper('catName', function (catid) {
@@ -116,8 +119,8 @@ jQuery(document).ready(function ($) {
     });
 
     //选中删除
-    $('.hermit-delete-all').click(function() {
-        if ($(this).prev('.hermit-action-selector') == 'trash') {
+    $('.hermit-selector-button').click(function() {
+        if ($(this).prev('.hermit-action-selector').val() == 'trash') {
             var arr = [];
 
             $('.cb-select-th').each(function () {
@@ -130,6 +133,20 @@ jQuery(document).ready(function ($) {
 
             arr = arr.join(',');
             dele(arr)
+        }
+        else if ($(this).prev('.hermit-action-selector').val() == 'movecat') {
+            var arr = [];
+
+            $('.cb-select-th').each(function () {
+                var $this = $(this);
+
+                if ($this.prop("checked")) {
+                    arr.push($this.val())
+                }
+            });
+
+            arr = arr.join(',');
+            move_cat(arr)
         }
     });
 
@@ -362,6 +379,46 @@ jQuery(document).ready(function ($) {
                 }
             })
         }
+    }
+
+    function move_cat(ids) {
+        $.mxlayer({
+            title: '选则目标分类',
+            main: catmovTmpl(hermit),
+            button: '提交',
+            width: 720,
+            height: 220,
+            cancel: function () {
+            },
+            confirm: function (that) {
+                $bodyLoader.showProgress('移动音乐中');
+                var data = {
+                    type: 'move',
+                    catid: $('#hermit-move-song_cat').val(),
+                    ids: ids
+                };
+                $.ajax({
+                    url: hermit.adminUrl,
+                    data: data,
+                    type: 'post',
+                    success: function (data) {
+                        $bodyLoader.showSuccess('移动成功');
+
+                        that.fireEvent();
+
+                        list({
+                            page: 1,
+                            catid: hermit.currentCatId
+                        }, function () {
+                            initView();
+                        });
+                    },
+                    error: function () {
+                        $bodyLoader.showError(msg.error);
+                    }
+                });
+            }
+        })
     }
 
     function isEmpty(str) {
