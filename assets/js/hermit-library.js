@@ -214,7 +214,8 @@ jQuery(document).ready(function ($) {
                                 lastPageText: '»', //最后页标题
                                 click: function (index) {
                                     list({
-                                        page: index
+                                        page: index,
+                                        catid: hermit.currentCatId
                                     })
                                 }
                             });
