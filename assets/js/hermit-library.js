@@ -324,6 +324,7 @@ jQuery(document).ready(function ($) {
                 if (callback) {
                     hermit.count = result.count;
                     hermit.maxPage = result.maxPage;
+                    hermit.catList = result.catList;
 
                     callback();
                 }

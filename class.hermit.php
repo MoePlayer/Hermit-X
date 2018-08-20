@@ -371,8 +371,9 @@ class hermit
                 $data    = $this->music_list($paged, $catid);
                 $count   = intval($this->music_count($catid));
                 $maxPage = ceil($count / $prePage);
+                $catList = $this->music_catList();
 
-                $result = compact('data', 'paged', 'maxPage', 'count');
+                $result = compact('data', 'paged', 'maxPage', 'count', 'catList');
                 $this->success_response($result);
                 break;
 
