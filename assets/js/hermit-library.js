@@ -151,7 +151,7 @@ jQuery(document).ready(function ($) {
             main: main_html,
             button: "关闭",
             width: 720,
-            height: 540,
+            height: 720,
             confirm: function (that) {
                 that.fireEvent();
             }
@@ -305,7 +305,7 @@ jQuery(document).ready(function ($) {
             main: main_html,
             button: msg.title,
             width: 720,
-            height: 540,
+            height: 720,
             cancel: function () {
             },
             confirm: function (that) {

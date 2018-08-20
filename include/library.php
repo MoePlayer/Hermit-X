@@ -96,6 +96,14 @@ $catid = isset($_GET['catid']) && $_GET['catid'] ? $_GET['catid'] : null;
 					<input type="text" id="hermit-form-song_author" name="song_author" value="{{song_author}}"/>
 				</td>
 			</tr>
+            <tr>
+                <td valign="top"><strong>分类</strong></td>
+                <td valign="top">
+                    <select id="hermit-form-song_cat" name="song_cat">
+                        {{#catOption catList song_cat}}{{/catOption}}
+                    </select>
+                </td>
+            </tr>
 			<tr>
 				<td valign="top"><strong>歌曲地址</strong></td>
 				<td valign="top">
@@ -116,14 +124,6 @@ $catid = isset($_GET['catid']) && $_GET['catid'] ? $_GET['catid'] : null;
                     <textarea name="song_url" rows="10" id="hermit-form-song_lrc" class="large-text code">{{song_lrc}}</textarea><br />
                 </td>
             </tr>
-			<tr>
-				<td valign="top"><strong>分类</strong></td>
-				<td valign="top">
-					<select id="hermit-form-song_cat" name="song_cat">
-						{{#catOption catList song_cat}}{{/catOption}}
-					</select>
-				</td>
-			</tr>
 			</tbody>
 		</table>
 	</script>
