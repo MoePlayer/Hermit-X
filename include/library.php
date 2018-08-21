@@ -112,7 +112,7 @@ $catid = isset($_GET['catid']) && $_GET['catid'] ? $_GET['catid'] : null;
 	<!-- 菜单模板 -->
 	<script id="hermit-nav-template" type="text/x-handlebars-template">
 		{{#catNav catList count}}{{/catNav}}
-		| <a href="javascript:;" class="hermit-new-nav">+ 新建分类</a>
+		| <a href="javascript:;" class="hermit-manage-nav">* 管理分类 *</a>
 	</script>
 
 	<!-- 翻页部分 -->
@@ -136,6 +136,33 @@ $catid = isset($_GET['catid']) && $_GET['catid'] ? $_GET['catid'] : null;
 			</tr>
 		{{/data}}
 	</script>
+
+    <!-- 分类管理部分 -->
+    <script id="hermit-manage-cat-template" type="text/x-handlebars-template">
+        <div class="hermit-cat-list-table">
+            <a href="javascript:;" class="hermit-new-nav" style="font-size: 14px">+ 添加分类</a>
+            <table class="wp-cat-list-table widefat fixed striped posts">
+                <colgroup>
+                    <col width="50%"/>
+                    <col width="50%"/>
+                </colgroup>
+                <thead>
+                <tr>
+                    <th scope="col" class="manage-column column-cat-title">分类名称</th>
+                    <th scope="col" class="manage-column column-cat-action">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                    {{#catList}}
+                    <tr>
+                        <td>{{title}}</td>
+                        <td>{{#catAction id}}{{/catAction}}</td>
+                    </tr>
+                    {{/catList}}
+                </tbody>
+            </table>
+        </div>
+    </script>
 
 	<script>
 		var hermit = {

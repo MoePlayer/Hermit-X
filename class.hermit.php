@@ -395,12 +395,12 @@ class hermit
                 }
                 break;
 
-            case 'catdel':
+            case 'catupd':
                 $result = $this->cat_updata();
                 $this->success_response($result);
                 break;
 
-            case 'catupd':
+            case 'catdel':
                 $this->cat_delete();
                 $data = $this->music_catList();
                 $this->success_response($data);
@@ -838,27 +838,23 @@ class hermit
     {
         global $wpdb, $hermit_cat_name, $hermit_table_name;
 
-        $ids = $this->post('ids');
-
-        foreach($ids as $key => $cat_id) {
-            if($cat_id == 1)continue;
-            $result = $wpdb->get_results($wpdb->prepare("SELECT id FROM `$hermit_table_name` WHERE song_cat = %d", $cat_id));
-
-            for ($i = 0; $i < count($result); $i++) {
-                $wpdb->update($hermit_table_name, array(
-                    'id' => 1
-                ), array(
-                    'id' => $result[$i]->id
-                ), array(
-                    '%d',
-                ), array(
-                    '%d'
-                ));
-            }
-            $wpdb->delete($hermit_cat_name, array(
-                'id' => $cat_id
+        $cat_id = $this->post('id');
+        if($cat_id == 1)return false;
+        $result = $wpdb->get_results($wpdb->prepare("SELECT id FROM `$hermit_table_name` WHERE song_cat = %d", $cat_id));
+        for ($i = 0; $i < count($result); $i++) {
+            $wpdb->update($hermit_table_name, array(
+                'song_cat' => 1
+            ), array(
+                'id' => $result[$i]->id
+            ), array(
+                '%d',
+            ), array(
+                '%d'
             ));
         }
+        $wpdb->delete($hermit_cat_name, array(
+            'id' => $cat_id
+        ));
 
         return true;
     }

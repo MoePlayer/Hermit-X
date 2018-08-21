@@ -21,6 +21,9 @@ jQuery(document).ready(function ($) {
         tableSrc = $("#hermit-table-template").html(),
         tableTmpl = Handlebars.compile(tableSrc),
 
+        manageSrc = $("#hermit-manage-cat-template").html(),
+        manageTmpl = Handlebars.compile(manageSrc)
+
         $bodyLoader = $.mxloader('#wpwrap', true);
 
     Handlebars.registerHelper('catName', function (catid) {
@@ -59,6 +62,18 @@ jQuery(document).ready(function ($) {
             var _checked = val.id == song_cat ? ' selected="selected"' : '';
             html += '<option value="' + val.id + '"' + _checked + '>' + val.title + '</option>';
         });
+
+        return html;
+    });
+
+    Handlebars.registerHelper('catAction', function (id) {
+        var html = '';
+
+        if (id !== '1') {
+            html = '<a href="javascript:;" class="hermit-cat-edit" data-id="' + id + '">编辑</a> | <a href="javascript:;" class="hermit-cat-delete" data-id="' + id + '">删除</a>';
+        } else {
+            html = '<p>默认分类禁止编辑/删除</p>'
+        }
 
         return html;
     });
@@ -133,8 +148,24 @@ jQuery(document).ready(function ($) {
         }
     });
 
+    //管理分类
+    $('.hermit-list-table').on('click', '.hermit-manage-nav', function () {
+        $.mxlayer({
+            title: '分类管理',
+            main: manageTmpl(hermit),
+            button: '关闭',
+            width: 720,
+            height: 720,
+            cancel: function () {
+            },
+            confirm: function (that) {
+                that.fireEvent()
+            }
+        })
+    });
+
     //新建分类
-    $('.hermit-list-table').on('click', '.hermit-new-nav', function () {
+    $('body').on('click', '.hermit-new-nav', function () {
         var title = window.prompt("新建分类","");
 
         if( title ){
@@ -150,6 +181,87 @@ jQuery(document).ready(function ($) {
                 success: function (data) {
                     hermit.catList = data;
                     $bodyLoader.showSuccess('新建分类成功');
+                    list({
+                        page: 1,
+                        catid: hermit.currentCatId
+                    }, function () {
+                        initView();
+                        $('.mxlayer-main-body').html(manageTmpl(hermit));
+                    });
+                },
+                error: function () {
+                    $bodyLoader.showError('分类已存在');
+                }
+            });
+        }
+    });
+
+    //删除分类
+    $('body').on('click', '.hermit-cat-delete', function () {
+        var $this = $(this),
+            id = $this.attr('data-id');
+
+        if ( id === '1' )return;
+
+        var cofim = window.confirm('确认删除?');
+
+        if (cofim) {
+            $bodyLoader.showProgress('删除分类中');
+
+            $.ajax({
+                url: hermit.adminUrl,
+                type: 'post',
+                data: {
+                    type: 'catdel',
+                    id: id
+                },
+                success: function (result) {
+                    hermit.catList = result;
+                    $bodyLoader.showSuccess('删除分类成功');
+                    list({
+                        page: 1,
+                        catid: hermit.currentCatId
+                    }, function () {
+                        initView();
+                        $('.mxlayer-main-body').html(manageTmpl(hermit));
+                    });
+                },
+                error: function () {
+                    $bodyLoader.showProgress('删除失败，请稍后重试。');
+                }
+            })
+        }
+    });
+
+    //编辑分类
+    $('body').on('click', '.hermit-cat-edit', function () {
+        var title = window.prompt("重命名分类",""),
+            $this = $(this),
+            id = $this.attr('data-id');
+
+        if ( id === '1' )return;
+
+        if( title ){
+            $bodyLoader.showProgress('重命名分类中');
+
+            $.ajax({
+                url: hermit.adminUrl,
+                data: {
+                    type: 'catupd',
+                    title: title,
+                    id: id
+                },
+                type: 'post',
+                success: function (data) {
+                    hermit.catList = data;
+                    $bodyLoader.showSuccess('重命名分类成功');
+                    list({
+                        page: 1,
+                        catid: hermit.currentCatId
+                    }, function () {
+                        initView();
+                        $('.mxlayer-main-body').html(manageTmpl(hermit));
+                    });
                 },
                 error: function () {
                     $bodyLoader.showError('分类已存在');
