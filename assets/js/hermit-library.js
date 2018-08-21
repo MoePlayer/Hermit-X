@@ -383,7 +383,7 @@ jQuery(document).ready(function ($) {
 
     function move_cat(ids) {
         $.mxlayer({
-            title: '选则目标分类',
+            title: '选择目标分类',
             main: catmovTmpl(hermit),
             button: '提交',
             width: 720,
