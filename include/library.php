@@ -16,8 +16,9 @@ $catid = isset($_GET['catid']) && $_GET['catid'] ? $_GET['catid'] : null;
 				<select name="action" class="hermit-action-selector">
 					<option value="no">批量操作</option>
 					<option value="trash">删除</option>
+                    <option value="movecat">移动分类至</option>
 				</select>
-				<button class="button action hermit-delete-all">应用</button>
+				<button class="button action hermit-selector-button">应用</button>
 			</div>
 			<div class="tablenav-pages">
 			</div>
@@ -66,8 +67,9 @@ $catid = isset($_GET['catid']) && $_GET['catid'] ? $_GET['catid'] : null;
 				<select name="action" class="hermit-action-selector">
 					<option value="no">批量操作</option>
 					<option value="trash">删除</option>
+                    <option value="movecat">移动分类至</option>
 				</select>
-				<button class="button action hermit-delete-all">应用</button>
+				<button class="button action hermit-selector-button">应用</button>
 			</div>
 			<div class="tablenav-pages">
 			</div>
@@ -137,6 +139,7 @@ $catid = isset($_GET['catid']) && $_GET['catid'] ? $_GET['catid'] : null;
 		{{/data}}
 	</script>
 
+
     <!-- 分类管理部分 -->
     <script id="hermit-manage-cat-template" type="text/x-handlebars-template">
         <div class="hermit-cat-list-table">
@@ -162,6 +165,7 @@ $catid = isset($_GET['catid']) && $_GET['catid'] ? $_GET['catid'] : null;
                 </tbody>
             </table>
         </div>
+
     </script>
 
 	<script>
