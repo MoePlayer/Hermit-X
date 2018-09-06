@@ -80,6 +80,8 @@ jQuery(document).ready(function ($) {
         var html;
 
         html = '<a href="javascript:" class="hermit-show-lrc" data-index="' + index +'">显示歌词</a>';
+        return html;
+    });
 
     Handlebars.registerHelper('catAction', function (id) {
         var html = '';
