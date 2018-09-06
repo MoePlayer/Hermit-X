@@ -16,8 +16,9 @@ $catid = isset($_GET['catid']) && $_GET['catid'] ? $_GET['catid'] : null;
 				<select name="action" class="hermit-action-selector">
 					<option value="no">批量操作</option>
 					<option value="trash">删除</option>
+                    <option value="movecat">移动分类至</option>
 				</select>
-				<button class="button action hermit-delete-all">应用</button>
+				<button class="button action hermit-selector-button">应用</button>
 			</div>
 			<div class="tablenav-pages">
 			</div>
@@ -66,8 +67,9 @@ $catid = isset($_GET['catid']) && $_GET['catid'] ? $_GET['catid'] : null;
 				<select name="action" class="hermit-action-selector">
 					<option value="no">批量操作</option>
 					<option value="trash">删除</option>
+                    <option value="movecat">移动分类至</option>
 				</select>
-				<button class="button action hermit-delete-all">应用</button>
+				<button class="button action hermit-selector-button">应用</button>
 			</div>
 			<div class="tablenav-pages">
 			</div>
@@ -136,6 +138,20 @@ $catid = isset($_GET['catid']) && $_GET['catid'] ? $_GET['catid'] : null;
 			</tr>
 		{{/data}}
 	</script>
+
+    <!-- 批量移动部分 -->
+    <script id="hermit-move-cat-template" type="text/x-handlebars-template">
+        <table class="form-table">
+            <tbody>
+                <td valign="top"><strong>分类</strong></td>
+                <td valign="top">
+                    <select id="hermit-move-song_cat" name="song_cat">
+                        {{#catOption catList song_cat}}{{/catOption}}
+                    </select>
+                </td>
+            </tbody>
+        </table>
+    </script>
 
 	<script>
 		var hermit = {
