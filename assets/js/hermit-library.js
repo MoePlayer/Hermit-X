@@ -22,7 +22,7 @@ jQuery(document).ready(function ($) {
         tableTmpl = Handlebars.compile(tableSrc),
 
         manageSrc = $("#hermit-manage-cat-template").html(),
-        manageTmpl = Handlebars.compile(manageSrc)
+        manageTmpl = Handlebars.compile(manageSrc),
 
         $bodyLoader = $.mxloader('#wpwrap', true);
 
@@ -557,7 +557,7 @@ jQuery(document).ready(function ($) {
     function move_cat(ids) {
         $.mxlayer({
             title: '选择目标分类',
-            main: catmovTmpl(hermit),
+            main: manageTmpl(hermit),
             button: '提交',
             width: 720,
             height: 220,
