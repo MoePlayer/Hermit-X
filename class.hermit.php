@@ -245,7 +245,6 @@ class hermit
             switch ($scope) {
                     //本地音乐部分
                     case 'remote':
-                        $this->nonce_verify();
                         $result = array(
                             'status' => 200,
                             'msg' => $this->music_remote($id)
@@ -253,7 +252,6 @@ class hermit
                         break;
 
                     case 'remote_lyric':
-                        $this->nonce_verify();
                         echo $this->remote_lrc($id);
                         exit;
 
@@ -632,7 +630,7 @@ class hermit
                 "lrc" => admin_url() . "admin-ajax.php" . "?action=hermit&scope=remote_lyric&id=" . $value->id
             );
         }
-        $result = $HMTJSON->remoteNonce($result, true);
+
         return $result;
     }
 
