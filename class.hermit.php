@@ -372,10 +372,11 @@ class hermit
                 $catid = $catid ? $catid : null;
 
                 $data    = $this->music_list($paged, $catid);
-                $count   = intval($this->music_count());
+                $count   = intval($this->music_count($catid));
                 $maxPage = ceil($count / $prePage);
+                $catList = $this->music_catList();
 
-                $result = compact('data', 'paged', 'maxPage', 'count');
+                $result = compact('data', 'paged', 'maxPage', 'count', 'catList');
                 $this->success_response($result);
                 break;
 
@@ -395,6 +396,17 @@ class hermit
                     $data = $this->music_catList();
                     $this->success_response($data);
                 }
+                break;
+
+            case 'catupd':
+                $result = $this->cat_updata();
+                $this->success_response($result);
+                break;
+
+            case 'catdel':
+                $this->cat_delete();
+                $data = $this->music_catList();
+                $this->success_response($data);
                 break;
 
             default:
@@ -847,6 +859,57 @@ class hermit
             'title' => $title,
             'count' => intval($this->music_count($new_cat_id))
         );
+    }
+
+    /**
+     * 删除本地分类
+     *
+     * @return boolean
+     */
+    private function cat_delete()
+    {
+        global $wpdb, $hermit_cat_name, $hermit_table_name;
+
+        $cat_id = $this->post('id');
+        if($cat_id == 1)return false;
+        $result = $wpdb->get_results($wpdb->prepare("SELECT id FROM `$hermit_table_name` WHERE song_cat = %d", $cat_id));
+        for ($i = 0; $i < count($result); $i++) {
+            $wpdb->update($hermit_table_name, array(
+                'song_cat' => 1
+            ), array(
+                'id' => $result[$i]->id
+            ), array(
+                '%d',
+            ), array(
+                '%d'
+            ));
+        }
+        $wpdb->delete($hermit_cat_name, array(
+            'id' => $cat_id
+        ));
+
+        return true;
+    }
+
+    /**
+     * 升级本地分类
+     */
+    private function cat_updata()
+    {
+        global $wpdb, $hermit_cat_name;
+
+        $id      = $this->post('id');
+        $title   = stripslashes($this->post('title'));
+
+        $wpdb->update($hermit_cat_name, compact('title'), array(
+            'id' => $id
+        ), array(
+            '%s'
+        ), array(
+            '%d'
+        ));
+
+        return compact('id', 'title');
     }
 
     /**
