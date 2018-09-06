@@ -461,21 +461,4 @@ class HermitJson
         return $HMT->settings($key);
     }
 
-    public function remoteNonce($data) {
-        if(!$this->settings('low_security')){
-            foreach ($data["songs"] as $key => $value) {
-                //$data["songs"][$key]['url'] = $value['url'] . "&_nonce=".wp_create_nonce("remote_song_url#:".$value['id']);
-                //$data["songs"][$key]['pic'] = $value['pic'] . "&_nonce=".wp_create_nonce("remote_pic_url#:".$value['id']);
-                $data["songs"][$key]['lrc'] = $value['lrc'] . "&_nonce=".wp_create_nonce("remote_lyric#:".$value['id']);
-            }
-        } else {
-            foreach ($data["songs"] as $key => $value) {
-                //$data["songs"][$key]['url'] = $value['url'] . "&_nonce=".md5(NONCE_KEY."remote_song_url#:".$value['id'].NONCE_KEY);
-                //$data["songs"][$key]['pic'] = $value['pic'] . "&_nonce=".md5(NONCE_KEY."remote_pic_url#:".$value['id'].NONCE_KEY);
-                $data["songs"][$key]['lrc'] = $value['lrc'] . "&_nonce=".md5(NONCE_KEY."remote_lyric#:".$value['id'].NONCE_KEY);
-            }
-        }
-
-        return $data;
-    }
 }
