@@ -167,6 +167,21 @@ $catid = isset($_GET['catid']) && $_GET['catid'] ? $_GET['catid'] : null;
             <!-- 不对html转码 -->
             {{{ song_lrc_html }}}
         </div>
+	</script>
+
+	<!-- 批量移动部分 -->
+	<script id="hermit-move-cat-template" type="text/x-handlebars-template">
+    	<table class="form-table">
+        	<tbody>
+            	<td valign="top"><strong>分类</strong></td>
+            	<td valign="top">
+                	<select id="hermit-move-song_cat" name="song_cat">
+                    	{{#catOption catList song_cat}}{{/catOption}}
+                	</select>
+            	</td>
+            </tbody>
+        </table>
+    </script>
 
     <!-- 分类管理部分 -->
     <script id="hermit-manage-cat-template" type="text/x-handlebars-template">

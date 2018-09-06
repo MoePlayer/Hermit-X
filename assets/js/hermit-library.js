@@ -21,6 +21,12 @@ jQuery(document).ready(function ($) {
         tableSrc = $("#hermit-table-template").html(),
         tableTmpl = Handlebars.compile(tableSrc),
 
+        lrcSrc = $("#hermit-lrc-template").html(),
+        lrcTmpl = Handlebars.compile(lrcSrc),
+
+        catmovSrc = $("#hermit-move-cat-template").html(),
+        catmovTmpl = Handlebars.compile(catmovSrc),
+
         manageSrc = $("#hermit-manage-cat-template").html(),
         manageTmpl = Handlebars.compile(manageSrc),
 
@@ -66,7 +72,6 @@ jQuery(document).ready(function ($) {
         return html;
     });
 
-
     Handlebars.registerHelper('catCover', function (cover_url, name) {
         var html;
 
@@ -80,6 +85,7 @@ jQuery(document).ready(function ($) {
         var html;
 
         html = '<a href="javascript:" class="hermit-show-lrc" data-index="' + index +'">显示歌词</a>';
+
         return html;
     });
 
@@ -91,7 +97,6 @@ jQuery(document).ready(function ($) {
         } else {
             html = '<p>默认分类禁止编辑/删除</p>'
         }
-
 
         return html;
     });
@@ -557,7 +562,7 @@ jQuery(document).ready(function ($) {
     function move_cat(ids) {
         $.mxlayer({
             title: '选择目标分类',
-            main: manageTmpl(hermit),
+            main: catmovTmpl(hermit),
             button: '提交',
             width: 720,
             height: 220,
