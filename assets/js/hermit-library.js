@@ -21,6 +21,15 @@ jQuery(document).ready(function ($) {
         tableSrc = $("#hermit-table-template").html(),
         tableTmpl = Handlebars.compile(tableSrc),
 
+        lrcSrc = $("#hermit-lrc-template").html(),
+        lrcTmpl = Handlebars.compile(lrcSrc),
+
+        catmovSrc = $("#hermit-move-cat-template").html(),
+        catmovTmpl = Handlebars.compile(catmovSrc),
+
+        manageSrc = $("#hermit-manage-cat-template").html(),
+        manageTmpl = Handlebars.compile(manageSrc),
+
         $bodyLoader = $.mxloader('#wpwrap', true);
 
     Handlebars.registerHelper('catName', function (catid) {
@@ -63,6 +72,35 @@ jQuery(document).ready(function ($) {
         return html;
     });
 
+    Handlebars.registerHelper('catCover', function (cover_url, name) {
+        var html;
+
+        if (cover_url != "")html = '<img class="cover" src="' + cover_url +'" title="' + name +'" alt="图片加载失败">';
+        else html = '<p>没有封面图</p>'
+
+        return html;
+    });
+
+    Handlebars.registerHelper('catLrc', function (index) {
+        var html;
+
+        html = '<a href="javascript:" class="hermit-show-lrc" data-index="' + index +'">显示歌词</a>';
+
+        return html;
+    });
+
+    Handlebars.registerHelper('catAction', function (id) {
+        var html = '';
+
+        if (id !== '1') {
+            html = '<a href="javascript:;" class="hermit-cat-edit" data-id="' + id + '">编辑</a> | <a href="javascript:;" class="hermit-cat-delete" data-id="' + id + '">删除</a>';
+        } else {
+            html = '<p>默认分类禁止编辑/删除</p>'
+        }
+
+        return html;
+    });
+
     //上传mp3
     $('body').on('click', '#hermit-form-song_url-upload', function(){
         /**
@@ -86,6 +124,29 @@ jQuery(document).ready(function ($) {
         file_frame.open();
     });
 
+    //上传封面图片
+    $('body').on('click', '#hermit-form-song_cover-upload', function(){
+        /**
+         * 采用 3.5之后的新上传图片方法
+         * 不再支持3.5以下 Wordpress 版本
+         */
+
+            // Create the media frame.
+        var file_frame = wp.media.frames.file_frame = wp.media({
+                title: '上传本地图片（尽量用英文名称）',
+                multiple: false  // Set to true to allow multiple files to be selected
+            });
+
+        // When an image is selected, run a callback.
+        file_frame.on( 'select', function() {
+            var attachment = file_frame.state().get('selection').first().toJSON();
+            $('#hermit-form-song_cover').val(attachment.url);
+        });
+
+        // Finally, open the modal
+        file_frame.open();
+    });
+
     //新建音乐
     $('.add-new-h2').click(function () {
         var sobj = {
@@ -94,6 +155,25 @@ jQuery(document).ready(function ($) {
         };
 
         form(sobj)
+    });
+
+    //显示歌词
+    $('.hermit-list-table').on('click', '.hermit-show-lrc', function () {
+        var $this = $(this),
+            index = $this.attr('data-index'),
+            sobj = hermit.data[index],
+            main_html = lrcTmpl(sobj);
+
+        $.mxlayer({
+            title: sobj["song_name"],
+            main: main_html,
+            button: "关闭",
+            width: 720,
+            height: 720,
+            confirm: function (that) {
+                that.fireEvent();
+            }
+        })
     });
 
     //编辑
@@ -116,8 +196,8 @@ jQuery(document).ready(function ($) {
     });
 
     //选中删除
-    $('.hermit-delete-all').click(function() {
-        if ($(this).prev('.hermit-action-selector') == 'trash') {
+    $('.hermit-selector-button').click(function() {
+        if ($(this).prev('.hermit-action-selector').val() == 'trash') {
             var arr = [];
 
             $('.cb-select-th').each(function () {
@@ -131,10 +211,40 @@ jQuery(document).ready(function ($) {
             arr = arr.join(',');
             dele(arr)
         }
+        else if ($(this).prev('.hermit-action-selector').val() == 'movecat') {
+            var arr = [];
+
+            $('.cb-select-th').each(function () {
+                var $this = $(this);
+
+                if ($this.prop("checked")) {
+                    arr.push($this.val())
+                }
+            });
+
+            arr = arr.join(',');
+            move_cat(arr)
+        }
+    });
+
+    //管理分类
+    $('.hermit-list-table').on('click', '.hermit-manage-nav', function () {
+        $.mxlayer({
+            title: '分类管理',
+            main: manageTmpl(hermit),
+            button: '关闭',
+            width: 720,
+            height: 720,
+            cancel: function () {
+            },
+            confirm: function (that) {
+                that.fireEvent()
+            }
+        })
     });
 
     //新建分类
-    $('.hermit-list-table').on('click', '.hermit-new-nav', function () {
+    $('body').on('click', '.hermit-new-nav', function () {
         var title = window.prompt("新建分类","");
 
         if( title ){
@@ -150,6 +260,87 @@ jQuery(document).ready(function ($) {
                 success: function (data) {
                     hermit.catList = data;
                     $bodyLoader.showSuccess('新建分类成功');
+                    list({
+                        page: 1,
+                        catid: hermit.currentCatId
+                    }, function () {
+                        initView();
+                        $('.mxlayer-main-body').html(manageTmpl(hermit));
+                    });
+                },
+                error: function () {
+                    $bodyLoader.showError('分类已存在');
+                }
+            });
+        }
+    });
+
+    //删除分类
+    $('body').on('click', '.hermit-cat-delete', function () {
+        var $this = $(this),
+            id = $this.attr('data-id');
+
+        if ( id === '1' )return;
+
+        var cofim = window.confirm('确认删除?');
+
+        if (cofim) {
+            $bodyLoader.showProgress('删除分类中');
+
+            $.ajax({
+                url: hermit.adminUrl,
+                type: 'post',
+                data: {
+                    type: 'catdel',
+                    id: id
+                },
+                success: function (result) {
+                    hermit.catList = result;
+                    $bodyLoader.showSuccess('删除分类成功');
+                    list({
+                        page: 1,
+                        catid: hermit.currentCatId
+                    }, function () {
+                        initView();
+                        $('.mxlayer-main-body').html(manageTmpl(hermit));
+                    });
+                },
+                error: function () {
+                    $bodyLoader.showProgress('删除失败，请稍后重试。');
+                }
+            })
+        }
+    });
+
+    //编辑分类
+    $('body').on('click', '.hermit-cat-edit', function () {
+        var title = window.prompt("重命名分类",""),
+            $this = $(this),
+            id = $this.attr('data-id');
+
+        if ( id === '1' )return;
+
+        if( title ){
+            $bodyLoader.showProgress('重命名分类中');
+
+            $.ajax({
+                url: hermit.adminUrl,
+                data: {
+                    type: 'catupd',
+                    title: title,
+                    id: id
+                },
+                type: 'post',
+                success: function (data) {
+                    hermit.catList = data;
+                    $bodyLoader.showSuccess('重命名分类成功');
+                    list({
+                        page: 1,
+                        catid: hermit.currentCatId
+                    }, function () {
+                        initView();
+                        $('.mxlayer-main-body').html(manageTmpl(hermit));
+                    });
                 },
                 error: function () {
                     $bodyLoader.showError('分类已存在');
@@ -214,7 +405,8 @@ jQuery(document).ready(function ($) {
                                 lastPageText: '»', //最后页标题
                                 click: function (index) {
                                     list({
-                                        page: index
+                                        page: index,
+                                        catid: hermit.currentCatId
                                     })
                                 }
                             });
@@ -243,11 +435,11 @@ jQuery(document).ready(function ($) {
             main: main_html,
             button: msg.title,
             width: 720,
-            height: 540,
+            height: 720,
             cancel: function () {
             },
             confirm: function (that) {
-                var formKey = ['song_name', 'song_author', 'song_url', 'song_cat'],
+                var formKey = ['song_name', 'song_author', 'song_url', 'song_cat', 'song_cover', 'song_lrc'],
                     formObj = {};
 
                 $bodyLoader.showProgress('数据上传中');
@@ -258,8 +450,12 @@ jQuery(document).ready(function ($) {
                         val = $elem.val();
 
                     if (isEmpty(val)) {
-                        $bodyLoader.showError('请输入正确的信息。');
-                        return false;
+                        if (i < 4) {
+                            $bodyLoader.showError('请输入正确的信息。');
+                            return false;
+                        } else {
+                            val = '';
+                        }
                     }
 
                     formObj[_id] = val
@@ -323,6 +519,7 @@ jQuery(document).ready(function ($) {
                 if (callback) {
                     hermit.count = result.count;
                     hermit.maxPage = result.maxPage;
+                    hermit.catList = result.catList;
 
                     callback();
                 }
@@ -360,6 +557,46 @@ jQuery(document).ready(function ($) {
                 }
             })
         }
+    }
+
+    function move_cat(ids) {
+        $.mxlayer({
+            title: '选择目标分类',
+            main: catmovTmpl(hermit),
+            button: '提交',
+            width: 720,
+            height: 220,
+            cancel: function () {
+            },
+            confirm: function (that) {
+                $bodyLoader.showProgress('移动音乐中');
+                var data = {
+                    type: 'move',
+                    catid: $('#hermit-move-song_cat').val(),
+                    ids: ids
+                };
+                $.ajax({
+                    url: hermit.adminUrl,
+                    data: data,
+                    type: 'post',
+                    success: function (data) {
+                        $bodyLoader.showSuccess('移动成功');
+
+                        that.fireEvent();
+
+                        list({
+                            page: 1,
+                            catid: hermit.currentCatId
+                        }, function () {
+                            initView();
+                        });
+                    },
+                    error: function () {
+                        $bodyLoader.showError(msg.error);
+                    }
+                });
+            }
+        })
     }
 
     function isEmpty(str) {

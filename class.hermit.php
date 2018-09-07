@@ -245,12 +245,15 @@ class hermit
             switch ($scope) {
                     //本地音乐部分
                     case 'remote':
-                        $this->nonce_verify();
                         $result = array(
                             'status' => 200,
                             'msg' => $this->music_remote($id)
                         );
                         break;
+
+                    case 'remote_lyric':
+                        echo $this->remote_lrc($id);
+                        exit;
 
                     //默认路由
                     default:
@@ -369,10 +372,11 @@ class hermit
                 $catid = $catid ? $catid : null;
 
                 $data    = $this->music_list($paged, $catid);
-                $count   = intval($this->music_count());
+                $count   = intval($this->music_count($catid));
                 $maxPage = ceil($count / $prePage);
+                $catList = $this->music_catList();
 
-                $result = compact('data', 'paged', 'maxPage', 'count');
+                $result = compact('data', 'paged', 'maxPage', 'count', 'catList');
                 $this->success_response($result);
                 break;
 
@@ -392,6 +396,17 @@ class hermit
                     $data = $this->music_catList();
                     $this->success_response($data);
                 }
+                break;
+
+            case 'catupd':
+                $result = $this->cat_updata();
+                $this->success_response($result);
+                break;
+
+            case 'catdel':
+                $this->cat_delete();
+                $data = $this->music_catList();
+                $this->success_response($data);
                 break;
 
             default:
@@ -612,20 +627,35 @@ class hermit
 
     private function music_remote($ids)
     {
-        global $wpdb, $hermit_table_name;
+        global $wpdb, $hermit_table_name, $HMTJSON;
 
         $result = array();
-        $data   = $wpdb->get_results("SELECT id,song_name,song_author,song_url FROM {$hermit_table_name} WHERE id in ({$ids}) order by field(id, {$ids})");
+        $data   = $wpdb->get_results("SELECT id,song_name,song_author,song_url,song_cover FROM {$hermit_table_name} WHERE id in ({$ids}) order by field(id, {$ids})");
 
         foreach ($data as $key => $value) {
             $result['songs'][] = array(
+                "id" => $value->id,
                 "title" => $value->song_name,
                 "author" => $value->song_author,
                 "url" => $value->song_url,
-                "pic" => "",
-                "lrc" => ""
+                "pic" => $value->song_cover,
+                "lrc" => admin_url() . "admin-ajax.php" . "?action=hermit&scope=remote_lyric&id=" . $value->id
             );
         }
+
+        return $result;
+    }
+
+    /**
+     * 本地歌词
+     */
+    private function remote_lrc($id)
+    {
+        global $wpdb, $hermit_table_name;
+
+        $data   = $wpdb->get_results($wpdb->prepare("SELECT song_lrc FROM `$hermit_table_name` WHERE id = %d", $id));
+        if (count($data) < 0) $result = "";
+        else $result = $data[0]->song_lrc;
 
         return $result;
     }
@@ -645,10 +675,14 @@ class hermit
         $song_name   = stripslashes($this->post('song_name'));
         $song_author = stripslashes($this->post('song_author'));
         $song_url    = esc_attr(esc_html($this->post('song_url')));
+        $song_cover  = esc_attr(esc_html($this->post('song_cover')));
+        $song_lrc    = stripslashes($this->post('song_lrc'));
         $song_cat    = $this->post('song_cat');
         $created     = date('Y-m-d H:i:s');
 
-        $wpdb->insert($hermit_table_name, compact('song_name', 'song_author', 'song_url', 'song_cat', 'created'), array(
+        $wpdb->insert($hermit_table_name, compact('song_name', 'song_author', 'song_url', 'song_cover', 'song_lrc', 'song_cat', 'created'), array(
+            '%s',
+            '%s',
             '%s',
             '%s',
             '%s',
@@ -659,7 +693,7 @@ class hermit
 
         $song_cat_name = $this->music_cat($song_cat);
 
-        return compact('id', 'song_name', 'song_author', 'song_cat', 'song_cat_name', 'song_url');
+        return compact('id', 'song_name', 'song_author', 'song_cat', 'song_cat_name', 'song_url', 'song_cover', 'song_lrc');
     }
 
     /**
@@ -673,14 +707,18 @@ class hermit
         $song_name   = stripslashes($this->post('song_name'));
         $song_author = stripslashes($this->post('song_author'));
         $song_url    = esc_attr(esc_html($this->post('song_url')));
+        $song_cover  = esc_attr(esc_html($this->post('song_cover')));
+        $song_lrc    = stripslashes($this->post('song_lrc'));
         $song_cat    = $this->post('song_cat');
 
-        $wpdb->update($hermit_table_name, compact('song_name', 'song_author', 'song_cat', 'song_url'), array(
+        $wpdb->update($hermit_table_name, compact('song_name', 'song_author', 'song_cat', 'song_url', 'song_cover', 'song_lrc'), array(
             'id' => $id
         ), array(
             '%s',
             '%s',
             '%d',
+            '%s',
+            '%s',
             '%s'
         ), array(
             '%d'
@@ -688,7 +726,7 @@ class hermit
 
         $song_cat_name = $this->music_cat($song_cat);
 
-        return compact('id', 'song_name', 'song_author', 'song_cat', 'song_cat_name', 'song_url');
+        return compact('id', 'song_name', 'song_author', 'song_cat', 'song_cat_name', 'song_url', 'song_cover', 'song_lrc');
     }
 
     /**
@@ -732,12 +770,18 @@ class hermit
         $offset = ($paged - 1) * $limit;
 
         if ($catid) {
-            $query_str = "SELECT id,song_name,song_author,song_cat,song_url,created FROM {$hermit_table_name} WHERE `song_cat` = '{$catid}' ORDER BY `created` DESC LIMIT {$limit} OFFSET {$offset}";
+            $query_str = "SELECT id,song_name,song_author,song_cat,song_url,song_cover,song_lrc,created FROM {$hermit_table_name} WHERE `song_cat` = '{$catid}' ORDER BY `created` DESC LIMIT {$limit} OFFSET {$offset}";
         } else {
-            $query_str = "SELECT id,song_name,song_author,song_cat,song_url,created FROM {$hermit_table_name} ORDER BY `created` DESC LIMIT {$limit} OFFSET {$offset}";
+            $query_str = "SELECT id,song_name,song_author,song_cat,song_url,song_cover,song_lrc,created FROM {$hermit_table_name} ORDER BY `created` DESC LIMIT {$limit} OFFSET {$offset}";
         }
 
         $result = $wpdb->get_results($query_str);
+
+        // 将lrc转成html格式
+        for ($i = 0; $i < count($result); $i++) {
+            if ($result[$i]->song_lrc == "") $result[$i]->song_lrc_html = "没有歌词<br />";
+            else $result[$i]->song_lrc_html = str_replace("\n", "<br />", $result[$i]->song_lrc);
+        }
 
         return $result;
     }
@@ -815,6 +859,57 @@ class hermit
             'title' => $title,
             'count' => intval($this->music_count($new_cat_id))
         );
+    }
+
+    /**
+     * 删除本地分类
+     *
+     * @return boolean
+     */
+    private function cat_delete()
+    {
+        global $wpdb, $hermit_cat_name, $hermit_table_name;
+
+        $cat_id = $this->post('id');
+        if($cat_id == 1)return false;
+        $result = $wpdb->get_results($wpdb->prepare("SELECT id FROM `$hermit_table_name` WHERE song_cat = %d", $cat_id));
+        for ($i = 0; $i < count($result); $i++) {
+            $wpdb->update($hermit_table_name, array(
+                'song_cat' => 1
+            ), array(
+                'id' => $result[$i]->id
+            ), array(
+                '%d',
+            ), array(
+                '%d'
+            ));
+        }
+        $wpdb->delete($hermit_cat_name, array(
+            'id' => $cat_id
+        ));
+
+        return true;
+    }
+
+    /**
+     * 升级本地分类
+     */
+    private function cat_updata()
+    {
+        global $wpdb, $hermit_cat_name;
+
+        $id      = $this->post('id');
+        $title   = stripslashes($this->post('title'));
+
+        $wpdb->update($hermit_cat_name, compact('title'), array(
+            'id' => $id
+        ), array(
+            '%s'
+        ), array(
+            '%d'
+        ));
+
+        return compact('id', 'title');
     }
 
     /**

@@ -460,4 +460,5 @@ class HermitJson
         global $HMT;
         return $HMT->settings($key);
     }
+
 }

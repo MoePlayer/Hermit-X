@@ -16,8 +16,9 @@ $catid = isset($_GET['catid']) && $_GET['catid'] ? $_GET['catid'] : null;
 				<select name="action" class="hermit-action-selector">
 					<option value="no">批量操作</option>
 					<option value="trash">删除</option>
+                    <option value="movecat">移动分类至</option>
 				</select>
-				<button class="button action hermit-delete-all">应用</button>
+				<button class="button action hermit-selector-button">应用</button>
 			</div>
 			<div class="tablenav-pages">
 			</div>
@@ -25,10 +26,12 @@ $catid = isset($_GET['catid']) && $_GET['catid'] ? $_GET['catid'] : null;
 		<table class="wp-list-table widefat fixed striped posts">
 			<colgroup>
 				<col width="35"/>
-				<col width="10%" />
+                <col width="120"/>
 				<col width="120"/>
 				<col width="120"/>
-				<col width="60%"/>
+				<col width="120"/>
+				<col width="40%"/>
+                <col width="120"/>
 				<col width="120"/>
 			</colgroup>
 			<thead>
@@ -37,10 +40,12 @@ $catid = isset($_GET['catid']) && $_GET['catid'] ? $_GET['catid'] : null;
 						<label class="screen-reader-text" for="cb-select-all">全选</label>
 						<input id="cb-select-all" type="checkbox">
 					</td>
+                    <th scope="col" class="manage-column column-cover">封面</th>
 					<th scope="col" class="manage-column column-title">歌曲名称</th>
 					<th scope="col" class="manage-column column-author">作者</th>
 					<th scope="col" class="manage-column column-categories">分类</th>
 					<th scope="col" class="manage-column column-url">地址</th>
+                    <th scope="col" class="manage-column column-lrc">歌词</th>
 					<th scope="col" class="manage-column column-action">操作</th>
 				</tr>
 			</thead>
@@ -52,10 +57,12 @@ $catid = isset($_GET['catid']) && $_GET['catid'] ? $_GET['catid'] : null;
 						<label class="screen-reader-text" for="cb-select-all-1">全选</label>
 						<input id="cb-select-all" type="checkbox">
 					</td>
-					<th scope="col" class="manage-column column-title">名称</th>
+                    <th scope="col" class="manage-column column-cover">封面</th>
+					<th scope="col" class="manage-column column-title">歌曲名称</th>
 					<th scope="col" class="manage-column column-author">作者</th>
 					<th scope="col" class="manage-column column-categories">分类</th>
 					<th scope="col" class="manage-column column-url">地址</th>
+                    <th scope="col" class="manage-column column-lrc">歌词</th>
 					<th scope="col" class="manage-column column-action">操作</th>
 				</tr>
 			</tfoot>
@@ -66,8 +73,9 @@ $catid = isset($_GET['catid']) && $_GET['catid'] ? $_GET['catid'] : null;
 				<select name="action" class="hermit-action-selector">
 					<option value="no">批量操作</option>
 					<option value="trash">删除</option>
+                    <option value="movecat">移动分类至</option>
 				</select>
-				<button class="button action hermit-delete-all">应用</button>
+				<button class="button action hermit-selector-button">应用</button>
 			</div>
 			<div class="tablenav-pages">
 			</div>
@@ -90,6 +98,14 @@ $catid = isset($_GET['catid']) && $_GET['catid'] ? $_GET['catid'] : null;
 					<input type="text" id="hermit-form-song_author" name="song_author" value="{{song_author}}"/>
 				</td>
 			</tr>
+            <tr>
+                <td valign="top"><strong>分类</strong></td>
+                <td valign="top">
+                    <select id="hermit-form-song_cat" name="song_cat">
+                        {{#catOption catList song_cat}}{{/catOption}}
+                    </select>
+                </td>
+            </tr>
 			<tr>
 				<td valign="top"><strong>歌曲地址</strong></td>
 				<td valign="top">
@@ -97,14 +113,19 @@ $catid = isset($_GET['catid']) && $_GET['catid'] ? $_GET['catid'] : null;
 					<a href="javascript:;" id="hermit-form-song_url-upload" >上传或添加音乐</a> （本地音乐需要注意盗链）
 				</td>
 			</tr>
-			<tr>
-				<td valign="top"><strong>分类</strong></td>
-				<td valign="top">
-					<select id="hermit-form-song_cat" name="song_cat">
-						{{#catOption catList song_cat}}{{/catOption}}
-					</select>
-				</td>
-			</tr>
+            <tr>
+                <td valign="top"><strong>封面地址</strong></td>
+                <td valign="top">
+                    <textarea name="song_url" rows="3" id="hermit-form-song_cover" class="large-text code">{{song_cover}}</textarea><br />
+                    <a href="javascript:;" id="hermit-form-song_cover-upload" >上传或添加封面图片</a> （本地图片需要注意盗链）
+                </td>
+            </tr>
+            <tr>
+                <td valign="top"><strong>歌词</strong></td>
+                <td valign="top">
+                    <textarea name="song_url" rows="10" id="hermit-form-song_lrc" class="large-text code">{{song_lrc}}</textarea><br />
+                </td>
+            </tr>
 			</tbody>
 		</table>
 	</script>
@@ -112,7 +133,7 @@ $catid = isset($_GET['catid']) && $_GET['catid'] ? $_GET['catid'] : null;
 	<!-- 菜单模板 -->
 	<script id="hermit-nav-template" type="text/x-handlebars-template">
 		{{#catNav catList count}}{{/catNav}}
-		| <a href="javascript:;" class="hermit-new-nav">+ 新建分类</a>
+		| <a href="javascript:;" class="hermit-manage-nav">* 管理分类 *</a>
 	</script>
 
 	<!-- 翻页部分 -->
@@ -128,14 +149,67 @@ $catid = isset($_GET['catid']) && $_GET['catid'] ? $_GET['catid'] : null;
 					<label class="screen-reader-text" for="cb-select-th">选择</label>
 					<input class="cb-select-th" type="checkbox" value="{{id}}">
 				</th>
+                <td>{{#catCover song_cover song_name}}{{/catCover}}</td>
 				<td>{{song_name}}</td>
 				<td>{{song_author}}</td>
 				<td>{{#catName song_cat}}{{/catName}}</td>
 				<td>{{song_url}}</td>
+                <td>{{#catLrc @index}}{{/catLrc}}</td>
 				<td><a href="javascript:;" class="hermit-edit" data-index="{{@index}}">编辑</a> | <a href="javascript:;" class="hermit-delete" data-id="{{id}}">删除</a></td>
 			</tr>
 		{{/data}}
 	</script>
+
+
+    <!-- 歌词模板 -->
+    <script id="hermit-lrc-template" type="text/x-handlebars-template">
+        <div>
+            <!-- 不对html转码 -->
+            {{{ song_lrc_html }}}
+        </div>
+	</script>
+
+	<!-- 批量移动部分 -->
+	<script id="hermit-move-cat-template" type="text/x-handlebars-template">
+    	<table class="form-table">
+        	<tbody>
+            	<td valign="top"><strong>分类</strong></td>
+            	<td valign="top">
+                	<select id="hermit-move-song_cat" name="song_cat">
+                    	{{#catOption catList song_cat}}{{/catOption}}
+                	</select>
+            	</td>
+            </tbody>
+        </table>
+    </script>
+
+    <!-- 分类管理部分 -->
+    <script id="hermit-manage-cat-template" type="text/x-handlebars-template">
+        <div class="hermit-cat-list-table">
+            <a href="javascript:;" class="hermit-new-nav" style="font-size: 14px">+ 添加分类</a>
+            <table class="wp-cat-list-table widefat fixed striped posts">
+                <colgroup>
+                    <col width="50%"/>
+                    <col width="50%"/>
+                </colgroup>
+                <thead>
+                <tr>
+                    <th scope="col" class="manage-column column-cat-title">分类名称</th>
+                    <th scope="col" class="manage-column column-cat-action">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                    {{#catList}}
+                    <tr>
+                        <td>{{title}}</td>
+                        <td>{{#catAction id}}{{/catAction}}</td>
+                    </tr>
+                    {{/catList}}
+                </tbody>
+            </table>
+        </div>
+
+    </script>
 
 	<script>
 		var hermit = {
