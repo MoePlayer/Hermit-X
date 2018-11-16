@@ -374,15 +374,10 @@ class hermit
                 $data    = $this->music_list($paged, $catid);
                 $count   = intval($this->music_count()); // 歌曲总数
                 $catList = $this->music_catList();
-                $cat_count = -1 // 当前标签歌曲数
-                foreach($catList as $catInfo) {
-                    if (isset($catInfo['id']) && intval($catInfo['id']) == $catid) {
-                        $cat_count = intval($catInfo['count']);
-                        break;
-                    }
-                }
-                if ($cat_count < 0){
-                    $cat_count = intval($this->music_count($catid)) 
+                if ($catid == null) {
+                    $cat_count = $count;
+                } else {
+                    $cat_count = intval($this->music_count($catid));
                 }
                 $maxPage = ceil($cat_count / $prePage);
 
