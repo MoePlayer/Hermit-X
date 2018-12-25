@@ -17,66 +17,52 @@ class hermit
          **/
         add_action('admin_menu', array(
             $this,
-            'menu'
+            'menu',
         ));
         add_shortcode('hermit', array(
             $this,
-            'shortcode'
+            'shortcode',
         ));
         add_action('admin_init', array(
             $this,
-            'page_init'
+            'page_init',
         ));
         add_action('wp_enqueue_scripts', array(
             $this,
-            'hermit_scripts'
+            'hermit_scripts',
         ));
         add_filter('plugin_action_links', array(
             $this,
-            'plugin_action_link'
+            'plugin_action_link',
         ), 10, 4);
         add_action('wp_ajax_nopriv_hermit', array(
             $this,
-            'hermit_callback'
+            'hermit_callback',
         ));
         add_action('wp_ajax_hermit', array(
             $this,
-            'hermit_callback'
+            'hermit_callback',
         ));
         add_action('in_admin_footer', array(
             $this,
-            'music_footer'
+            'music_footer',
         ));
         add_action('wp_ajax_hermit_source', array(
             $this,
-            'hermit_source_callback'
+            'hermit_source_callback',
         ));
         add_action('wp_footer', array(
             $this,
-            'aplayer_init'
+            'aplayer_init',
         ));
         add_action('admin_enqueue_scripts', array(
             $this,
-            'cookies_pointer'
+            'cookies_pointer',
         ));
         add_action('wp_ajax_hermit_ignore_cookies_pointer', array(
             $this,
-            'ignore_cookies_pointer'
+            'ignore_cookies_pointer',
         ));
-
-        /**
-         ** 封面来源
-         */
-        if ($this->settings('albumSource')) {
-            add_action('wp_ajax_nopriv_hermit_album', array(
-                $this,
-                'hermit_album'
-            ));
-            add_action('wp_ajax_hermit_album', array(
-                $this,
-                'hermit_album'
-            ));
-        }
     }
 
     /**
@@ -107,7 +93,11 @@ class hermit
     {
         $this->_css('APlayer.min');
         $this->_js('APlayer.min', $this->settings('jsplace'));
-        $this->_js('hermit-load.min', 1);
+        if (!$this->settings('debug')) {
+            $this->_js('hermit-load.min', 1);
+        } else {
+            $this->_js('hermit-load', 1);
+        }
     }
 
     /**
@@ -148,10 +138,10 @@ class hermit
             default:
                 break;
         }
-        $atts["theme"]       = $color;
-        $atts["songs"]       = $content;
+        $atts["theme"] = $color;
+        $atts["songs"] = $content;
         if ($this->settings('listFolded') == 1) {
-            $atts["listfolded"]  = 'true';
+            $atts["listfolded"] = 'true';
         }
 
         $atts["mode"] = strtolower($atts["mode"]);
@@ -177,14 +167,14 @@ class hermit
 
         unset($atts["mode"]);
 
-        $atts["_nonce"]      = $this->settings('low_security') ? md5(NONCE_KEY.$content.NONCE_KEY) : wp_create_nonce($content);
+        $atts["_nonce"] = $this->settings('low_security') ? md5(NONCE_KEY . $content . NONCE_KEY) : wp_create_nonce($content);
 
         $playlist_max_height = $this->settings('playlist_max_height');
         if ($playlist_max_height != 0 && empty($atts["listmaxheight"])) {
             $atts["listmaxheight"] = $playlist_max_height . "px";
         }
 
-        $keys   = array_keys($atts);
+        $keys = array_keys($atts);
         $apatts = "";
         foreach ($keys as $value) {
             if ($value == "auto") {
@@ -210,19 +200,27 @@ class hermit
 
     public function nonce_verify()
     {
-        if (!$this->settings('low_security')) {
-            $result = wp_verify_nonce($_GET['_nonce'], $_GET['scope'].'#:'.$_GET['id']);
+        if (!isset($_GET['musicset'])) {
+            if (!$this->settings('low_security')) {
+                $result = wp_verify_nonce($_GET['_nonce'], $_GET['scope'] . '#:' . $_GET['id']);
+            } else {
+                $result = md5(NONCE_KEY . $_GET['scope'] . '#:' . $_GET['id'] . NONCE_KEY) === $_GET['_nonce'];
+            }
         } else {
-            $result = md5(NONCE_KEY.$_GET['scope'].'#:'.$_GET['id'].NONCE_KEY) === $_GET['_nonce'];
+            if (!$this->settings('low_security')) {
+                $result = wp_verify_nonce($_GET['_nonce'], $_GET['musicset']);
+            } else {
+                $result = md5(NONCE_KEY . $_GET['musicset'] . NONCE_KEY) === $_GET['_nonce'];
+            }
         }
 
         if (!$result) {
-            header('HTTP/1.0 401 Unauthorized');
+            http_response_code(401);
             header('Content-type: application/json;charset=UTF-8');
             $result = array(
-                    'status' => 401,
-                    'msg' => $result,
-                );
+                'status' => 401,
+                'msg' => $result,
+            );
             die(json_encode($result));
         }
         return true;
@@ -232,104 +230,120 @@ class hermit
      */
     public function hermit_callback()
     {
-        global $HMTJSON;
-
         if (!empty($_SERVER["HTTP_REFERER"])) {
             $referer = parse_url($_SERVER["HTTP_REFERER"]);
             $host = strtolower($referer['host']);
         }
         if (empty($_SERVER["HTTP_REFERER"]) || $host === parse_url(home_url())['host']) {
-            $scope = $_GET['scope'];
-            $id    = $_GET['id'];
-
-            switch ($scope) {
-                    //本地音乐部分
-                    case 'remote':
-                        $this->nonce_verify();
-                        $result = array(
-                            'status' => 200,
-                            'msg' => $this->music_remote($id)
-                        );
-                        break;
-
-                    //默认路由
-                    default:
-                    $re = '/^(?<site>(netease|xiami|tencent|kugou|baidu)?)_?(?<scope>songs|songlist|album|playlist|collect|artist|song_url|lyric|id_parse)$/i';
-                    preg_match($re, $scope, $matches);
-                        if (!empty($matches['scope'])) {
-                            $scope = $matches['scope'];
-                            if (empty($matches['site'])) {
-                                $site = 'xiami';
-                            } else {
-                                $site = $matches['site'];
-                            }
-                            if ($scope === 'songs') {
-                                $scope = 'songlist';
-                            } elseif ($scope === 'collect') {
-                                $scope = 'playlist';
-                            }
-                            if (method_exists($HMTJSON, $scope)) {
-                                // if ($scope === 'pic_url') {
-                                //     $this->nonce_verify();
-                                //     $result = array(
-                                //         'status' => 200,
-                                //         'msg' => $HMTJSON->$scope($site, $id, $_GET['picid'])
-                                //     );
-                                //}
-                                if ($scope === 'id_parse') {
-                                    $result = array(
-                                        'status' => 200,
-                                        'msg' => $HMTJSON->$scope($site, explode(',', $_GET['src']))
-                                    );
-                                } elseif ($scope === 'lyric') {
-                                    $this->nonce_verify();
-                                    echo $HMTJSON->$scope($site, $_GET['id']);
-                                    exit;
-                                } else {
-                                    $this->nonce_verify();
-                                    $result = array(
-                                        'status' => 200,
-                                        'order' => $_GET['i'],
-                                        'msg' => $HMTJSON->$scope($site, $id)
-                                    );
-                                }
-                            } else {
-                                $result = array(
-                                    'status' => 400,
-                                    'msg' => null
-                                );
-                            }
-                        } else {
-                            $result = array(
-                                'status' => 400,
-                                'msg' => null
-                            );
-                        }
+            if (!isset($_GET['musicset'])) {
+                $this->hermit_route($_GET["scope"], $_GET["id"]);
+            } else {
+                $this->nonce_verify();
+                $result = array(
+                    'status' => 200,
+                    'msg' => array( 'songs' => [], ),
+                );
+                $musicSet = explode(";", $_GET["musicset"]);
+                foreach ($musicSet as $key => $music) {
+                    $musicInfo = explode("#:", $music);
+                    $currentResult = $this->hermit_route($musicInfo[0], $musicInfo[1])["msg"]["songs"];
+                    if (count($currentResult) < 1) {
+                        continue;
+                    }
+                    $result["msg"]["songs"] = array_merge($result["msg"]["songs"], $currentResult);
                 }
+            }
         } else {
             $result = array(
-                    'status' => 401,
-                    'msg' => null
-                );
+                'status' => 401,
+                'msg' => null,
+            );
         }
-
-
 
         //输出 JSON
         header('Content-type: application/json;charset=UTF-8');
         exit(json_encode($result));
     }
 
-    /**
-     * 输出https下图片格式
-     */
-    public function hermit_album()
+    private function hermit_route($scope, $id)
     {
-        $url     = $this->get('s');
-        $imgdata = file_get_contents($url);
+        global $HMTJSON;
+        switch ($scope) {
+            //本地音乐部分
+            case 'remote':
+                $this->nonce_verify();
+                $result = array(
+                    'status' => 200,
+                    'msg' => $this->music_remote($id),
+                );
+                break;
 
-        header("Content-Type:image/jpg");
-        exit($imgdata);
+            //默认路由
+            default:
+                $re = '/^(?<site>(netease|xiami|tencent|kugou|baidu)?)_?(?<scope>songs|songlist|album|playlist|collect|artist|song_url|lyric|id_parse)$/i';
+                preg_match($re, $scope, $matches);
+                if (!empty($matches['scope'])) {
+                    $scope = $matches['scope'];
+                    if (empty($matches['site'])) {
+                        $site = 'xiami';
+                    } else {
+                        $site = $matches['site'];
+                    }
+                    if ($scope === 'songs') {
+                        $scope = 'songlist';
+                    } elseif ($scope === 'collect') {
+                        $scope = 'playlist';
+                    }
+                    
+                    if (method_exists($HMTJSON, $scope)) {
+                        // if ($scope === 'pic_url') {
+                        //     $this->nonce_verify();
+                        //     $result = array(
+                        //         'status' => 200,
+                        //         'msg' => $HMTJSON->$scope($site, $id, $_GET['picid'])
+                        //     );
+                        //}
+                        if ($scope === 'id_parse') {
+                            if (array_intersect($this->settings('roles'), wp_get_current_user()->roles)){
+                                $result = array(
+                                    'status' => 200,
+                                    'msg' => $HMTJSON->$scope($site, explode(',', $_GET['src'])),
+                                );
+                            } else {
+                                $result = array(
+                                    'status' => 401,
+                                    'msg' => false,
+                                );
+                            }
+                        } elseif ($scope === 'lyric') {
+                            $this->nonce_verify();
+                            echo $HMTJSON->$scope($site, $_GET['id']);
+                            exit;
+                        } else {
+                            if (!isset($_GET['musicset'])){
+                                $this->nonce_verify();
+                            }
+
+                            $result = array(
+                                'status' => 200,
+                                'msg' => $HMTJSON->$scope($site, $id),
+                            );
+                        }
+                    } else {
+                        $result = array(
+                            'status' => 400,
+                            'msg' => null,
+                        );
+                    }
+                } else {
+                    $result = array(
+                        'status' => 400,
+                        'msg' => null,
+                    );
+                }
+        }
+
+        return $result;
     }
 
     /**
@@ -362,14 +376,14 @@ class hermit
                 break;
 
             case 'list':
-                $paged   = intval($this->get('paged'));
-                $catid   = $this->get('catid');
+                $paged = intval($this->get('paged'));
+                $catid = $this->get('catid');
                 $prePage = $this->settings('prePage');
 
                 $catid = $catid ? $catid : null;
 
-                $data    = $this->music_list($paged, $catid);
-                $count   = intval($this->music_count());
+                $data = $this->music_list($paged, $catid);
+                $count = intval($this->music_count());
                 $maxPage = ceil($count / $prePage);
 
                 $result = compact('data', 'paged', 'maxPage', 'count');
@@ -408,13 +422,13 @@ class hermit
         global $pagenow;
 
         $allowed_roles = $this->settings('roles');
-        $user          = wp_get_current_user();
+        $user = wp_get_current_user();
 
         if (array_intersect($allowed_roles, $user->roles)) {
             if ($pagenow == "post-new.php" || $pagenow == "post.php") {
                 add_action('media_buttons_context', array(
                     $this,
-                    'custom_button'
+                    'custom_button',
                 ));
 
                 $this->_css('hermit-post');
@@ -422,15 +436,15 @@ class hermit
                 $this->_js('hermit-post');
 
                 $prePage = $this->settings('prePage');
-                $count   = $this->music_count();
+                $count = $this->music_count();
                 $maxPage = ceil($count / $prePage);
-                $roles   = $user->roles;
+                $roles = $user->roles;
 
                 wp_localize_script('hermit-post', 'hermit', array(
                     "ajax_url" => admin_url() . "admin-ajax.php",
                     "max_page" => $maxPage,
                     "roles" => $roles,
-                    "plugin_url" => HERMIT_URL
+                    "plugin_url" => HERMIT_URL,
                 ));
             }
 
@@ -451,20 +465,20 @@ class hermit
     {
         add_menu_page('Hermit X 播放器', 'Hermit X 播放器', 'manage_options', 'hermit', array(
             $this,
-            'library'
+            'library',
         ), HERMIT_URL . '/assets/images/logo.png');
         add_submenu_page('hermit', '音乐库', '音乐库', 'manage_options', 'hermit', array(
             $this,
-            'library'
+            'library',
         ));
         add_submenu_page('hermit', '设置', '设置', 'manage_options', 'hermit-setting', array(
             $this,
-            'setting'
+            'setting',
         ));
 
         add_action('admin_init', array(
             $this,
-            'hermit_setting'
+            'hermit_setting',
         ));
     }
 
@@ -473,7 +487,7 @@ class hermit
      */
     public function library()
     {
-        @require_once('include/library.php');
+        @require_once 'include/library.php';
     }
 
     /**
@@ -481,9 +495,8 @@ class hermit
      */
     public function setting()
     {
-        @require_once('include/setting.php');
+        @require_once 'include/setting.php';
     }
-
 
     /**
      * 注册设置数组
@@ -500,9 +513,9 @@ class hermit
     {
         if (strpos($plugin_file, 'hermit') !== false && is_plugin_active($plugin_file)) {
             $_actions = array(
-                'option' => '<a href="' . HERMIT_ADMIN_URL . 'admin.php?page=hermit">音乐库</a>'
+                'option' => '<a href="' . HERMIT_ADMIN_URL . 'admin.php?page=hermit">音乐库</a>',
             );
-            $actions  = array_merge($_actions, $actions);
+            $actions = array_merge($_actions, $actions);
         }
 
         return $actions;
@@ -515,7 +528,7 @@ class hermit
     {
         global $pagenow;
         if ($pagenow == "post-new.php" || $pagenow == "post.php") {
-            @require_once('include/template.php');
+            @require_once 'include/template.php';
         }
     }
 
@@ -537,12 +550,11 @@ class hermit
             'prePage' => 20,
             'remainTime' => 10,
             'roles' => array(
-                'administrator'
+                'administrator',
             ),
-            'albumSource' => 0,
-            'debug' => 0,
+            'debug' => WP_DEBUG,
             'color_customize' => '#5895be',
-            'netease_cookies'=> '',
+            'netease_cookies' => '',
             'low_security' => 0,
             'globalPlayer' => 0,
             'listFolded' => 0,
@@ -569,11 +581,11 @@ class hermit
         wp_enqueue_script('wp-pointer');
 
         $filename = HERMIT_PATH . '/include/cookies-pointer.php';
-        $callback = require($filename);
+        $callback = require $filename;
 
         $ignore = add_query_arg(array(
-            'action'   => 'hermit_ignore_cookies_pointer',
-            '_wpnonce' => wp_create_nonce('hermit-ignore-cookies-pointer')
+            'action' => 'hermit_ignore_cookies_pointer',
+            '_wpnonce' => wp_create_nonce('hermit-ignore-cookies-pointer'),
         ), admin_url('admin-ajax.php'));
 
         ob_start();
@@ -596,7 +608,7 @@ class hermit
             return;
         }
 
-        $user_id     = get_current_user_id();
+        $user_id = get_current_user_id();
         $dismissed[] = 'hermit-cookies-setting';
 
         if (update_user_meta($user_id, 'dismissed_wp_pointers', implode(',', $dismissed))) {
@@ -615,7 +627,7 @@ class hermit
         global $wpdb, $hermit_table_name;
 
         $result = array();
-        $data   = $wpdb->get_results("SELECT id,song_name,song_author,song_url FROM {$hermit_table_name} WHERE id in ({$ids}) order by field(id, {$ids})");
+        $data = $wpdb->get_results("SELECT id,song_name,song_author,song_url FROM {$hermit_table_name} WHERE id in ({$ids}) order by field(id, {$ids})");
 
         foreach ($data as $key => $value) {
             $result['songs'][] = array(
@@ -623,7 +635,7 @@ class hermit
                 "author" => $value->song_author,
                 "url" => $value->song_url,
                 "pic" => "",
-                "lrc" => ""
+                "lrc" => "",
             );
         }
 
@@ -642,18 +654,18 @@ class hermit
     {
         global $wpdb, $hermit_table_name;
 
-        $song_name   = stripslashes($this->post('song_name'));
+        $song_name = stripslashes($this->post('song_name'));
         $song_author = stripslashes($this->post('song_author'));
-        $song_url    = esc_attr(esc_html($this->post('song_url')));
-        $song_cat    = $this->post('song_cat');
-        $created     = date('Y-m-d H:i:s');
+        $song_url = esc_attr(esc_html($this->post('song_url')));
+        $song_cat = $this->post('song_cat');
+        $created = date('Y-m-d H:i:s');
 
         $wpdb->insert($hermit_table_name, compact('song_name', 'song_author', 'song_url', 'song_cat', 'created'), array(
             '%s',
             '%s',
             '%s',
             '%d',
-            '%s'
+            '%s',
         ));
         $id = $wpdb->insert_id;
 
@@ -669,21 +681,21 @@ class hermit
     {
         global $wpdb, $hermit_table_name;
 
-        $id          = $this->post('id');
-        $song_name   = stripslashes($this->post('song_name'));
+        $id = $this->post('id');
+        $song_name = stripslashes($this->post('song_name'));
         $song_author = stripslashes($this->post('song_author'));
-        $song_url    = esc_attr(esc_html($this->post('song_url')));
-        $song_cat    = $this->post('song_cat');
+        $song_url = esc_attr(esc_html($this->post('song_url')));
+        $song_cat = $this->post('song_cat');
 
         $wpdb->update($hermit_table_name, compact('song_name', 'song_author', 'song_cat', 'song_url'), array(
-            'id' => $id
+            'id' => $id,
         ), array(
             '%s',
             '%s',
             '%d',
-            '%s'
+            '%s',
         ), array(
-            '%d'
+            '%d',
         ));
 
         $song_cat_name = $this->music_cat($song_cat);
@@ -710,7 +722,7 @@ class hermit
     {
         global $wpdb, $hermit_table_name;
 
-        $ids   = $this->post('ids');
+        $ids = $this->post('ids');
         $catid = $this->post('catid');
 
         $wpdb->query("UPDATE {$hermit_table_name} SET song_cat = {$catid} WHERE id IN ({$ids})");
@@ -728,7 +740,7 @@ class hermit
     {
         global $wpdb, $hermit_table_name;
 
-        $limit  = $this->settings('prePage');
+        $limit = $this->settings('prePage');
         $offset = ($paged - 1) * $limit;
 
         if ($catid) {
@@ -752,7 +764,7 @@ class hermit
         global $wpdb, $hermit_cat_name;
 
         $query_str = "SELECT id,title FROM {$hermit_cat_name}";
-        $result    = $wpdb->get_results($query_str);
+        $result = $wpdb->get_results($query_str);
 
         if (!empty($result)) {
             foreach ($result as $key => $val) {
@@ -805,7 +817,7 @@ class hermit
         $title = stripslashes($title);
 
         $wpdb->insert($hermit_cat_name, compact('title'), array(
-            '%s'
+            '%s',
         ));
 
         $new_cat_id = $wpdb->insert_id;
@@ -813,7 +825,7 @@ class hermit
         return array(
             'id' => $new_cat_id,
             'title' => $title,
-            'count' => intval($this->music_count($new_cat_id))
+            'count' => intval($this->music_count($new_cat_id)),
         );
     }
 
@@ -908,9 +920,16 @@ class hermit
 
     public function aplayer_init()
     {
-        wp_localize_script('hermit-load.min', 'HermitX', array(
-            'ajaxurl' => admin_url('admin-ajax.php'),
-            'version' => HERMIT_VERSION,
-        ));
+        if (!$this->settings('debug')) {
+            wp_localize_script('hermit-load.min', 'HermitX', array(
+                'ajaxurl' => admin_url('admin-ajax.php'),
+                'version' => HERMIT_VERSION,
+            ));
+        } else {
+            wp_localize_script('hermit-load', 'HermitX', array(
+                'ajaxurl' => admin_url('admin-ajax.php'),
+                'version' => HERMIT_VERSION,
+            ));
+        }
     }
 }

@@ -80,8 +80,7 @@ function hermitInit() {
                     }
                 }
             };
-            var scope = option[i].songs.split("#:");
-            var apiurl = HermitX.ajaxurl + "?action=hermit&scope=" + option[i].songs.split("#:")[0] + "&id=" + option[i].songs.split("#:")[1] + "&_nonce=" + option[i]._nonce;
+            const apiurl = HermitX.ajaxurl + "?action=hermit&musicset=" + escape(option[i].songs) + "&_nonce=" + option[i]._nonce;
             xhr[i].open("get", apiurl, true);
             xhr[i].send(null);
         }
