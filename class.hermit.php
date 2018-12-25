@@ -277,6 +277,9 @@ class hermit
                     'msg' => $this->music_remote($id),
                 );
                 break;
+            case 'remote_lyric':
+                echo $this->remote_lrc($id);
+                exit;
 
             //默认路由
             default:
@@ -643,6 +646,12 @@ class hermit
     {
         global $wpdb, $hermit_table_name, $HMTJSON;
 
+        $key = "/remote/song/$ids";
+        $cache = $HMTJSON->get_cache($key);
+        if(!empty($cache)){
+            return $cache;
+        }
+
         $result = array();
         $data   = $wpdb->get_results("SELECT id,song_name,song_author,song_url,song_cover FROM {$hermit_table_name} WHERE id in ({$ids}) order by field(id, {$ids})");
 
@@ -657,6 +666,7 @@ class hermit
             );
         }
 
+        $HMTJSON->set_cache($key, $result, 128);
         return $result;
     }
 
@@ -665,12 +675,21 @@ class hermit
      */
     private function remote_lrc($id)
     {
+        global $HMTJSON;
+
+        $key = "/remote/lyric/$id";
+        $cache = $HMTJSON->get_cache($key);
+        if(!empty($cache)){
+            return $cache;
+        }
+        
         global $wpdb, $hermit_table_name;
 
         $data   = $wpdb->get_results($wpdb->prepare("SELECT song_lrc FROM `$hermit_table_name` WHERE id = %d", $id));
         if (count($data) < 0) $result = "";
         else $result = $data[0]->song_lrc;
 
+        $HMTJSON->set_cache($key, $result, 128);
         return $result;
     }
 
@@ -740,6 +759,8 @@ class hermit
 
         $song_cat_name = $this->music_cat($song_cat);
 
+        delete_transient("/remote/lyric/$id");
+        delete_transient("/remote/song/$id");
         return compact('id', 'song_name', 'song_author', 'song_cat', 'song_cat_name', 'song_url', 'song_cover', 'song_lrc');
     }
 
