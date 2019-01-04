@@ -572,13 +572,14 @@ class hermit
             'roles' => array(
                 'administrator',
             ),
-            'debug' => WP_DEBUG,
+            'debug' => false,
             'color_customize' => '#5895be',
             'netease_cookies' => '',
             'low_security' => 0,
             'globalPlayer' => 0,
             'listFolded' => 0,
             'proxy' => '',
+            'assetsPublicCDN' => 1,
         );
 
         $settings = $this->_settings;
@@ -974,8 +975,14 @@ class hermit
     {
         $css_arr = explode(',', $css_str);
 
+        if ($this->settings("assetsPublicCDN") && !is_admin()) {
+            $hermitAssetsUrl = 'https://cdn.jsdelivr.net/gh/moeplayer/hermit-x@' . HERMIT_VERSION;
+        } else {
+            $hermitAssetsUrl = HERMIT_URL;
+        }
+
         foreach ($css_arr as $key => $val) {
-            $css_path = sprintf('%s/assets/css/%s.css', HERMIT_URL, $val);
+            $css_path = sprintf('%s/assets/css/%s.css', $hermitAssetsUrl, $val);
             wp_enqueue_style($val, $css_path, false, HERMIT_VERSION);
         }
     }
@@ -984,8 +991,14 @@ class hermit
     {
         $js_arr = explode(',', $js_str);
 
+        if ($this->settings("assetsPublicCDN") && !is_admin()) {
+            $hermitAssetsUrl = 'https://cdn.jsdelivr.net/gh/moeplayer/hermit-x@' . HERMIT_VERSION;
+        } else {
+            $hermitAssetsUrl = HERMIT_URL;
+        }
+
         foreach ($js_arr as $key => $val) {
-            $js_path = sprintf('%s/assets/js/lib/%s.js', HERMIT_URL, $val);
+            $js_path = sprintf('%s/assets/js/lib/%s.js', $hermitAssetsUrl, $val);
             wp_enqueue_script($val, $js_path, false, HERMIT_VERSION, $js_place);
         }
     }
@@ -994,8 +1007,14 @@ class hermit
     {
         $js_arr = explode(',', $js_str);
 
+        if ($this->settings("assetsPublicCDN") && !is_admin()) {
+            $hermitAssetsUrl = 'https://cdn.jsdelivr.net/gh/moeplayer/hermit-x@' . HERMIT_VERSION;
+        } else {
+            $hermitAssetsUrl = HERMIT_URL;
+        }
+
         foreach ($js_arr as $key => $val) {
-            $js_path = sprintf('%s/assets/js/%s.js', HERMIT_URL, $val);
+            $js_path = sprintf('%s/assets/js/%s.js', $hermitAssetsUrl, $val);
             wp_enqueue_script($val, $js_path, false, HERMIT_VERSION, $js_place);
         }
     }

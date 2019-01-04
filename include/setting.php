@@ -172,6 +172,19 @@
 					<p class="description">限制播放列表的最大高度，0为不限制。</p>
 				</td>
 			</tr>
+			<tr valign="top">
+				<th scope="row"><label>前台公共 CDN</label></th>
+				<td>
+					<input type='hidden' name='hermit_setting[assetsPublicCDN]' value='0' />
+					<p><label><input type="checkbox" name="hermit_setting[assetsPublicCDN]"
+					          value="1" <?php if ($this->settings('assetsPublicCDN') == 1) {
+                        echo 'checked="checked"';
+                    } ?>/>
+						<span>启用公共 CDN</span></label></p>
+
+					<p class="description">在前台使用 <a href="https://www.jsdelivr.com/" target="_blank" rel="noopener">jsDelivr</a> 加载 JS、CSS 等资源文件，提升访问速度。 </p>
+				</td>
+			</tr>
 			<tr>
 				<th scope="row"><label>新建权限</label></th>
 				<td>
