@@ -96,5 +96,5 @@ function reloadHermit() {
     hermitInit();
 }
 var ap = [];
-document.addEventListener("DOMContentLoaded", hermitInit);
+document.addEventListener("DOMContentLoaded", reloadHermit);
 console.log("\n %c Hermit X Music Helper v" + HermitX.version + " %c https://lwl.moe/HermitX \n", "color: #fff; background: #4285f4; padding:5px 0;", "background: #66CCFF; padding:5px 0;");
