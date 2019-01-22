@@ -433,19 +433,19 @@ class HermitJson
 
     public function get_cache($key)
     {
-        $cache = get_transient($key);
+        $cache = wp_cache_get( $key, 'hermitx' );
         return $cache === false ? false : json_decode($cache, true);
     }
 
     public function set_cache($key, $value, $hour = 0.1)
     {
         $value = json_encode($value);
-        set_transient($key, $value, 60 * 60 * $hour);
+        wp_cache_set( $key, $value, 'hermitx', 60 * 60 * $hour );
     }
 
     public function clear_cache($key)
     {
-        //delete_transient($key);
+        //wp_cache_delete($key, 'hermitx');
     }
 
     /**
