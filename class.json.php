@@ -46,8 +46,11 @@ class HermitJson
             $url = str_replace('http://m7.', 'https://m7.', $url);
             $url = str_replace('http://m10', 'https://m10', $url);
         }
-        if ($site === "xiami" || $site === 'tencent') {
+        if ($site === "xiami") {
             $url = str_replace('http://', 'https://', $url);
+        }
+        if ($site === 'tencent') {
+            $url = str_replace('http://ws.stream.qqmusic.qq.com', 'https://dl.stream.qqmusic.qq.com', $url);
         }
         if ($site === 'baidu') {
             $url = str_replace('http://zhangmenshiting.qianqian.com', 'https://gss3.baidu.com/y0s1hSulBw92lNKgpU_Z2jR7b2w6buu', $url);
