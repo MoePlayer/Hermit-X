@@ -63,6 +63,10 @@ class hermit
             $this,
             'ignore_cookies_pointer',
         ));
+        add_action('enqueue_block_editor_assets', array(
+            $this,
+            'hermitx_editor_assets'
+        ));
     }
 
     /**
@@ -1068,5 +1072,18 @@ class hermit
                 'version' => HERMIT_VERSION,
             ));
         }
+    }
+
+    /**
+     * 加载 Gutenberg 区块
+     */
+    public function hermitx_editor_assets()
+    {
+        wp_enqueue_script(
+            'hermitx-block-js',
+            HERMIT_URL . '/assets/js/blocks.build.js',
+            array('wp-blocks', 'wp-i18n', 'wp-element', 'wp-editor'),
+            true
+        );
     }
 }
